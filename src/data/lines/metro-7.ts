@@ -216,49 +216,56 @@ export const metroLine7: MetroLineData = {
       coordinates: { lat: 48.81012995727394, lng: 2.362263387127349 }
     },
     {
-      order: 35,
+      order: 37,
       name: "Villejuif - Louis Aragon",
       shortName: undefined,
       connections: [],
       coordinates: { lat: 48.78756279294567, lng: 2.367804105603498 }
     },
     {
-      order: 36,
+      order: 35,
       name: "Villejuif - Léo Lagrange",
       shortName: undefined,
       connections: [],
       coordinates: { lat: 48.80468812091137, lng: 2.3639531966021656 }
     },
     {
-      order: 38,
+      order: 36,
       name: "Villejuif Paul Vaillant-Couturier",
       shortName: "Hôpital Paul Brousse",
       connections: [],
       coordinates: { lat: 48.79648308455054, lng: 2.3682695400496945 }
     },
     {
-      order: 41,
+      order: 38,
+      name: "Porte d'Italie",
+      shortName: undefined,
+      connections: [],
+      coordinates: { lat: 48.79648308455054, lng: 2.3682695400496945 }
+    },
+    {
+      order: 40,
       name: "Porte d'Ivry",
       shortName: undefined,
       connections: ["T3A"],
       coordinates: { lat: 48.82135578381409, lng: 2.3692905873460295 }
     },
     {
-      order: 42,
+      order: 39,
       name: "Porte de Choisy",
       shortName: undefined,
       connections: ["T3A", "T9"],
       coordinates: { lat: 48.81987622105712, lng: 2.364531953109201 }
     },
     {
-      order: 44,
+      order: 41,
       name: "Pierre et Marie Curie",
       shortName: undefined,
       connections: [],
       coordinates: { lat: 48.815930763056315, lng: 2.3772672015137393 }
     },
     {
-      order: 45,
+      order: 42,
       name: "Mairie d'Ivry",
       shortName: undefined,
       connections: [],

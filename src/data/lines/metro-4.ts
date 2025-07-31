@@ -86,7 +86,7 @@ export const metroLine4: MetroLineData = {
       order: 12,
       name: "Les Halles",
       shortName: undefined,
-      connections: [],
+      connections: ["A", "B", "D"],
       coordinates: { lat: 48.86251523497548, lng: 2.345785860039181 }
     },
     {

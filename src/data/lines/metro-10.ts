@@ -135,7 +135,7 @@ export const metroLine10: MetroLineData = {
       order: 21,
       name: "Cluny-La Sorbonne",
       shortName: undefined,
-      connections: [],
+      connections: ["4", "B", "C"],
       coordinates: { lat: 48.851050282314304, lng: 2.3442733454213514 }
     },
     {
