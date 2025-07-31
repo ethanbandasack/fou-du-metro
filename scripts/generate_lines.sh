@@ -84,7 +84,7 @@ generate_line_file() {
     
     # Start generating TypeScript file
     cat > "$OUTPUT_DIR/$filename" << EOF
-import { MetroLineData } from './types';
+import { MetroLineData } from '../src/data/lines/types';
 
 export const $varname: MetroLineData = {
   line: "$line",
