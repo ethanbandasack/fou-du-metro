@@ -1,0 +1,124 @@
+id,name,line,lineColor,zone,connections,nextStations,previousStations
+1-01,Château de Vincennes,1,#FFCD00,1,,Bérault,
+1-02,Bérault,1,#FFCD00,1,,Saint-Mandé,Château de Vincennes
+1-03,Saint-Mandé,1,#FFCD00,1,,Vincennes,Bérault
+1-04,Vincennes,1,#FFCD00,2,,Nation,Saint-Mandé
+1-05,Nation,1,#FFCD00,1,"2,6,9,RER A",République,Vincennes
+1-06,République,1,#FFCD00,1,"3,5,8,9,11",Bastille,Nation
+1-07,Bastille,1,#FFCD00,1,"5,8",Hôtel de Ville,République
+1-08,Hôtel de Ville,1,#FFCD00,1,"4,11",Châtelet,Bastille
+1-09,Châtelet,1,#FFCD00,1,"4,7,11,14,RER A,RER B,RER D",Louvre-Rivoli,Hôtel de Ville
+1-10,Louvre-Rivoli,1,#FFCD00,1,,Palais-Royal-Musée du Louvre,Châtelet
+1-11,Palais-Royal-Musée du Louvre,1,#FFCD00,1,"7,14",Tuileries,Louvre-Rivoli
+1-12,Tuileries,1,#FFCD00,1,,Concorde,Palais-Royal-Musée du Louvre
+1-13,Concorde,1,#FFCD00,1,"8,12",Champs-Élysées-Clemenceau,Tuileries
+1-14,Champs-Élysées-Clemenceau,1,#FFCD00,1,"13",Franklin D. Roosevelt,Concorde
+1-15,Franklin D. Roosevelt,1,#FFCD00,1,"9",George V,Champs-Élysées-Clemenceau
+1-16,George V,1,#FFCD00,1,,Charles de Gaulle-Étoile,Franklin D. Roosevelt
+1-17,Charles de Gaulle-Étoile,1,#FFCD00,1,"2,6,RER A",Argentine,George V
+1-18,Argentine,1,#FFCD00,1,,Porte Maillot,Charles de Gaulle-Étoile
+1-19,Porte Maillot,1,#FFCD00,1,RER C,Neuilly-Porte Maillot,Argentine
+1-20,Neuilly-Porte Maillot,1,#FFCD00,2,,Sablons,Porte Maillot
+1-21,Sablons,1,#FFCD00,2,,Pont de Neuilly,Neuilly-Porte Maillot
+1-22,Pont de Neuilly,1,#FFCD00,2,,Esplanade de La Défense,Sablons
+1-23,Esplanade de La Défense,1,#FFCD00,3,,La Défense,Pont de Neuilly
+1-24,La Défense,1,#FFCD00,3,"RER A,T2",,Esplanade de La Défense
+2-01,Porte Dauphine,2,#0064B0,1,,Victor Hugo,
+2-02,Victor Hugo,2,#0064B0,1,,Charles de Gaulle-Étoile,Porte Dauphine
+2-03,Charles de Gaulle-Étoile,2,#0064B0,1,"1,6,RER A",Ternes,Victor Hugo
+2-04,Ternes,2,#0064B0,1,,Courcelles,Charles de Gaulle-Étoile
+2-05,Courcelles,2,#0064B0,1,,Monceau,Ternes
+2-06,Monceau,2,#0064B0,1,,Villiers,Courcelles
+2-07,Villiers,2,#0064B0,1,"3",Rome,Monceau
+2-08,Rome,2,#0064B0,1,,Place de Clichy,Villiers
+2-09,Place de Clichy,2,#0064B0,1,"13",Pigalle,Rome
+2-10,Pigalle,2,#0064B0,1,"12",Anvers,Place de Clichy
+2-11,Anvers,2,#0064B0,1,,Barbès-Rochechouart,Pigalle
+2-12,Barbès-Rochechouart,2,#0064B0,1,"4",La Chapelle,Anvers
+2-13,La Chapelle,2,#0064B0,1,,Stalingrad,Barbès-Rochechouart
+2-14,Stalingrad,2,#0064B0,1,"5,7",Jaurès,La Chapelle
+2-15,Jaurès,2,#0064B0,1,"5,7bis",Colonel Fabien,Stalingrad
+2-16,Colonel Fabien,2,#0064B0,1,,Belleville,Jaurès
+2-17,Belleville,2,#0064B0,1,"11",Couronnes,Colonel Fabien
+2-18,Couronnes,2,#0064B0,1,,Ménilmontant,Belleville
+2-19,Ménilmontant,2,#0064B0,1,,Père Lachaise,Couronnes
+2-20,Père Lachaise,2,#0064B0,1,"3",Philippe Auguste,Ménilmontant
+2-21,Philippe Auguste,2,#0064B0,1,,Alexandre Dumas,Père Lachaise
+2-22,Alexandre Dumas,2,#0064B0,1,,Avron,Philippe Auguste
+2-23,Avron,2,#0064B0,1,,Nation,Alexandre Dumas
+2-24,Nation,2,#0064B0,1,"1,6,9,RER A",,Avron
+3-01,Pont de Levallois-Bécon,3,#9F9825,2,,Anatole France,
+3-02,Anatole France,3,#9F9825,2,,Louise Michel,Pont de Levallois-Bécon
+3-03,Louise Michel,3,#9F9825,2,,Porte de Champerret,Anatole France
+3-04,Porte de Champerret,3,#9F9825,2,,Pereire,Louise Michel
+3-05,Pereire,3,#9F9825,1,,Wagram,Porte de Champerret
+3-06,Wagram,3,#9F9825,1,,Malesherbes,Pereire
+3-07,Malesherbes,3,#9F9825,1,,Villiers,Wagram
+3-08,Villiers,3,#9F9825,1,"2",Europe,Malesherbes
+3-09,Europe,3,#9F9825,1,,Saint-Lazare,Villiers
+3-10,Saint-Lazare,3,#9F9825,1,"12,13,14,RER E",Havre-Caumartin,Europe
+3-11,Havre-Caumartin,3,#9F9825,1,"9",Opéra,Saint-Lazare
+3-12,Opéra,3,#9F9825,1,"7,8",Quatre-Septembre,Havre-Caumartin
+3-13,Quatre-Septembre,3,#9F9825,1,,Bourse,Opéra
+3-14,Bourse,3,#9F9825,1,,Sentier,Quatre-Septembre
+3-15,Sentier,3,#9F9825,1,,Réaumur-Sébastopol,Bourse
+3-16,Réaumur-Sébastopol,3,#9F9825,1,"4",Arts et Métiers,Sentier
+3-17,Arts et Métiers,3,#9F9825,1,"11",Temple,Réaumur-Sébastopol
+3-18,Temple,3,#9F9825,1,,République,Arts et Métiers
+3-19,République,3,#9F9825,1,"1,5,8,9,11",Filles du Calvaire,Temple
+3-20,Filles du Calvaire,3,#9F9825,1,,Saint-Sébastien-Froissart,République
+3-21,Saint-Sébastien-Froissart,3,#9F9825,1,,Chemin Vert,Filles du Calvaire
+3-22,Chemin Vert,3,#9F9825,1,,Père Lachaise,Saint-Sébastien-Froissart
+3-23,Père Lachaise,3,#9F9825,1,"2",Gambetta,Chemin Vert
+3-24,Gambetta,3,#9F9825,1,"3bis",Pelleport,Père Lachaise
+3-25,Pelleport,3,#9F9825,1,,Saint-Fargeau,Gambetta
+3-26,Saint-Fargeau,3,#9F9825,1,,Gallieni,Pelleport
+3-27,Gallieni,3,#9F9825,1,,,"",Saint-Fargeau
+4-01,Porte de Clignancourt,4,#C04191,2,,Simplon,
+4-02,Simplon,4,#C04191,1,,Marcadet-Poissonniers,Porte de Clignancourt
+4-03,Marcadet-Poissonniers,4,#C04191,1,"12",Château Rouge,Simplon
+4-04,Château Rouge,4,#C04191,1,,Barbès-Rochechouart,Marcadet-Poissonniers
+4-05,Barbès-Rochechouart,4,#C04191,1,"2",Gare du Nord,Château Rouge
+4-06,Gare du Nord,4,#C04191,1,"5,RER B,RER D",Gare de l'Est,Barbès-Rochechouart
+4-07,Gare de l'Est,4,#C04191,1,"5,7",République,Gare du Nord
+4-08,République,4,#C04191,1,"1,3,5,8,9,11",Strasbourg-Saint-Denis,Gare de l'Est
+4-09,Strasbourg-Saint-Denis,4,#C04191,1,"8,9",Réaumur-Sébastopol,République
+4-10,Réaumur-Sébastopol,4,#C04191,1,"3",Étienne Marcel,Strasbourg-Saint-Denis
+4-11,Étienne Marcel,4,#C04191,1,,Les Halles,Réaumur-Sébastopol
+4-12,Les Halles,4,#C04191,1,"RER A,RER B,RER D",Châtelet,Étienne Marcel
+4-13,Châtelet,4,#C04191,1,"1,7,11,14,RER A,RER B,RER D",Cité,Les Halles
+4-14,Cité,4,#C04191,1,,Saint-Michel,Châtelet
+4-15,Saint-Michel,4,#C04191,1,"RER B,RER C",Odéon,Cité
+4-16,Odéon,4,#C04191,1,"6,10",Saint-Germain-des-Prés,Saint-Michel
+4-17,Saint-Germain-des-Prés,4,#C04191,1,,Saint-Sulpice,Odéon
+4-18,Saint-Sulpice,4,#C04191,1,,Saint-Placide,Saint-Germain-des-Prés
+4-19,Saint-Placide,4,#C04191,1,,Montparnasse-Bienvenüe,Saint-Sulpice
+4-20,Montparnasse-Bienvenüe,4,#C04191,1,"6,12,13",Vavin,Saint-Placide
+4-21,Vavin,4,#C04191,1,,Raspail,Montparnasse-Bienvenüe
+4-22,Raspail,4,#C04191,1,"6",Denfert-Rochereau,Vavin
+4-23,Denfert-Rochereau,4,#C04191,1,"6,RER B",Mouton-Duvernet,Raspail
+4-24,Mouton-Duvernet,4,#C04191,1,,Alésia,Denfert-Rochereau
+4-25,Alésia,4,#C04191,1,,Porte d'Orléans,Mouton-Duvernet
+4-26,Porte d'Orléans,4,#C04191,2,,,"",Alésia
+5-01,Bobigny-Pablo Picasso,5,#FF7E2E,2,,Bobigny-Pantin-Raymond Queneau,
+5-02,Bobigny-Pantin-Raymond Queneau,5,#FF7E2E,2,,Église de Pantin,Bobigny-Pablo Picasso
+5-03,Église de Pantin,5,#FF7E2E,2,,Hoche,Bobigny-Pantin-Raymond Queneau
+5-04,Hoche,5,#FF7E2E,2,,Porte de Pantin,Église de Pantin
+5-05,Porte de Pantin,5,#FF7E2E,2,,Ourcq,Hoche
+5-06,Ourcq,5,#FF7E2E,1,,Laumière,Porte de Pantin
+5-07,Laumière,5,#FF7E2E,1,,Jaurès,Ourcq
+5-08,Jaurès,5,#FF7E2E,1,"2,7bis",Stalingrad,Laumière
+5-09,Stalingrad,5,#FF7E2E,1,"2,7",Gare du Nord,Jaurès
+5-10,Gare du Nord,5,#FF7E2E,1,"4,RER B,RER D",Gare de l'Est,Stalingrad
+5-11,Gare de l'Est,5,#FF7E2E,1,"4,7",Jacques Bonsergent,Gare du Nord
+5-12,Jacques Bonsergent,5,#FF7E2E,1,,République,Gare de l'Est
+5-13,République,5,#FF7E2E,1,"1,3,4,8,9,11",Oberkampf,Jacques Bonsergent
+5-14,Oberkampf,5,#FF7E2E,1,,Richard-Lenoir,République
+5-15,Richard-Lenoir,5,#FF7E2E,1,,Bréguet-Sabin,Oberkampf
+5-16,Bréguet-Sabin,5,#FF7E2E,1,,Bastille,Richard-Lenoir
+5-17,Bastille,5,#FF7E2E,1,"1,8",Quai de la Rapée,Bréguet-Sabin
+5-18,Quai de la Rapée,5,#FF7E2E,1,,Gare d'Austerlitz,Bastille
+5-19,Gare d'Austerlitz,5,#FF7E2E,1,"10,RER C",Saint-Marcel,Quai de la Rapée
+5-20,Saint-Marcel,5,#FF7E2E,1,,Campo-Formio,Gare d'Austerlitz
+5-21,Campo-Formio,5,#FF7E2E,1,,Place d'Italie,Saint-Marcel
+5-22,Place d'Italie,5,#FF7E2E,1,"6,7",,Campo-Formio
