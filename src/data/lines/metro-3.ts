@@ -72,21 +72,21 @@ export const metroLine3: MetroLineData = {
       order: 10,
       name: "Saint-Lazare",
       shortName: undefined,
-      connections: ["12", "13", "14", "J", "L"],
+      connections: ["7", "8", "9", "12", "13", "14", "A", "J", "L"],
       coordinates: { lat: 48.87515128791023, lng: 2.324380555428912 }
     },
     {
       order: 11,
       name: "Havre-Caumartin",
       shortName: undefined,
-      connections: ["9"],
+      connections: ["7", "8", "9", "12", "13", "14", "A", "J", "L"],
       coordinates: { lat: 48.873513389595466, lng: 2.3275430817269713 }
     },
     {
       order: 12,
       name: "Opéra",
       shortName: undefined,
-      connections: ["7", "8"],
+      connections: ["7", "8", "9", "12", "13", "14", "A", "J", "L"],
       coordinates: { lat: 48.87130850300574, lng: 2.331493987087091 }
     },
     {

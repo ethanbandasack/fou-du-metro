@@ -238,9 +238,9 @@ export const rerC: MetroLineData = {
     },
     {
       order: 37,
-      name: "Saint-Michel",
-      shortName: "Notre-Dame",
-      connections: ["4", "B"],
+      name: "Saint-Michel Notre Dame",
+      shortName: "",
+      connections: ["4", "10", "B"],
       coordinates: { lat: 48.85353290071982, lng: 2.3452883321974305 }
     },
     {

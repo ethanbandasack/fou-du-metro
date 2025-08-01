@@ -128,14 +128,14 @@ export const metroLine9: MetroLineData = {
       order: 18,
       name: "Saint-Augustin",
       shortName: undefined,
-      connections: [],
+      connections: ["3", "7", "8", "12", "13", "14", "A", "J", "L"],
       coordinates: { lat: 48.87447567664767, lng: 2.322001788877926 }
     },
     {
       order: 19,
       name: "Havre-Caumartin",
       shortName: undefined,
-      connections: ["3"],
+      connections: ["3", "7", "8", "12", "13", "14", "A", "J", "L"],
       coordinates: { lat: 48.87371340670775, lng: 2.3276954096301736 }
     },
     {

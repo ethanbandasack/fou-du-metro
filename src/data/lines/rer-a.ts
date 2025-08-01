@@ -156,7 +156,7 @@ export const rerA: MetroLineData = {
       order: 22,
       name: "Auber",
       shortName: undefined,
-      connections: [],
+      connections: ["3", "7", "8", "9", "12", "13", "14", "J", "L"],
       coordinates: { lat: 48.87215749487708, lng: 2.3299271706082756 }
     },
     {

@@ -107,7 +107,7 @@ export const metroLine4: MetroLineData = {
       order: 15,
       name: "Saint-Michel",
       shortName: undefined,
-      connections: ["B", "C"],
+      connections: ["10", "B", "C"],
       coordinates: { lat: 48.85316798489062, lng: 2.343285978923924 }
     },
     {

@@ -198,7 +198,7 @@ export const trainL: MetroLineData = {
       order: 28,
       name: "Saint-Lazare",
       shortName: undefined,
-      connections: ["12", "13", "14", "3", "J"],
+      connections: ["3", "7", "8", "9", "12", "13", "14", "A", "J"],
       coordinates: { lat: 48.87683695396951, lng: 2.3247380468366337 }
     },
     {

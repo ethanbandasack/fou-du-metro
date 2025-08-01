@@ -86,7 +86,7 @@ export const metroLine8: MetroLineData = {
       order: 13,
       name: "Opéra",
       shortName: undefined,
-      connections: ["3", "7"],
+      connections: ["3", "7", "9", "12", "13", "14", "A", "J", "L"],
       coordinates: { lat: 48.87048333292661, lng: 2.3311863468516525 }
     },
     {

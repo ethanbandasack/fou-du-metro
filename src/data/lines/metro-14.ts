@@ -44,7 +44,7 @@ export const metroLine14: MetroLineData = {
       order: 6,
       name: "Saint-Lazare",
       shortName: undefined,
-      connections: ["12", "13", "3", "J", "L"],
+      connections: ["3", "7", "8", "9", "12", "13", "A", "J", "L"],
       coordinates: { lat: 48.87571908982334, lng: 2.324224580938853 }
     },
     {
