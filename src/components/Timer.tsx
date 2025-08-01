@@ -7,11 +7,12 @@ import { formatTime } from '@/utils/metroUtils';
 interface TimerProps {
   autoStart?: boolean;
   onTimeUpdate?: (seconds: number) => void;
+  resetTrigger?: boolean;
   className?: string;
 }
 
-export function Timer({ autoStart = false, onTimeUpdate, className = '' }: TimerProps) {
-  const { timer, totalSeconds } = useTimer(autoStart);
+export function Timer({ autoStart = false, onTimeUpdate, resetTrigger, className = '' }: TimerProps) {
+  const { timer, totalSeconds, stopAndReset } = useTimer(autoStart);
 
   // Notify parent component of time changes
   React.useEffect(() => {
@@ -19,6 +20,13 @@ export function Timer({ autoStart = false, onTimeUpdate, className = '' }: Timer
       onTimeUpdate(totalSeconds);
     }
   }, [totalSeconds, onTimeUpdate]);
+
+  // Reset timer when resetTrigger changes
+  React.useEffect(() => {
+    if (resetTrigger) {
+      stopAndReset();
+    }
+  }, [resetTrigger, stopAndReset]);
 
   // Format time display
   const displayTime = formatTime(totalSeconds);

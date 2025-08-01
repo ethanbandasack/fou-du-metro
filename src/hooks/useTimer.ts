@@ -102,6 +102,17 @@ export function useTimer(autoStart: boolean = false) {
     }));
   }, []);
 
+  const stopAndReset = useCallback(() => {
+    setTotalSeconds(0);
+    setTimer({
+      seconds: 0,
+      minutes: 0,
+      hours: 0,
+      isRunning: false,
+      isPaused: false
+    });
+  }, []);
+
   const reset = useCallback(() => {
     setTotalSeconds(0);
     setTimer({
@@ -119,6 +130,7 @@ export function useTimer(autoStart: boolean = false) {
     start,
     pause,
     stop,
+    stopAndReset,
     reset
   };
 }

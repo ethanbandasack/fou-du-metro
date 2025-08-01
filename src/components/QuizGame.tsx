@@ -40,6 +40,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   const [showScores, setShowScores] = useState(false);
   const [lastFoundStation, setLastFoundStation] = useState<string>('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [resetTimerTrigger, setResetTimerTrigger] = useState(false);
 
   // Authentication state
   const [authState, setAuthState] = useState<AuthState>({
@@ -250,6 +251,9 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
       saveCurrentScore();
     }
     
+    // Reset and unfold timer
+    setResetTimerTrigger(prev => !prev);
+    
     setQuizState(prev => ({
       ...prev,
       isGameActive: false,
@@ -379,6 +383,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
             <Timer 
               autoStart={quizState.isGameActive && !quizState.isPaused}
               onTimeUpdate={handleTimeUpdate}
+              resetTrigger={resetTimerTrigger}
             />
             
             <div className="flex gap-2 flex-wrap">
