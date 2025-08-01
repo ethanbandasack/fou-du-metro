@@ -210,16 +210,16 @@ export const rerB: MetroLineData = {
     },
     {
       order: 30,
-      name: "Saint-Michel",
-      shortName: "Notre-Dame",
-      connections: ["4", "C"],
+      name: "Saint-Michel Notre Dame",
+      shortName: "",
+      connections: ["4", "B", "C"],
       coordinates: { lat: 48.85211888263096, lng: 2.34402115205528 }
     },
     {
       order: 31,
       name: "Châtelet-Les Halles",
       shortName: undefined,
-      connections: ["A", "D"],
+      connections: ["1", "4", "7", "11", "A", "D"],
       coordinates: { lat: 48.86182227279812, lng: 2.3470126872387564 }
     },
     {
