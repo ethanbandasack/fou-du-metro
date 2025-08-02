@@ -209,21 +209,21 @@ export const metroLine13: MetroLineData = {
       coordinates: { lat: 48.91900755521728, lng: 2.3426080144231554 }
     },
     {
-      order: 34,
+      order: 35,
       name: "Basilique de Saint-Denis",
       shortName: "Hôtel de Ville",
       connections: ["T1"],
       coordinates: { lat: 48.93677678991262, lng: 2.3593662963605984 }
     },
     {
-      order: 35,
+      order: 34,
       name: "Saint-Denis - Porte de Paris",
       shortName: undefined,
       connections: ["T8"],
       coordinates: { lat: 48.929935889678696, lng: 2.3560357941727967 }
     },
     {
-      order: 37,
+      order: 36,
       name: "Saint-Denis - Université",
       shortName: undefined,
       connections: [],
