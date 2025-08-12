@@ -265,13 +265,23 @@ const QuizTable: React.FC<QuizTableProps> = ({
               const isCollapsed = collapsedLines.has(lineName);
               
               return (
-                <div key={lineName} className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden ${isLineCompleted ? 'bg-green-50 dark:bg-green-900/10' : ''}`}>
-                  {/* Line color indicator */}
-                  <div 
-                    className="h-1 w-full" 
-                    style={{ backgroundColor: getLineColor(lineName) }}
-                  ></div>
-                  <div className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center ${isLineCompleted ? 'bg-green-100 dark:bg-green-800/20' : 'bg-gray-50 dark:bg-gray-800'}`}>
+                <div key={lineName} className={`border border-gray-200 dark:border-gray-700 rounded-lg ${isLineCompleted ? 'bg-green-50 dark:bg-green-900/10' : ''}`}>
+                  <div
+                    className={`sticky z-40 rounded-t-lg pt-2 ${
+                      isLineCompleted ? 'bg-green-100 dark:bg-green-800/20' : 'bg-gray-50 dark:bg-gray-800'
+                    }`}
+                    style={{ top: 'var(--global-sticky-height, 0px)' }}
+                  >
+                    {/* Line color indicator (now part of sticky header) */}
+                    <div 
+                      className="h-1 w-full"
+                      style={{ backgroundColor: getLineColor(lineName) }}
+                    />
+                    <div
+                      className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center ${
+                        isLineCompleted ? 'bg-green-100 dark:bg-green-800/20' : 'bg-gray-50 dark:bg-gray-800'
+                      }`}
+                    >
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleLineCollapse(lineName)}
@@ -296,8 +306,10 @@ const QuizTable: React.FC<QuizTableProps> = ({
                         {isLineVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     )}
+                    </div>
                   </div>
                   {!isCollapsed && (
+                    <div className="rounded-b-lg overflow-hidden">
                     <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-800">
@@ -352,6 +364,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
                       })}
                     </tbody>
                   </table>
+                  </div>
                   )}
                 </div>
               );

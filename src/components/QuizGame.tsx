@@ -41,6 +41,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   const [lastFoundStation, setLastFoundStation] = useState<string>('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [resetTimerTrigger, setResetTimerTrigger] = useState(false);
+  const stickyHeaderRef = useRef<HTMLDivElement>(null);
 
   // Authentication state
   const [authState, setAuthState] = useState<AuthState>({
@@ -67,6 +68,30 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
     }
     setAuthLoading(false);
   }, []);
+
+  // Maintain a CSS variable for the global sticky header height to offset inner sticky line headers
+  useEffect(() => {
+    const updateStickyHeight = () => {
+      const el = stickyHeaderRef.current;
+      if (!el) return;
+      const height = el.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--global-sticky-height', `${height}px`);
+    };
+
+    // Initial measure
+    updateStickyHeight();
+
+    // Recalculate on resize
+    window.addEventListener('resize', updateStickyHeight);
+
+    // Recalculate when UI that can change header height toggles
+    const raf = requestAnimationFrame(updateStickyHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateStickyHeight);
+      cancelAnimationFrame(raf);
+    };
+  }, [showSettings, showScores, quizState.isGameActive]);
 
   // Load saved scores when component mounts (regardless of auth state)
   useEffect(() => {
@@ -363,7 +388,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Sticky Header Container */}
-      <div className="sticky top-0 bg-white dark:bg-gray-900 z-50 shadow-md mb-6">
+      <div ref={stickyHeaderRef} className="sticky top-0 bg-white dark:bg-gray-900 z-50 shadow-md mb-6">
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="text-center">
