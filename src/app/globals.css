@@ -10,6 +10,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-parisine: var(--font-parisine);
+}
+
+.font-parisine {
+  font-family: var(--font-parisine), sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

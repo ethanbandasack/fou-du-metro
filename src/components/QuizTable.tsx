@@ -322,13 +322,13 @@ const QuizTable: React.FC<QuizTableProps> = ({
                           <tr key={`${station.id}-${lineName}-${index}`} className={stationRowClass}>
                             <td className="px-3 py-2 text-sm">
                               {showStationName ? (
-                                <span className={
+                                <span className={`${
                                   isGuessed 
                                     ? "text-green-700 dark:text-green-300 font-medium"
                                     : gameEnded 
                                     ? "text-red-700 dark:text-red-300 font-medium"
                                     : "text-blue-700 dark:text-blue-300 font-medium"
-                                }>
+                                } font-parisine`}>
                                   {station.nom_long}
                                 </span>
                               ) : (

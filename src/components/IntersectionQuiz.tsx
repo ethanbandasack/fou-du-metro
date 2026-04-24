@@ -69,9 +69,22 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     const metas = Object.keys(MetaCategories).filter(m => m !== 'custom');
     const m1 = metas[Math.floor(Math.random() * metas.length)];
     const m2 = metas[Math.floor(Math.random() * metas.length)];
+    
     setMeta1(m1);
     setMeta2(m2);
-    // Values will be updated by useEffect
+
+    // Give react time to update categories pool if needed (though it shouldn't be strictly necessary since it's computed)
+    const cat1List = getAvailableCategories(allStations, customLines, customArrs)[m1];
+    const cat2List = getAvailableCategories(allStations, customLines, customArrs)[m2];
+
+    if (cat1List.length > 0) {
+        const r1 = cat1List[Math.floor(Math.random() * cat1List.length)];
+        setSub1(r1.id);
+    }
+    if (cat2List.length > 0) {
+        const r2 = cat2List[Math.floor(Math.random() * cat2List.length)];
+        setSub2(r2.id);
+    }
   };
 
   // Sync subcategories when meta changes
@@ -233,27 +246,35 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 )}
             </div>
 
+            <div className="space-y-3 pt-4">
+                <button 
+                    onClick={shuffleAll}
+                    className="w-full bg-white text-black py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-black hover:bg-black hover:text-white transition-all"
+                >
+                    Tout mélanger
+                </button>
+                <button 
+                    onClick={setupGame}
+                    className="w-full bg-white text-black py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-black hover:bg-black hover:text-white transition-all"
+                >
+                    Recommencer
+                </button>
+            </div>
+
             <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
                 <span className="text-[11px] font-bold">Suggestions</span>
                 <button 
                   onClick={() => setSuggestionsEnabled(!suggestionsEnabled)}
                   className={`border border-black px-3 py-1 text-[10px] font-bold transition-all ${suggestionsEnabled ? 'bg-black text-white' : 'bg-white'}`}
                 >
-                  {suggestionsEnabled ? 'Marche' : 'Arrêt'}
+                  {suggestionsEnabled ? 'Oui' : 'Non'}
                 </button>
             </div>
         </div>
-
-        <button 
-            onClick={setupGame}
-            className="w-full bg-black text-white py-4 text-sm font-bold border border-black hover:bg-gray-900 transition-all"
-        >
-            Générer le quiz
-        </button>
       </aside>
 
       <main className="flex-1 overflow-y-auto">
-        <header className="sticky top-0 bg-white/80 backdrop-blur-md z-30 p-12 lg:p-20 py-8 lg:py-10 border-b border-black flex flex-col md:flex-row justify-between items-baseline gap-4 mb-16">
+        <header className="sticky top-0 bg-white/80 backdrop-blur-md z-30 px-8 lg:px-12 py-4 lg:py-6 border-b border-black flex flex-col md:flex-row justify-between items-baseline gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-3">
                 <span 
                     className="px-3 py-1 border border-black font-bold text-sm"
@@ -288,7 +309,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
             </div>
         </header>
 
-        <div className="p-12 lg:p-20 pt-0 space-y-16">
+        <div className="px-8 lg:px-12 pt-0 space-y-10">
             {/* Input area */}
             <section className="space-y-2 relative">
                 <form onSubmit={handleGuess}>
@@ -299,8 +320,14 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                         onChange={(e) => setSearchInput(e.target.value)}
                         placeholder="Saisir une station..."
                         disabled={revealed || targetStations.length === 0}
-                        className={`w-full bg-transparent border-b-2 border-black py-4 text-5xl font-bold tracking-tight outline-none placeholder:text-gray-200 transition-all ${errorShake ? 'animate-shake border-red-500' : 'focus:border-black'}`}
+                        className={`w-full bg-transparent border-b-2 border-black py-2 text-3xl font-bold tracking-tight outline-none placeholder:text-gray-200 transition-all font-parisine ${targetStations.length === 0 ? 'opacity-20 cursor-not-allowed' : ''} ${errorShake ? 'animate-shake border-red-500' : 'focus:border-black'}`}
                     />
+                    
+                    {targetStations.length === 0 && (
+                        <div className="absolute inset-0 flex items-center justify-start pointer-events-none">
+                            <span className="text-red-500 text-xs font-black uppercase tracking-widest bg-white pr-4">Attention : Aucune station trouvée avec ces critères</span>
+                        </div>
+                    )}
                     
                     {/* Suggestions List */}
                     {suggestions.length > 0 && (
@@ -333,14 +360,14 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                         if (!isFound && !revealed) return null;
 
                         return (
-                            <div key={name} className={`bg-white p-5 flex flex-col justify-between h-32 ${isFound ? '' : 'opacity-40 grayscale italic'}`}>
+                            <div key={name} className={`bg-white p-5 flex flex-col justify-between h-32 font-parisine ${isFound ? '' : 'opacity-70 contrast-[0.8] italic'}`}>
                                 <span className="text-[11px] font-bold leading-tight">{name}</span>
                                 <div className="flex flex-wrap gap-1">
                                     {station?.lines.map(l => (
                                         <div 
                                             key={l} 
-                                            className="w-6 h-6 flex items-center justify-center text-[10px] font-bold border border-gray-200"
-                                            style={{backgroundColor: isFound ? LINE_COLORS[l] : '#eee', color: isFound ? 'white' : '#999'}}
+                                            className="w-6 h-6 flex items-center justify-center text-[10px] font-bold border border-gray-200 font-parisine"
+                                            style={{backgroundColor: (isFound || revealed) ? LINE_COLORS[l] : '#eee', color: (isFound || revealed) ? 'white' : '#999'}}
                                         >
                                             {l}
                                         </div>
@@ -352,16 +379,17 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 </div>
                 
                 {targetStations.length === 0 && (
-                    <div className="py-20 text-center border border-dashed border-gray-200">
-                        <p className="text-gray-300 font-medium text-xs">Aucune station dans cette intersection</p>
+                    <div className="py-32 text-center border-2 border-dashed border-red-100 bg-red-50/30">
+                        <p className="text-red-600 font-black text-xs uppercase tracking-[0.2em]">Intersection vide</p>
+                        <p className="text-[10px] text-red-400 mt-2 font-medium">Veuillez modifier vos critères de recherche dans la barre latérale</p>
                     </div>
                 )}
             </section>
 
             {foundStations.length === targetStations.length && targetStations.length > 0 && (
-                <div className="bg-black text-white p-16 text-center border-t-4 border-black">
-                    <h4 className="text-6xl font-bold tracking-tight mb-2">Quiz terminé</h4>
-                    <p className="text-xs font-medium opacity-50">Toutes les stations ont été identifiées</p>
+                <div className="bg-white text-black py-12 px-6 text-center border-2 border-black">
+                    <h4 className="text-3xl font-bold tracking-tight mb-2 font-parisine">Quiz terminé</h4>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Toutes les stations ont été identifiées</p>
                 </div>
             )}
         </div>

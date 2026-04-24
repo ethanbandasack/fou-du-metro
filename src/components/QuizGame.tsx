@@ -546,7 +546,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Tapez le nom d'une gare..."
                 disabled={quizState.isPaused}
-                className="block w-full px-8 py-4 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-200 focus:outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black text-xl font-black uppercase tracking-tight"
+                className="block w-full px-8 py-4 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-200 focus:outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black text-xl font-black uppercase tracking-tight font-parisine"
               />
               {lastFoundStation && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm animate-pulse">
