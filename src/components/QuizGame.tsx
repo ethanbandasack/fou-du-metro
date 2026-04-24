@@ -581,7 +581,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Login to Save Scores</h3>
+              <h3 className="text-xl font-bold text-foreground">Connexion</h3>
               <button
                 onClick={() => setShowLoginForm(false)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -589,13 +589,13 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                 <X size={24} />
               </button>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
-              Enter your authentication code to save your quiz scores and track your progress.
+            <p className="text-foreground/60 mb-4 text-sm">
+              Entrez votre code d'authentification pour sauvegarder vos scores et suivre votre progression.
             </p>
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label htmlFor="authCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Authentication Code
+                <label htmlFor="authCode" className="block text-sm font-medium text-foreground/70 mb-1">
+                  Code d'authentification
                 </label>
                 <input
                   type="text"
@@ -603,26 +603,26 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   value={loginForm.authCode}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, authCode: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                  placeholder="Enter your auth code"
+                  placeholder="Entrez votre code..."
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Contact the administrator to get your authentication code
+                <p className="text-xs text-foreground/40 mt-1">
+                  Contactez l'administrateur pour obtenir votre code d'authentification
                 </p>
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex-1 bg-accent text-accent-foreground border-2 border-border px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
                 >
-                  Login
+                  Connexion
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowLoginForm(false)}
-                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                  className="flex-1 bg-muted text-foreground border-2 border-border px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </form>
@@ -651,9 +651,9 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
 
       {/* Scores Panel */}
       {showScores && !authLoading && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div className="bg-card p-6 border-2 border-border shadow-md transition-colors duration-300">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Recent Scores</h3>
+            <h3 className="text-xl font-bold text-foreground">Scores Récents</h3>
             <div className="flex gap-2">
               {savedScores.length > 0 && authState.isAuthenticated && (
                 <button
@@ -661,7 +661,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   className="flex items-center gap-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
                 >
                   <Trash2 size={16} />
-                  Clear All
+                  Effacer tout
                 </button>
               )}
               <button
@@ -669,7 +669,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                 className="flex items-center gap-2 px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-sm"
               >
                 <X size={16} />
-                Close
+                Fermer
               </button>
             </div>
           </div>
@@ -679,16 +679,16 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mb-4">
               <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200 text-sm">
                 <LogIn size={16} />
-                <span className="font-medium">Login to save your scores</span>
+                <span className="font-medium uppercase text-[10px] tracking-widest">Connectez-vous pour sauvegarder</span>
               </div>
-              <p className="text-blue-700 dark:text-blue-300 text-xs mt-1">
-                You can view all scores, but login is required to save your own quiz results.
+              <p className="text-blue-700 dark:text-blue-300 text-[10px] mt-1 font-bold">
+                Vous pouvez voir tous les scores, mais la connexion est requise pour sauvegarder vos propres résultats.
               </p>
             </div>
           )}
           
           {savedScores.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No scores saved yet. Complete a quiz to see results here!</p>
+            <p className="text-foreground/40 text-center py-8 font-bold uppercase text-xs">Aucun score sauvegardé. Terminez un quiz pour voir les résultats ici !</p>
           ) : (
             <div className="space-y-3">
               {savedScores.map((score) => (
@@ -696,27 +696,27 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-1">
                       <span className="font-bold text-lg text-green-600">{score.percentage}%</span>
-                      <span className="text-gray-900 dark:text-gray-100">
-                        {score.score} / {score.totalStations} stations
+                      <span className="text-foreground font-medium">
+                        {score.score} / {score.totalStations} gares
                       </span>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className="text-foreground/60 font-bold">
                         {Math.floor(score.timeElapsed / 60)}:{(score.timeElapsed % 60).toString().padStart(2, '0')}
                       </span>
-                      <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded">
+                      <span className="text-[10px] font-black uppercase text-accent-foreground bg-accent px-2 py-1">
                         {score.username}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-[10px] text-foreground/40 font-bold uppercase tracking-tight">
                       {score.date.toLocaleDateString()} {score.date.toLocaleTimeString()} • 
                       {score.modes.join(', ')} • 
-                      {score.lines.length > 0 ? score.lines.join(', ') : 'All lines'}
+                      {score.lines.length > 0 ? score.lines.join(', ') : 'Toutes les lignes'}
                     </div>
                   </div>
                   {authState.isAuthenticated && (
                     <button
                       onClick={() => deleteScore(score.id)}
                       className="ml-3 p-1 text-red-500 hover:text-red-700 transition-colors"
-                      title="Delete this score"
+                      title="Supprimer ce score"
                     >
                       <X size={16} />
                     </button>
@@ -733,11 +733,11 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
         <div className="space-y-4">
           <div className="bg-green-100 border-2 border-green-400 rounded-lg p-6 text-center">
             <Trophy size={48} className="mx-auto text-green-600 mb-4" />
-            <h2 className="text-2xl font-bold text-green-800 mb-2">
-              Congratulations! 🎉
+            <h2 className="text-2xl font-bold text-green-800 mb-2 font-parisine">
+              Félicitations ! 🎉
             </h2>
-            <p className="text-green-700">
-              You&apos;ve identified all {uniqueStationNames.size} stations in {Math.floor(quizState.timeElapsed / 60)}:{(quizState.timeElapsed % 60).toString().padStart(2, '0')}!
+            <p className="text-green-700 font-bold uppercase text-[10px] tracking-widest">
+              Vous avez identifié les {uniqueStationNames.size} gares en {Math.floor(quizState.timeElapsed / 60)}:{(quizState.timeElapsed % 60).toString().padStart(2, '0')} !
             </p>
           </div>
           
@@ -746,17 +746,17 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
             <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <LogIn size={20} className="text-yellow-600" />
-                <span className="font-semibold text-yellow-800">Score Not Saved</span>
+                <span className="font-bold uppercase text-xs text-yellow-800">Score non sauvegardé</span>
               </div>
-              <p className="text-yellow-700 text-sm mb-3">
-                Your score wasn&apos;t saved because you&apos;re not logged in. Login to save your progress and track your improvements!
+              <p className="text-yellow-700 text-[10px] mb-3 font-bold uppercase">
+                Votre score n'a pas été sauvegardé car vous n'êtes pas connecté. Connectez-vous pour suivre votre progression !
               </p>
-              <button
-                onClick={() => setShowLoginForm(true)}
-                className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm"
-              >
-                Login to Save Scores
-              </button>
+                <button
+                  onClick={() => setShowLoginForm(true)}
+                  className="bg-yellow-500 text-white border-2 border-yellow-600 px-4 py-2 font-black uppercase text-[10px] hover:bg-yellow-600 transition-colors"
+                >
+                  Se connecter pour sauvegarder
+                </button>
             </div>
           )}
         </div>
@@ -781,17 +781,17 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
           <div className="text-gray-400 mb-4">
             <Settings size={64} className="mx-auto" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">
-            No Stations Available
+          <h3 className="text-xl font-black uppercase text-foreground mb-2">
+            Aucune gare disponible
           </h3>
-          <p className="text-gray-500 mb-4">
-            Please select transport modes and/or lines from the settings to start the quiz.
+          <p className="text-foreground/50 mb-4 font-bold uppercase text-[10px] tracking-widest">
+            Veuillez sélectionner des modes de transport et/ou des lignes dans les paramètres pour commencer le quiz.
           </p>
           <button
             onClick={() => setShowSettings(true)}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="px-6 py-3 bg-accent text-accent-foreground border-2 border-border font-black uppercase tracking-widest text-xs hover:opacity-80 transition-colors"
           >
-            Open Settings
+            Ouvrir les Paramètres
           </button>
         </div>
       )}

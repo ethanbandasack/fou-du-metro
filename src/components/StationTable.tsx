@@ -92,31 +92,31 @@ export function StationTable({ stations, lines }: StationTableProps) {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">
-          Paris Transport Stations
+        <h1 className="text-4xl font-black uppercase tracking-tighter text-foreground mb-2">
+          Gares & Stations
         </h1>
-        <p className="text-gray-600">
-          Complete list of all metro, RER, train, and tram stations
+        <p className="text-foreground/60 font-bold uppercase text-[10px] tracking-widest">
+          Liste complète du réseau (Métro, RER, Train, Tramway)
         </p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-md space-y-4">
+      <div className="bg-card p-4 border-2 border-border shadow-md space-y-4">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-foreground/40" />
           <input
             type="text"
-            placeholder="Search stations..."
+            placeholder="Rechercher une gare..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border-2 border-border bg-card text-foreground focus:outline-none focus:bg-muted transition-colors font-bold"
           />
         </div>
 
         {/* Mode Filter */}
         <div>
-          <h4 className="font-medium text-sm text-gray-700 mb-2">Transport Type:</h4>
+          <h4 className="font-bold text-[10px] text-foreground/50 uppercase tracking-widest mb-2">Type de Transport :</h4>
           <div className="flex flex-wrap gap-2">
             {availableModes.map((mode) => {
               const isSelected = selectedModes.includes(mode);
@@ -126,10 +126,10 @@ export function StationTable({ stations, lines }: StationTableProps) {
                   key={mode}
                   onClick={() => toggleMode(mode)}
                   className={`
-                    px-3 py-1 rounded-md border-2 transition-all text-sm
+                    px-3 py-1 border-2 transition-all text-xs font-black uppercase
                     ${isSelected 
-                      ? 'border-blue-500 bg-blue-50 text-blue-800' 
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                      ? 'border-accent bg-accent text-accent-foreground' 
+                      : 'border-border bg-card text-foreground/70 hover:border-accent'
                     }
                   `}
                 >
@@ -143,7 +143,7 @@ export function StationTable({ stations, lines }: StationTableProps) {
         {/* Available Lines for selected modes */}
         {selectedModes.length > 0 && (
           <div>
-            <h4 className="font-medium text-sm text-gray-700 mb-2">Lines:</h4>
+            <h4 className="font-bold text-[10px] text-foreground/50 uppercase tracking-widest mb-2">Lignes :</h4>
             <div className="flex flex-wrap gap-2">
               {lines
                 .filter(line => selectedModes.includes(line.mode))
@@ -155,15 +155,15 @@ export function StationTable({ stations, lines }: StationTableProps) {
                       key={`${line.mode}-${line.line}`}
                       onClick={() => toggleLine(line.line)}
                       className={`
-                        flex items-center gap-2 px-2 py-1 rounded-md border-2 transition-all text-sm
+                        flex items-center gap-2 px-2 py-1 border-2 transition-all text-[10px] font-black uppercase
                         ${isSelected 
-                          ? 'border-blue-500 bg-blue-50 text-blue-800' 
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                          ? 'border-accent bg-accent text-accent-foreground' 
+                          : 'border-border bg-card text-foreground/70 hover:border-accent'
                         }
                       `}
                     >
                       <div 
-                        className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                        className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
                         style={{ backgroundColor: line.color }}
                       >
                         {line.line}
@@ -178,8 +178,8 @@ export function StationTable({ stations, lines }: StationTableProps) {
       </div>
 
       {/* Results count */}
-      <div className="text-center text-gray-600">
-        Showing {filteredStations.length} stations
+      <div className="text-center text-foreground/40 font-bold uppercase text-[10px] tracking-[0.2em]">
+        Affichage de {filteredStations.length} gares
       </div>
 
       {/* Stations Table - Grouped by Line */}
@@ -189,45 +189,45 @@ export function StationTable({ stations, lines }: StationTableProps) {
           const lineInfo = lines.find(l => l.mode === mode && l.line === line);
           
           return (
-            <div key={lineKey} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div key={lineKey} className="bg-card border-2 border-border shadow-md overflow-hidden transition-colors duration-300">
               <div 
                 className="px-6 py-4 text-white font-semibold text-lg flex items-center gap-3"
                 style={{ backgroundColor: lineInfo?.color || '#666666' }}
               >
-                <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center font-bold">
+                <div className="w-8 h-8 bg-white/20 border-2 border-white/40 flex items-center justify-center font-black">
                   {line}
                 </div>
-                {mode} Line {line}
-                <span className="ml-auto text-sm opacity-90">
-                  {stationsInLine.length} stations
+                {mode} - Ligne {line}
+                <span className="ml-auto text-[10px] font-black uppercase tracking-widest opacity-80">
+                  {stationsInLine.length} gares
                 </span>
               </div>
               
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Station Name
+                      <th className="px-6 py-3 text-left text-[10px] font-black text-foreground/60 uppercase tracking-widest">
+                        Nom de la Gare
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Connections
+                      <th className="px-6 py-3 text-left text-[10px] font-black text-foreground/60 uppercase tracking-widest">
+                        Correspondances
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Operator
+                      <th className="px-6 py-3 text-left text-[10px] font-black text-foreground/60 uppercase tracking-widest">
+                        Exploitant
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-card divide-y divide-border">
                     {stationsInLine.map((station) => (
-                      <tr key={station.id} className="hover:bg-gray-50">
+                      <tr key={station.id} className="hover:bg-muted transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-black text-foreground font-parisine">
                               {station.nom_long}
                             </div>
                             {station.nom_so_gar && (
-                              <div className="text-sm text-gray-500">
+                              <div className="text-xs text-foreground/40 font-bold uppercase">
                                 {station.nom_so_gar}
                               </div>
                             )}
@@ -238,17 +238,17 @@ export function StationTable({ stations, lines }: StationTableProps) {
                             {station.connections.map((connection, index) => (
                               <span
                                 key={index}
-                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                className="inline-flex items-center px-2 py-0.5 border border-border text-[9px] font-black uppercase bg-muted text-foreground"
                               >
                                 {connection}
                               </span>
                             ))}
                             {station.connections.length === 0 && (
-                              <span className="text-gray-400 text-sm">No connections</span>
+                              <span className="text-foreground/30 text-xs font-bold italic uppercase">Aucune correspondance</span>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-foreground/60 uppercase">
                           {station.exploitant}
                         </td>
                       </tr>
@@ -266,11 +266,11 @@ export function StationTable({ stations, lines }: StationTableProps) {
           <div className="text-gray-400 mb-4">
             <Filter size={64} className="mx-auto" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">
-            No Stations Found
+          <h3 className="text-xl font-black uppercase text-foreground mb-2">
+            Aucune gare trouvée
           </h3>
-          <p className="text-gray-500">
-            Try adjusting your search or filter criteria.
+          <p className="text-foreground/40 font-bold uppercase text-xs">
+            Essayez d'ajuster votre recherche ou vos critères de filtrage.
           </p>
         </div>
       )}

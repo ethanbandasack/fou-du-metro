@@ -268,8 +268,8 @@ const QuizTable: React.FC<QuizTableProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleLineCollapse(lineName)}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                        title={isCollapsed ? "Expand line" : "Collapse line"}
+                        className="text-foreground/60 hover:text-foreground transition-colors"
+                        title={isCollapsed ? "Développer la ligne" : "Réduire la ligne"}
                       >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
                       </button>
@@ -284,7 +284,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
                       <button
                         onClick={() => toggleLineVisibility(lineName)}
                         className="text-foreground/60 hover:text-foreground transition-colors"
-                        title={isLineVisible ? "Hide answers for this line" : "Show answers for this line"}
+                        title={isLineVisible ? "Masquer les réponses" : "Afficher les réponses"}
                       >
                         {isLineVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -297,11 +297,11 @@ const QuizTable: React.FC<QuizTableProps> = ({
                     <thead>
                       <tr className="bg-muted">
                         <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
-                          Station
+                          Gare
                         </th>
                         {showConnections && (
                           <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
-                            Connections
+                            Correspondances
                           </th>
                         )}
                       </tr>

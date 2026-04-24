@@ -68,7 +68,7 @@ export function StationCard({
           
           {showConnections && station.connections && station.connections.length > 0 && (
             <div className="mt-3">
-              <div className="text-xs text-foreground/50 mb-1 uppercase font-bold">Connections:</div>
+              <div className="text-xs text-foreground/50 mb-1 uppercase font-bold">Correspondances :</div>
               <div className="flex flex-wrap gap-1">
                 {station.connections.map((connection, index) => (
                   <span 
@@ -84,7 +84,7 @@ export function StationCard({
           
           {isGuessed && (
             <div className="mt-2 text-green-600 text-sm font-medium">
-              ✓ Guessed!
+              ✓ Trouvé !
             </div>
           )}
         </>
@@ -93,7 +93,7 @@ export function StationCard({
           <div className="w-8 h-8 rounded-full bg-foreground/10 mx-auto mb-2 flex items-center justify-center text-foreground/40 text-sm font-bold border-2 border-border">
             ?
           </div>
-          <div className="text-foreground/40 text-xs uppercase font-bold">Click to reveal</div>
+          <div className="text-foreground/40 text-xs uppercase font-bold">Cliquer pour révéler</div>
         </div>
       )}
     </div>

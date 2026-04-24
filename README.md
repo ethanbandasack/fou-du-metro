@@ -1,17 +1,17 @@
 # Le Fou du Métro 🚇
 
-Un quiz interactif sur le transport ferré d'Île-de-France.
+An interactive quiz about the rail transport network in Île-de-France (Paris).
 
-## Installation
+> [!NOTE]
+> The game interface and station names are in French.
+
+## Getting Started
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Description
+## About the Game
 
-Testez vos connaissances sur le réseau de transport parisien (Métro, RER, Train, Tramway) via différents modes de jeu, incluant un mode classique et un mode "Intersection" avancé.
-
----
-*Projet développé avec Next.js 15, TypeScript et Tailwind CSS.*
+Test your knowledge of the Parisian transport network (Metro, RER, Train, Tramway) through various game modes, including a classic quiz and an advanced "Intersection" mode to master the network.

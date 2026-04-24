@@ -5,21 +5,10 @@ import { EnrichedStation } from '@/types/metro';
 import { 
   getAvailableCategories, 
   MetaCategories, 
-  Category, 
   LINE_COLORS 
 } from '@/utils/intersectionUtils';
 import { 
-  Search, 
-  Shuffle, 
-  RotateCcw, 
-  Trophy, 
-  Info, 
-  Moon, 
-  Sun, 
-  Settings2,
-  ChevronDown,
-  CheckCircle2,
-  AlertCircle
+  Shuffle
 } from 'lucide-react';
 import { normalizeStationName, fuzzyMatch } from '@/utils/metroUtils';
 
@@ -33,8 +22,8 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const [meta2, setMeta2] = useState<string>('geo');
   const [sub1, setSub1] = useState<string>('');
   const [sub2, setSub2] = useState<string>('');
-  const [customLines, setCustomLines] = useState<string>('');
-  const [customArrs, setCustomArrs] = useState<string>('');
+  const [customLines] = useState<string>('');
+  const [customArrs] = useState<string>('');
   const [suggestionsEnabled, setSuggestionsEnabled] = useState(true);
   
   const [targetStations, setTargetStations] = useState<string[]>([]);
@@ -54,7 +43,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const flatPool = useMemo(() => Object.values(categories).flat(), [categories]);
 
   // Handle random category selection
-  const handleRandomSub = (index: 1 | 2) => {
+  const handleRandomSub = useCallback((index: 1 | 2) => {
     const meta = index === 1 ? meta1 : meta2;
     const cats = categories[meta] || [];
     const validCats = cats.filter(c => !c.id.startsWith('random-'));
@@ -63,7 +52,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
       if (index === 1) setSub1(randomCat.id);
       else setSub2(randomCat.id);
     }
-  };
+  }, [meta1, meta2, categories]);
 
   const shuffleAll = () => {
     const metas = Object.keys(MetaCategories).filter(m => m !== 'custom');
@@ -92,13 +81,13 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     if (!sub1 || !categories[meta1]?.find(c => c.id === sub1)) {
         handleRandomSub(1);
     }
-  }, [meta1, categories]);
+  }, [meta1, categories, sub1, handleRandomSub]);
 
   useEffect(() => {
     if (!sub2 || !categories[meta2]?.find(c => c.id === sub2)) {
         handleRandomSub(2);
     }
-  }, [meta2, categories]);
+  }, [meta2, categories, sub2, handleRandomSub]);
 
   // Setup/Refresh Game Logic
   const setupGame = useCallback(() => {
@@ -185,7 +174,6 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const currentCatA = flatPool.find(c => c.id === sub1);
   const currentCatB = flatPool.find(c => c.id === sub2);
 
-  const progress = targetStations.length > 0 ? (foundStations.length / targetStations.length) * 100 : 0;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-card text-foreground transition-colors duration-300">
