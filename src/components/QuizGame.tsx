@@ -411,10 +411,10 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Sticky Header Container */}
-      <div ref={stickyHeaderRef} className="sticky top-20 bg-card z-50 shadow-md mb-6 transition-colors duration-300">
+      <div ref={stickyHeaderRef} className="sticky top-20 bg-card z-50 shadow-sm mb-6 transition-colors duration-300">
         <div className="p-6 space-y-6">
           {/* Header */}
-          <div className="text-center py-4 border-b-2 border-border">
+          <div className="text-center py-4">
             <h1 className="text-4xl font-black tracking-tighter text-foreground mb-2">
               Quiz des Transports
             </h1>
@@ -546,7 +546,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Tapez le nom d'une gare..."
                 disabled={quizState.isPaused}
-                className="block w-full px-8 py-4 border-2 border-border bg-card text-foreground placeholder-gray-400 focus:outline-none focus:bg-accent focus:text-accent-foreground text-xl font-black tracking-tight font-parisine transition-colors"
+                className="block w-full px-8 py-4 border border-border bg-card text-foreground placeholder-gray-400 focus:outline-none focus:bg-accent focus:text-accent-foreground text-xl font-black tracking-tight font-parisine transition-colors"
               />
               {lastFoundStation && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm animate-pulse">
@@ -613,14 +613,14 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-accent text-accent-foreground border-2 border-border px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
+                  className="flex-1 bg-accent text-accent-foreground border border-border px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
                 >
                   Connexion
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowLoginForm(false)}
-                  className="flex-1 bg-muted text-foreground border-2 border-border px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
+                  className="flex-1 bg-muted text-foreground border border-border px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
                 >
                   Annuler
                 </button>
@@ -651,7 +651,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
 
       {/* Scores Panel */}
       {showScores && !authLoading && (
-        <div className="bg-card p-6 border-2 border-border shadow-md transition-colors duration-300">
+        <div className="bg-card p-6 shadow-sm transition-colors duration-300">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold text-foreground">Scores Récents</h3>
             <div className="flex gap-2">

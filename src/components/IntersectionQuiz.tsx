@@ -176,7 +176,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
 
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-card text-foreground transition-colors duration-300">
+    <div className="flex flex-col md:flex-row bg-card text-foreground transition-colors duration-300 shadow-sm overflow-hidden">
       {/* Sidebar - Config Minimaliste */}
       <aside className="w-full md:w-[300px] bg-muted border-r border-border p-8 space-y-10 shrink-0 flex flex-col transition-colors duration-300">
         <header className="border-b border-border pb-4">
@@ -375,7 +375,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
             </section>
 
             {foundStations.length === targetStations.length && targetStations.length > 0 && (
-                <div className="bg-card text-foreground py-12 px-6 text-center border-2 border-border">
+                <div className="bg-card text-foreground py-12 px-6 text-center border border-border">
                     <h4 className="text-3xl font-bold tracking-tight mb-2 font-parisine">Quiz terminé</h4>
                     <p className="text-[10px] font-black tracking-[0.3em] opacity-40">Toutes les stations ont été identifiées</p>
                 </div>
