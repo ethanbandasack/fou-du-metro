@@ -1,5 +1,18 @@
 // Types for the Paris Metro Quiz Application
 
+export interface EnrichedStation {
+  nom: string;
+  lines: string[];
+  lat: number;
+  lon: number;
+  arrondissement: number;
+  figure_historique: boolean;
+  couleur: boolean;
+  ouverte_apres_1980: boolean;
+  rive_gauche: boolean;
+  has_rer: boolean;
+}
+
 export interface MetroStation {
   id: string;
   gares_id: string;

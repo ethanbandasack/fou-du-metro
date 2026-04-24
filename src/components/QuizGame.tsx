@@ -391,15 +391,12 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
       <div ref={stickyHeaderRef} className="sticky top-0 bg-white dark:bg-gray-900 z-50 shadow-md mb-6">
         <div className="p-6 space-y-6">
           {/* Header */}
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-              Paris Transport Quiz
+          <div className="text-center py-4 border-b-2 border-black dark:border-white">
+            <h1 className="text-4xl font-black uppercase tracking-tighter text-gray-800 dark:text-gray-100 mb-2">
+              QUIZ DES TRANSPORTS
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Type station names to reveal them and test your knowledge!
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Requires exact name matching
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Identifiez les gares du réseau pour valider votre expertise
             </p>
           </div>
 
@@ -461,40 +458,40 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
               
               <button
                 onClick={toggleShowConnections}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 border-2 border-black dark:border-white text-[10px] font-black uppercase transition-all ${
                   settings.showConnections
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    ? 'bg-black text-white'
+                    : 'bg-white text-black dark:bg-gray-800 dark:text-white'
                 }`}
               >
-                {settings.showConnections ? <Eye size={20} /> : <EyeOff size={20} />}
-                {settings.showConnections ? 'Hide' : 'Show'} Connections
+                {settings.showConnections ? <Eye size={16} /> : <EyeOff size={16} />}
+                {settings.showConnections ? 'Masquer' : 'Afficher'} Corresp.
               </button>
               
               {!quizState.isGameActive ? (
                 <button
                   onClick={startGame}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black border-2 border-black dark:border-white hover:invert transition-colors text-xs font-black uppercase"
                 >
-                  <Play size={20} />
-                  Start Quiz
+                  <Play size={16} />
+                  Lancer le Quiz
                 </button>
               ) : (
                 <>
                   <button
                     onClick={pauseGame}
-                    className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-black dark:border-white bg-white text-black hover:bg-black hover:text-white transition-all text-xs font-black uppercase"
                   >
-                    <Pause size={20} />
-                    {quizState.isPaused ? 'Resume' : 'Pause'}
+                    <Pause size={16} />
+                    {quizState.isPaused ? 'Reprendre' : 'Pause'}
                   </button>
                   
                   <button
                     onClick={stopGame}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-black dark:border-white bg-black text-white hover:bg-white hover:text-black transition-all text-xs font-black uppercase"
                   >
-                    <RotateCcw size={20} />
-                    Stop & Save
+                    <RotateCcw size={16} />
+                    Sauvegarder
                   </button>
                 </>
               )}
@@ -507,14 +504,14 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
-              <input
+                <input
                 ref={searchInputRef}
                 type="text"
                 value={quizState.searchInput}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder="Type a station name..."
+                placeholder="Tapez le nom d'une gare..."
                 disabled={quizState.isPaused}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                className="block w-full px-8 py-4 border-2 border-black dark:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-200 focus:outline-none focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black text-xl font-black uppercase tracking-tight"
               />
               {lastFoundStation && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm animate-pulse">

@@ -13,6 +13,7 @@ An interactive quiz application to test your knowledge of all Paris transport st
   - Toggle showing station connections/transfers
   - Random order option
 - 📊 **Quiz Mode**: Interactive typing-based quiz to test your knowledge of Paris metro stations
+- 🧬 **Intersection Master**: A new advanced mode where you must find stations at the intersection of two criteria (e.g., Line 1 × Rive Gauche)
 - 📱 **Responsive Design**: Works on desktop, tablet, and mobile
 - 🎨 **Line-Colored Interface**: Each station displays with its actual transport line color
 
@@ -113,3 +114,11 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Data Pipeline
+
+The project includes a Python script to enrich metro data with geographical and historical information:
+- **Location**: `scripts/process_data.py`
+- **Output**: `src/data/stations-enriched.csv`
+
+To run the pipeline, you'll need Python with `geopandas` and `shapely` installed.

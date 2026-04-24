@@ -85,3 +85,5 @@ pids
 .out
 .storybook-out
 storybook-static
+
+src/data/

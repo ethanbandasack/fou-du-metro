@@ -319,6 +319,11 @@ export function getOptimizedStations(): MetroStation[] {
   return getStationsFromLineData();
 }
 
+export function getEnrichedStations(): EnrichedStation[] {
+  // This is a placeholder, in a real Next.js app we might fetch this from an API or use fs in server components
+  return [];
+}
+
 export function getOptimizedStationsByLine(): Record<string, MetroStation[]> {
   return getOrderedStationsByLine();
 }
