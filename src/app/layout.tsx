@@ -27,6 +27,7 @@ const parisine = localFont({
     }
   ],
   variable: "--font-parisine",
+  fallback: ["Arial", "Helvetica", "sans-serif"],
 });
 
 export const metadata: Metadata = {

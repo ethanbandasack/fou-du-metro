@@ -37,7 +37,7 @@
 }
 
 .font-parisine {
-  font-family: var(--font-parisine), sans-serif;
+  font-family: var(--font-parisine), Arial, Helvetica, sans-serif;
 }
 
 body {

@@ -1,7 +1,7 @@
 import HomePage from '@/components/HomePage';
 import { getOptimizedStations, getOptimizedStationsByLine } from '@/utils/metroUtils';
 import { parseEnrichedCSV } from '@/utils/intersectionUtils';
-import { MetroLine } from '@/types/metro';
+import { MetroLine, EnrichedStation } from '@/types/metro';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,9 +11,22 @@ export default async function Page() {
   const stationsByLine = getOptimizedStationsByLine();
   
   // Load enriched stations for the intersection quiz
-  const enrichedCsvPath = path.join(process.cwd(), 'src/data/stations-enriched.csv');
-  const enrichedCsvContent = fs.readFileSync(enrichedCsvPath, 'utf8');
-  const enrichedStations = parseEnrichedCSV(enrichedCsvContent);
+  let enrichedStations: EnrichedStation[] = [];
+  let dataError = false;
+  
+  try {
+    const enrichedCsvPath = path.join(process.cwd(), 'src/data/stations-enriched.csv');
+    if (fs.existsSync(enrichedCsvPath)) {
+      const enrichedCsvContent = fs.readFileSync(enrichedCsvPath, 'utf8');
+      enrichedStations = parseEnrichedCSV(enrichedCsvContent);
+    } else {
+      console.error('Data file missing: stations-enriched.csv');
+      dataError = true;
+    }
+  } catch (error) {
+    console.error('Error loading enriched stations:', error);
+    dataError = true;
+  }
 
   // Convert to the lines format expected by HomePage
   const lines: MetroLine[] = Object.entries(stationsByLine).map(([lineKey, lineStations]) => {
@@ -26,5 +39,5 @@ export default async function Page() {
     };
   });
 
-  return <HomePage stations={stations} lines={lines} enrichedStations={enrichedStations} />;
+  return <HomePage stations={stations} lines={lines} enrichedStations={enrichedStations} dataError={dataError} />;
 }
