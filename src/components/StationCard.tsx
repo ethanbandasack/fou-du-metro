@@ -28,10 +28,10 @@ export function StationCard({
       className={`
         p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer min-h-[120px] flex flex-col justify-center
         ${isGuessed 
-          ? 'bg-green-100 border-green-400 text-green-800' 
+          ? 'bg-green-500/10 border-green-500 text-green-600' 
           : hideContent 
-            ? 'bg-gray-100 border-gray-300 hover:border-gray-400 hover:bg-gray-200' 
-            : 'bg-white border-gray-200 hover:border-gray-300'
+            ? 'bg-muted border-border hover:border-accent hover:bg-muted/80' 
+            : 'bg-card border-border hover:border-accent'
         }
         ${className}
       `}
@@ -47,14 +47,14 @@ export function StationCard({
               {station.line}
             </div>
             <div>
-              <h3 className="font-semibold text-lg">{station.nom_long}</h3>
+              <h3 className="font-semibold text-lg text-foreground">{station.nom_long}</h3>
               {station.nom_so_gar && (
-                <p className="text-sm text-gray-600">{station.nom_so_gar}</p>
+                <p className="text-sm text-foreground/60">{station.nom_so_gar}</p>
               )}
             </div>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-4 text-sm text-foreground/60">
             <div className="flex items-center gap-1">
               <Train size={14} />
               <span>{station.mode} {station.line}</span>
@@ -68,12 +68,12 @@ export function StationCard({
           
           {showConnections && station.connections && station.connections.length > 0 && (
             <div className="mt-3">
-              <div className="text-xs text-gray-500 mb-1">Connections:</div>
+              <div className="text-xs text-foreground/50 mb-1 uppercase font-bold">Connections:</div>
               <div className="flex flex-wrap gap-1">
                 {station.connections.map((connection, index) => (
                   <span 
                     key={index}
-                    className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                    className="px-2 py-1 bg-blue-500/20 text-blue-600 text-xs font-bold"
                   >
                     {connection}
                   </span>
@@ -90,10 +90,10 @@ export function StationCard({
         </>
       ) : (
         <div className="text-center">
-          <div className="w-8 h-8 rounded-full bg-gray-400 mx-auto mb-2 flex items-center justify-center text-white text-sm font-bold">
+          <div className="w-8 h-8 rounded-full bg-foreground/10 mx-auto mb-2 flex items-center justify-center text-foreground/40 text-sm font-bold border-2 border-border">
             ?
           </div>
-          <div className="text-gray-500 text-sm">Click to reveal</div>
+          <div className="text-foreground/40 text-xs uppercase font-bold">Click to reveal</div>
         </div>
       )}
     </div>

@@ -248,10 +248,10 @@ const QuizTable: React.FC<QuizTableProps> = ({
               const isCollapsed = collapsedLines.has(lineName);
               
               return (
-                <div key={lineName} className={`border border-gray-200 dark:border-gray-700 rounded-lg ${isLineCompleted ? 'bg-green-50 dark:bg-green-900/10' : ''}`}>
+                <div key={lineName} className={`border border-border rounded-lg ${isLineCompleted ? 'bg-green-500/10' : ''}`}>
                   <div
                     className={`sticky z-30 rounded-t-lg pt-2 ${
-                      isLineCompleted ? 'bg-green-100 dark:bg-green-800/20' : 'bg-gray-50 dark:bg-gray-800'
+                      isLineCompleted ? 'bg-green-500/20' : 'bg-muted'
                     }`}
                     style={{ top: 'calc(5rem + var(--header-offset, 250px) + 8px)' }}
                   >
@@ -261,8 +261,8 @@ const QuizTable: React.FC<QuizTableProps> = ({
                       style={{ backgroundColor: getLineColor(lineName) }}
                     />
                     <div
-                      className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center ${
-                        isLineCompleted ? 'bg-green-100 dark:bg-green-800/20' : 'bg-gray-50 dark:bg-gray-800'
+                      className={`px-3 py-2 border-b border-border flex justify-between items-center ${
+                        isLineCompleted ? 'bg-green-500/10' : 'bg-muted'
                       }`}
                     >
                     <div className="flex items-center gap-2">
@@ -273,17 +273,17 @@ const QuizTable: React.FC<QuizTableProps> = ({
                       >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
                       </button>
-                      <h4 className={`font-medium text-sm ${isLineCompleted ? 'text-green-800 dark:text-green-200' : 'text-gray-900 dark:text-gray-100'}`}>
+                      <h4 className={`font-medium text-sm ${isLineCompleted ? 'text-green-600' : 'text-foreground'}`}>
                         {lineName}
                       </h4>
-                      <span className={`text-xs px-2 py-1 rounded ${isLineCompleted ? 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-200' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'}`}>
+                      <span className={`text-xs px-2 py-1 rounded ${isLineCompleted ? 'bg-green-500/20 text-green-600' : 'bg-muted text-foreground/60'}`}>
                         {guessedStationsInLine} / {totalStationsInLine}
                       </span>
                     </div>
                     {!isAuthenticated && (
                       <button
                         onClick={() => toggleLineVisibility(lineName)}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                        className="text-foreground/60 hover:text-foreground transition-colors"
                         title={isLineVisible ? "Hide answers for this line" : "Show answers for this line"}
                       >
                         {isLineVisible ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -295,27 +295,27 @@ const QuizTable: React.FC<QuizTableProps> = ({
                     <div className="rounded-b-lg overflow-hidden">
                     <table className="w-full">
                     <thead>
-                      <tr className="bg-gray-50 dark:bg-gray-800">
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <tr className="bg-muted">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                           Station
                         </th>
                         {showConnections && (
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                             Connections
                           </th>
                         )}
                       </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-card divide-y divide-border">
                       {lineStations.map((station: MetroStation, index: number) => {
                         const isGuessed = isStationGuessed(station);
                         const showStationName = isGuessed || shouldShowAnswers;
                         
                         let stationRowClass = '';
                         if (gameEnded && !isGuessed) {
-                          stationRowClass = 'bg-red-50 dark:bg-red-900/20';
+                          stationRowClass = 'bg-red-500/10';
                         } else if (isGuessed) {
-                          stationRowClass = 'bg-green-50 dark:bg-green-900/20';
+                          stationRowClass = 'bg-green-500/10';
                         }
                         
                         return (
@@ -324,15 +324,15 @@ const QuizTable: React.FC<QuizTableProps> = ({
                               {showStationName ? (
                                 <span className={`${
                                   isGuessed 
-                                    ? "text-green-700 dark:text-green-300 font-medium"
+                                    ? "text-green-600 font-medium"
                                     : gameEnded 
-                                    ? "text-red-700 dark:text-red-300 font-medium"
-                                    : "text-blue-700 dark:text-blue-300 font-medium"
+                                    ? "text-red-600 font-medium"
+                                    : "text-blue-600 font-medium"
                                 } font-parisine`}>
                                   {station.nom_long}
                                 </span>
                               ) : (
-                                <span className="text-gray-400 dark:text-gray-600 select-none">
+                                <span className="text-foreground/30 select-none">
                                   ●●●●●
                                 </span>
                               )}

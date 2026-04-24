@@ -46,19 +46,19 @@ export function LineFilter({
   const availableModes = [...new Set(lines.map(line => line.mode))];
 
   return (
-    <div className={`p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md ${className}`}>
+    <div className={`p-4 bg-card rounded-lg shadow-md border-2 border-border ${className}`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">Filter Transport</h3>
+        <h3 className="font-semibold text-lg text-foreground">Filter Transport</h3>
         <div className="flex gap-2">
           <button
             onClick={selectAll}
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+            className="px-3 py-1 bg-accent text-accent-foreground border-2 border-border rounded text-sm hover:opacity-80 transition-colors"
           >
             All
           </button>
           <button
             onClick={clearAll}
-            className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 transition-colors"
+            className="px-3 py-1 bg-muted text-foreground border-2 border-border rounded text-sm hover:opacity-80 transition-colors"
           >
             None
           </button>
@@ -67,7 +67,7 @@ export function LineFilter({
 
       {/* Mode Filter */}
       <div className="mb-4">
-        <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Transport Type:</h4>
+        <h4 className="font-medium text-sm text-foreground/70 mb-2">Transport Type:</h4>
         <div className="flex flex-wrap gap-2">
           {availableModes.map((mode) => {
             const isSelected = selectedModes.includes(mode);
@@ -77,10 +77,10 @@ export function LineFilter({
                 key={mode}
                 onClick={() => toggleMode(mode)}
                 className={`
-                  px-3 py-1 rounded-md border-2 transition-all text-sm
+                  px-3 py-1 rounded-md border-2 transition-all text-sm font-bold
                   ${isSelected 
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
-                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
+                    ? 'border-blue-500 bg-blue-500/20 text-blue-600' 
+                    : 'border-border bg-card text-foreground/70 hover:border-accent'
                   }
                 `}
               >
@@ -93,7 +93,7 @@ export function LineFilter({
       
       {/* Line Filter */}
       <div>
-        <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300 mb-2">Lines:</h4>
+        <h4 className="font-medium text-sm text-foreground/70 mb-2">Lines:</h4>
         <div className="flex flex-wrap gap-2">
           {lines
             .filter(line => selectedModes.length === 0 || selectedModes.includes(line.mode))
@@ -105,10 +105,10 @@ export function LineFilter({
                   key={`${line.mode}-${line.line}`}
                   onClick={() => toggleLine(line.line)}
                   className={`
-                    flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all
+                    flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all font-bold
                     ${isSelected 
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
-                      : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500'
+                      ? 'border-blue-500 bg-blue-500/20 text-blue-600' 
+                      : 'border-border bg-card text-foreground/70 hover:border-accent'
                     }
                   `}
                 >
@@ -121,7 +121,7 @@ export function LineFilter({
                   <span className="font-medium">
                     {line.mode} {line.line}
                   </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-sm opacity-50">
                     ({line.stations.length})
                   </span>
                 </button>
@@ -130,7 +130,7 @@ export function LineFilter({
         </div>
       </div>
       
-      <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+      <div className="mt-3 text-sm text-foreground/50 font-medium">
         {selectedLines.length === 0 
           ? 'No lines selected' 
           : `${selectedLines.length} line${selectedLines.length === 1 ? '' : 's'} selected`
