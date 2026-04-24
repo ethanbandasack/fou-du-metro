@@ -35,12 +35,14 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const [sub2, setSub2] = useState<string>('');
   const [customLines, setCustomLines] = useState<string>('');
   const [customArrs, setCustomArrs] = useState<string>('');
+  const [suggestionsEnabled, setSuggestionsEnabled] = useState(true);
   
   const [targetStations, setTargetStations] = useState<string[]>([]);
   const [foundStations, setFoundStations] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [revealed, setRevealed] = useState(false);
   const [errorShake, setErrorShake] = useState(false);
+  const [suggestions, setSuggestions] = useState<EnrichedStation[]>([]);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,15 +110,37 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     setFoundStations([]);
     setRevealed(false);
     setSearchInput('');
+    setSuggestions([]);
   }, [allStations, flatPool, sub1, sub2, gameMode]);
 
   useEffect(() => {
     setupGame();
   }, [setupGame]);
 
-  const handleGuess = (e: React.FormEvent) => {
-    e.preventDefault();
-    const val = searchInput.trim();
+  // Autocomplete logic
+  useEffect(() => {
+    if (!suggestionsEnabled || searchInput.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const val = normalizeStationName(searchInput);
+    if (!val) {
+      setSuggestions([]);
+      return;
+    }
+
+    const filtered = allStations.filter(s => {
+      const normalizedNom = normalizeStationName(s.nom);
+      return normalizedNom.includes(val);
+    }).slice(0, 8);
+    
+    setSuggestions(filtered);
+  }, [searchInput, allStations, suggestionsEnabled]);
+
+  const handleGuess = (e?: React.FormEvent, manualName?: string) => {
+    if (e) e.preventDefault();
+    const val = (manualName || searchInput).trim();
     if (!val) return;
 
     const matchedStation = allStations.find(s => 
@@ -127,6 +151,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
       if (!foundStations.includes(matchedStation.nom)) {
         setFoundStations(prev => [...prev, matchedStation.nom]);
         setSearchInput('');
+        setSuggestions([]);
       } else {
         triggerError();
       }
@@ -150,251 +175,197 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const progress = targetStations.length > 0 ? (foundStations.length / targetStations.length) * 100 : 0;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 pb-20">
-      {/* Config Panel */}
-      <section className="bg-[#f5f5f5] dark:bg-gray-800 border-2 border-black dark:border-white p-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 border-b-2 border-black dark:border-white pb-6">
-          <div className="space-y-1">
-            <h2 className="text-3xl font-black uppercase tracking-tighter">
-              METRO INTERSECTION
-            </h2>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Calculateur de correspondances parisiennes</p>
-          </div>
-          
-          <div className="flex border-2 border-black dark:border-white">
+    <div className="flex flex-col md:flex-row min-h-screen bg-white">
+      {/* Sidebar - Config Minimaliste */}
+      <aside className="w-full md:w-[300px] bg-[#fcfcfc] border-r border-black p-8 space-y-10 shrink-0 flex flex-col">
+        <header className="border-b border-black pb-4">
+            <h1 className="text-xl font-bold tracking-tight">Metrodoku</h1>
+            <span className="text-[11px] text-gray-500 font-medium">Entraînement / Intersection</span>
+        </header>
+
+        <div className="flex border border-black overflow-hidden">
             <button 
-              onClick={() => setGameMode('intersection')}
-              className={`px-4 py-2 text-xs font-bold uppercase transition-all ${gameMode === 'intersection' ? 'bg-black text-white' : 'bg-white text-black dark:bg-gray-700 dark:text-white'}`}
+              onClick={() => setGameMode('intersection')} 
+              className={`flex-1 py-2 text-[11px] font-bold transition-all ${gameMode === 'intersection' ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'}`}
             >
-              Intersection
+              2 catégories
             </button>
             <button 
-              onClick={() => setGameMode('single')}
-              className={`px-4 py-2 text-xs font-bold uppercase transition-all ${gameMode === 'single' ? 'bg-black text-white' : 'bg-white text-black dark:bg-gray-700 dark:text-white'}`}
+              onClick={() => setGameMode('single')} 
+              className={`flex-1 py-2 text-[11px] font-bold transition-all ${gameMode === 'single' ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'}`}
             >
-              Simple
+              1 catégorie
             </button>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Criterion A */}
-          <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">CRITÈRE ALPHA</label>
-            <div className="flex flex-col gap-1">
-              <select 
-                value={meta1}
-                onChange={(e) => setMeta1(e.target.value)}
-                className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-white p-2 text-sm font-bold appearance-none"
-              >
-                {Object.entries(MetaCategories).map(([id, name]) => (
-                  <option key={id} value={id}>{name}</option>
-                ))}
-              </select>
-              <select 
-                value={sub1}
-                onChange={(e) => setSub1(e.target.value)}
-                className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-white p-2 text-sm font-bold appearance-none"
-                disabled={meta1 === 'custom'}
-              >
-                {categories[meta1]?.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Criterion B */}
-          {gameMode === 'intersection' && (
+        <div className="space-y-8 flex-1">
             <div className="space-y-4">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">CRITÈRE BÊTA</label>
-              <div className="flex flex-col gap-1">
-                <select 
-                  value={meta2}
-                  onChange={(e) => setMeta2(e.target.value)}
-                  className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-white p-2 text-sm font-bold appearance-none"
-                >
-                  {Object.entries(MetaCategories).map(([id, name]) => (
-                    <option key={id} value={id}>{name}</option>
-                  ))}
-                </select>
-                <select 
-                  value={sub2}
-                  onChange={(e) => setSub2(e.target.value)}
-                  className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-white p-2 text-sm font-bold appearance-none"
-                  disabled={meta2 === 'custom'}
-                >
-                  {categories[meta2]?.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Catégorie 1</label>
+                    <select value={meta1} onChange={(e) => setMeta1(e.target.value)} className="w-full bg-white border border-black p-2 text-xs font-medium focus:outline-none appearance-none">
+                        {Object.entries(MetaCategories).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                    </select>
+                    <div className="flex gap-2">
+                        <select value={sub1} onChange={(e) => setSub1(e.target.value)} disabled={meta1 === 'custom'} className="flex-1 bg-white border border-black p-2 text-xs font-medium focus:outline-none appearance-none">
+                            {categories[meta1]?.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                        </select>
+                        <button onClick={() => handleRandomSub(1)} className="border border-black aspect-square w-9 flex items-center justify-center bg-white hover:bg-black hover:text-white transition-all">
+                            <Shuffle size={14} />
+                        </button>
+                    </div>
+                </div>
+
+                {gameMode === 'intersection' && (
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Catégorie 2</label>
+                        <select value={meta2} onChange={(e) => setMeta2(e.target.value)} className="w-full bg-white border border-black p-2 text-xs font-medium focus:outline-none appearance-none">
+                            {Object.entries(MetaCategories).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                        </select>
+                        <div className="flex gap-2">
+                            <select value={sub2} onChange={(e) => setSub2(e.target.value)} disabled={meta2 === 'custom'} className="flex-1 bg-white border border-black p-2 text-xs font-medium focus:outline-none appearance-none">
+                                {categories[meta2]?.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                            </select>
+                            <button onClick={() => handleRandomSub(2)} className="border border-black aspect-square w-9 flex items-center justify-center bg-white hover:bg-black hover:text-white transition-all">
+                                <Shuffle size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
-          )}
+
+            <div className="pt-6 border-t border-gray-100 flex items-center gap-3">
+                <span className="text-[11px] font-bold">Suggestions</span>
+                <button 
+                  onClick={() => setSuggestionsEnabled(!suggestionsEnabled)}
+                  className={`border border-black px-3 py-1 text-[10px] font-bold transition-all ${suggestionsEnabled ? 'bg-black text-white' : 'bg-white'}`}
+                >
+                  {suggestionsEnabled ? 'Marche' : 'Arrêt'}
+                </button>
+            </div>
         </div>
 
-        {/* Custom Inputs */}
-        {(meta1 === 'custom' || meta2 === 'custom') && (
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 border-2 border-black dark:border-white p-4">
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest">Lignes (ex: 1, 4, 14)</label>
-                    <input 
-                        type="text" 
-                        value={customLines}
-                        onChange={(e) => setCustomLines(e.target.value)}
-                        placeholder="1, 7, 13..."
-                        className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-white py-2 px-3 text-sm font-bold"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest">Arr. (ex: 1, 8, 15, 92)</label>
-                    <input 
-                        type="text" 
-                        value={customArrs}
-                        onChange={(e) => setCustomArrs(e.target.value)}
-                        placeholder="Arrondissements..."
-                        className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-white py-2 px-3 text-sm font-bold"
-                    />
-                </div>
-            </div>
-        )}
-
-        <div className="flex flex-col sm:flex-row gap-2 mt-12">
-          <button 
-            onClick={shuffleAll}
-            className="flex-1 bg-white hover:bg-black hover:text-white dark:bg-gray-900 border-2 border-black dark:border-white text-xs font-black uppercase py-4 transition-all"
-          >
-            Mélange Aléatoire
-          </button>
-          <button 
+        <button 
             onClick={setupGame}
-            className="flex-[2] bg-black text-white hover:bg-white hover:text-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white border-2 border-black dark:border-white text-xs font-black uppercase py-4 transition-all"
-          >
-            Générer Nouveau Quiz
-          </button>
-        </div>
-      </section>
+            className="w-full bg-black text-white py-4 text-sm font-bold border border-black hover:bg-gray-900 transition-all"
+        >
+            Générer le quiz
+        </button>
+      </aside>
 
-      {/* Gameplay Section */}
-      <section className="space-y-12">
-        <div className="flex flex-col items-center gap-8">
-            <div className="flex flex-wrap items-center justify-center gap-4">
-                <div className="border-2 border-black dark:border-white px-6 py-2 bg-white dark:bg-gray-900">
-                    <span className="text-xl font-black uppercase tracking-tighter">
-                        {currentCatA?.name}
-                    </span>
-                </div>
+      <main className="flex-1 overflow-y-auto">
+        <header className="sticky top-0 bg-white/80 backdrop-blur-md z-30 p-12 lg:p-20 py-8 lg:py-10 border-b border-black flex flex-col md:flex-row justify-between items-baseline gap-4 mb-16">
+            <div className="flex flex-wrap items-center gap-3">
+                <span 
+                    className="px-3 py-1 border border-black font-bold text-sm"
+                    style={{ 
+                        backgroundColor: currentCatA?.type === 'line' ? LINE_COLORS[currentCatA.id.replace('line-', '')] : 'white',
+                        color: currentCatA?.type === 'line' ? 'white' : 'black'
+                    }}
+                >
+                    {currentCatA?.name}
+                </span>
                 {gameMode === 'intersection' && (
                     <>
-                        <span className="text-4xl font-black">×</span>
-                        <div className="border-2 border-black dark:border-white px-6 py-2 bg-white dark:bg-gray-900">
-                            <span className="text-xl font-black uppercase tracking-tighter">
-                                {currentCatB?.name}
-                            </span>
-                        </div>
+                        <span className="text-xl font-light">/</span>
+                        <span 
+                            className="px-3 py-1 border border-black font-bold text-sm"
+                            style={{ 
+                                backgroundColor: currentCatB?.type === 'line' ? LINE_COLORS[currentCatB.id.replace('line-', '')] : 'white',
+                                color: currentCatB?.type === 'line' ? 'white' : 'black'
+                            }}
+                        >
+                            {currentCatB?.name}
+                        </span>
                     </>
                 )}
             </div>
-            
-            <div className="text-center">
-                <div className="text-6xl font-black tracking-tighter mb-1">
-                    {targetStations.length}
-                </div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Stations à identifier</div>
-            </div>
-        </div>
 
-        {/* Status Bar */}
-        <div className="w-full max-w-lg mx-auto flex justify-between items-end border-b-2 border-black dark:border-white pb-2 px-1">
-            <div className="space-y-1 text-left">
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Progression</div>
-                <div className="text-2xl font-black leading-none">{foundStations.length} / {targetStations.length}</div>
-            </div>
             <div className="text-right">
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Ratio</div>
-                <div className="text-2xl font-black leading-none">{Math.round(progress)}%</div>
+                <div className="text-4xl font-bold tracking-tight">
+                    {foundStations.length} / {targetStations.length}
+                </div>
+                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Progression</div>
             </div>
-        </div>
+        </header>
 
-        {/* Input Form */}
-        <form onSubmit={handleGuess} className="max-w-2xl mx-auto space-y-4">
-          <div className="relative group">
-            <input 
-              ref={searchInputRef}
-              type="text" 
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Tapez le nom d'une gare..."
-              disabled={revealed || (targetStations.length === 0)}
-              className={`w-full bg-white dark:bg-gray-900 border-4 border-black dark:border-white py-6 px-8 text-2xl font-black uppercase tracking-tight outline-none transition-all placeholder:text-gray-200 ${errorShake ? 'animate-shake border-red-600' : 'focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black'}`}
-            />
-          </div>
-          <div className="flex justify-between items-center px-1">
-             <button 
-                type="button"
-                onClick={revealAll}
-                className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-             >
-                [ Abandonner / Voir Réponses ]
-             </button>
-             {errorShake && <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">Erreur de saisie</span>}
-          </div>
-        </form>
-
-        {/* Station Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[1px] bg-black dark:bg-white border-[1px] border-black dark:border-white">
-             {targetStations.map(name => {
-                 const isFound = foundStations.includes(name);
-                 const station = allStations.find(s => s.nom === name);
-                 
-                 if (!isFound && !revealed) return null;
-
-                 return (
-                     <div 
-                        key={name}
-                        className={`p-6 flex flex-col bg-white dark:bg-gray-900 transition-all ${isFound ? '' : 'opacity-50 grayscale'}`}
-                     >
-                        <div className="flex justify-between items-start mb-4">
-                             <span className="text-sm font-black uppercase tracking-tight leading-tight">
-                                {name}
-                             </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-auto">
-                            {station?.lines.map(l => (
-                                <span 
-                                    key={l}
-                                    className="w-8 h-8 flex items-center justify-center text-xs font-black border-2 border-black dark:border-white"
-                                    style={{ backgroundColor: isFound ? (LINE_COLORS[l] || '#000') : '#ccc', color: isFound ? 'white' : '#666' }}
+        <div className="p-12 lg:p-20 pt-0 space-y-16">
+            {/* Input area */}
+            <section className="space-y-2 relative">
+                <form onSubmit={handleGuess}>
+                    <input 
+                        ref={searchInputRef}
+                        type="text" 
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="Saisir une station..."
+                        disabled={revealed || targetStations.length === 0}
+                        className={`w-full bg-transparent border-b-2 border-black py-4 text-5xl font-bold tracking-tight outline-none placeholder:text-gray-200 transition-all ${errorShake ? 'animate-shake border-red-500' : 'focus:border-black'}`}
+                    />
+                    
+                    {/* Suggestions List */}
+                    {suggestions.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 z-50 bg-white border border-black mt-1">
+                            {suggestions.map(s => (
+                                <div 
+                                    key={s.nom}
+                                    onClick={() => handleGuess(undefined, s.nom)}
+                                    className="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer font-bold text-sm flex justify-between items-center"
                                 >
-                                    {l}
-                                </span>
+                                    <span>{s.nom}</span>
+                                </div>
                             ))}
                         </div>
-                     </div>
-                 );
-             })}
+                    )}
+                </form>
+                <div className="flex justify-between items-center text-[10px] font-medium text-gray-400">
+                    <span>Entrée pour valider</span>
+                    <button onClick={revealAll} className="hover:text-black">Afficher les réponses</button>
+                </div>
+            </section>
+
+            {/* Results */}
+            <section className="space-y-6">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Stations trouvées</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-gray-100 border border-gray-100">
+                    {targetStations.map(name => {
+                        const isFound = foundStations.includes(name);
+                        const station = allStations.find(s => s.nom === name);
+                        if (!isFound && !revealed) return null;
+
+                        return (
+                            <div key={name} className={`bg-white p-5 flex flex-col justify-between h-32 ${isFound ? '' : 'opacity-40 grayscale italic'}`}>
+                                <span className="text-[11px] font-bold leading-tight">{name}</span>
+                                <div className="flex flex-wrap gap-1">
+                                    {station?.lines.map(l => (
+                                        <div 
+                                            key={l} 
+                                            className="w-6 h-6 flex items-center justify-center text-[10px] font-bold border border-gray-200"
+                                            style={{backgroundColor: isFound ? LINE_COLORS[l] : '#eee', color: isFound ? 'white' : '#999'}}
+                                        >
+                                            {l}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                
+                {targetStations.length === 0 && (
+                    <div className="py-20 text-center border border-dashed border-gray-200">
+                        <p className="text-gray-300 font-medium text-xs">Aucune station dans cette intersection</p>
+                    </div>
+                )}
+            </section>
+
+            {foundStations.length === targetStations.length && targetStations.length > 0 && (
+                <div className="bg-black text-white p-16 text-center border-t-4 border-black">
+                    <h4 className="text-6xl font-bold tracking-tight mb-2">Quiz terminé</h4>
+                    <p className="text-xs font-medium opacity-50">Toutes les stations ont été identifiées</p>
+                </div>
+            )}
         </div>
-
-        {targetStations.length === 0 && (
-             <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-black dark:border-white">
-                <p className="text-sm font-black uppercase tracking-widest">NÉANT LOGIQUE</p>
-                <p className="text-[10px] mt-2 text-gray-500 font-bold">AUCUNE STATION DANS CETTE INTERSECTION</p>
-             </div>
-        )}
-
-        {foundStations.length === targetStations.length && targetStations.length > 0 && (
-            <div className="bg-black text-white dark:bg-white dark:text-black p-12 text-center border-4 border-black dark:border-white animate-pulse">
-                <h4 className="text-5xl font-black uppercase tracking-tighter mb-4">OPÉRATION RÉUSSIE</h4>
-                <p className="text-xs font-bold uppercase tracking-[0.3em] mb-8">Base de données complète</p>
-                <button 
-                  onClick={shuffleAll}
-                  className="bg-white text-black dark:bg-black dark:text-white px-10 py-3 font-black uppercase text-xs border-2 border-black dark:border-white hover:invert transition-all"
-                >
-                  Réinitialiser
-                </button>
-            </div>
-        )}
-      </section>
+      </main>
     </div>
   );
 }

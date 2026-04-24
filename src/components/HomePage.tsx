@@ -17,7 +17,7 @@ export default function HomePage({ stations, lines, enrichedStations }: HomePage
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] dark:bg-gray-900 border-x-2 border-black dark:border-white max-w-[1400px] mx-auto">
-      <nav className="bg-white dark:bg-gray-900 border-b-2 border-black dark:border-white sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-900 border-b-2 border-black dark:border-white sticky top-0 z-[70]">
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-3xl grayscale">🚇</span>
@@ -45,16 +45,18 @@ export default function HomePage({ stations, lines, enrichedStations }: HomePage
         </div>
       </nav>
 
-      <main className="py-12 px-6">
+      <main className="">
         {activeQuiz === 'classic' ? (
-          <QuizGame stations={stations} lines={lines} />
+          <div className="py-12 px-6">
+            <QuizGame stations={stations} lines={lines} />
+          </div>
         ) : (
           <IntersectionQuiz allStations={enrichedStations} />
         )}
       </main>
       
       <footer className="border-t-2 border-black dark:border-white p-8 text-center bg-white dark:bg-gray-900">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.5em]">Entraînement Système • Paris Metro Deep Learning</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">© Pseudo, 2025-2026</p>
       </footer>
     </div>
   );

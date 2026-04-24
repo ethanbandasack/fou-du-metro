@@ -25,7 +25,6 @@ const QuizTable: React.FC<QuizTableProps> = ({
   isAuthenticated = false
 }) => {
   const [visibleLines, setVisibleLines] = useState<Set<string>>(new Set());
-  const [showGlobalAnswers, setShowGlobalAnswers] = useState(false);
   const [collapsedLines, setCollapsedLines] = useState<Set<string>>(new Set());
 
   const toggleLineVisibility = (lineName: string) => {
@@ -40,9 +39,6 @@ const QuizTable: React.FC<QuizTableProps> = ({
     });
   };
 
-  const toggleGlobalVisibility = () => {
-    setShowGlobalAnswers(prev => !prev);
-  };
 
   const toggleLineCollapse = (lineName: string) => {
     setCollapsedLines(prev => {
@@ -232,19 +228,6 @@ const QuizTable: React.FC<QuizTableProps> = ({
 
   return (
     <div>
-      {/* Global Controls */}
-      {!isAuthenticated && (
-        <div className="mb-4 flex justify-end">
-          <button
-            onClick={toggleGlobalVisibility}
-            className="flex items-center gap-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
-            title={showGlobalAnswers ? "Hide all answers" : "Show all answers"}
-          >
-            {showGlobalAnswers ? <EyeOff size={16} /> : <Eye size={16} />}
-            {showGlobalAnswers ? 'Hide All' : 'Peek All'}
-          </button>
-        </div>
-      )}
 
       {/* Lines Grid */}
       <div className={`grid gap-6 grid-cols-1 md:grid-cols-2 ${numberOfColumns > 2 ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-2'}`}>
@@ -252,7 +235,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
           <div key={columnIndex} className="space-y-4">
             {columnLines.map(([lineName, lineStations]) => {
               const isLineVisible = visibleLines.has(lineName);
-              const shouldShowAnswers = showAllAnswers || gameEnded || showGlobalAnswers || isLineVisible;
+              const shouldShowAnswers = showAllAnswers || gameEnded || isLineVisible;
               
               // Calculate guessed stations for this line
               const guessedStationsInLine = lineStations.filter(station => isStationGuessed(station)).length;
@@ -267,10 +250,10 @@ const QuizTable: React.FC<QuizTableProps> = ({
               return (
                 <div key={lineName} className={`border border-gray-200 dark:border-gray-700 rounded-lg ${isLineCompleted ? 'bg-green-50 dark:bg-green-900/10' : ''}`}>
                   <div
-                    className={`sticky z-40 rounded-t-lg pt-2 ${
+                    className={`sticky z-30 rounded-t-lg pt-2 ${
                       isLineCompleted ? 'bg-green-100 dark:bg-green-800/20' : 'bg-gray-50 dark:bg-gray-800'
                     }`}
-                    style={{ top: 'var(--global-sticky-height, 0px)' }}
+                    style={{ top: 'calc(5rem + var(--header-offset, 250px) + 8px)' }}
                   >
                     {/* Line color indicator (now part of sticky header) */}
                     <div 

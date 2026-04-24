@@ -42,6 +42,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [resetTimerTrigger, setResetTimerTrigger] = useState(false);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
+  const [showGlobalAnswers, setShowGlobalAnswers] = useState(false);
 
   // Authentication state
   const [authState, setAuthState] = useState<AuthState>({
@@ -384,11 +385,33 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   }, []);
 
   const progress = uniqueStationNames.size > 0 ? (quizState.score / uniqueStationNames.size) * 100 : 0;
+  // Dynamic sticky header offset calculation
+  useEffect(() => {
+    const updateOffset = () => {
+      if (stickyHeaderRef.current) {
+        document.documentElement.style.setProperty(
+          '--header-offset', 
+          `${stickyHeaderRef.current.offsetHeight}px`
+        );
+      }
+    };
+    
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+    
+    // Also update after a short delay to account for dynamic content (e.g. settings appearing)
+    const timer = setTimeout(updateOffset, 100);
+    
+    return () => {
+      window.removeEventListener('resize', updateOffset);
+      clearTimeout(timer);
+    };
+  }, [showSettings, showScores, quizState.isGameActive]);
 
   return (
     <div className="max-w-6xl mx-auto">
       {/* Sticky Header Container */}
-      <div ref={stickyHeaderRef} className="sticky top-0 bg-white dark:bg-gray-900 z-50 shadow-md mb-6">
+      <div ref={stickyHeaderRef} className="sticky top-20 bg-white dark:bg-gray-900 z-50 shadow-md mb-6">
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="text-center py-4 border-b-2 border-black dark:border-white">
@@ -423,33 +446,33 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                    className="flex items-center gap-2 px-3 py-2 border border-black text-black hover:bg-black hover:text-white transition-colors text-sm font-bold uppercase"
                   >
                     <LogOut size={16} />
-                    Logout
+                    Deconnexion
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setShowLoginForm(!showLoginForm)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all text-xs font-black uppercase"
                 >
                   <LogIn size={20} />
-                  Login
+                  Connexion
                 </button>
               )}
               
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className={`flex items-center gap-2 px-4 py-2 border-2 border-black text-xs font-black uppercase transition-all ${showSettings ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'}`}
               >
                 <Settings size={20} />
-                Settings
+                Paramètres
               </button>
               
               <button
                 onClick={() => setShowScores(!showScores)}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                className={`flex items-center gap-2 px-4 py-2 border-2 border-black text-xs font-black uppercase transition-all ${showScores ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'}`}
                 disabled={authLoading}
               >
                 <Trophy size={20} />
@@ -495,6 +518,18 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   </button>
                 </>
               )}
+
+              <button
+                onClick={() => setShowGlobalAnswers(!showGlobalAnswers)}
+                className={`flex items-center gap-2 px-4 py-2 border-2 border-black dark:border-white text-xs font-black uppercase transition-all ${
+                  showGlobalAnswers 
+                    ? 'bg-black text-white' 
+                    : 'bg-white text-black dark:bg-gray-800 dark:text-white hover:bg-black hover:text-white'
+                }`}
+              >
+                {showGlobalAnswers ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showGlobalAnswers ? 'Masquer les solutions' : 'Afficher les solutions'}
+              </button>
             </div>
           </div>
 
@@ -518,6 +553,24 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   Found: {lastFoundStation}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Progress (Now inside sticky header) */}
+          {gameStations.length > 0 && (
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Progression globale</span>
+                <span className="text-[10px] font-black text-gray-600 dark:text-gray-400">
+                  {quizState.score} / {uniqueStationNames.size} gares ({Math.round(progress)}%)
+                </span>
+              </div>
+              <div className="w-full bg-gray-100 dark:bg-gray-800 h-2">
+                <div 
+                  className="bg-black dark:bg-white h-2 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -580,28 +633,6 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
       {/* Content Container */}
       <div className="px-6 space-y-6">
 
-      {/* Progress */}
-      {gameStations.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Progress</span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {quizState.score} / {uniqueStationNames.size} stations
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-            <div 
-              className="bg-green-500 h-3 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="mt-2 text-center">
-            <span className="text-lg font-bold text-green-600">
-              {Math.round(progress)}% Complete
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Settings Panel */}
       {showSettings && (
@@ -737,7 +768,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
           stations={stations}
           filteredStations={gameStations}
           guessedStations={quizState.guessedStations}
-          showAllAnswers={false}
+          showAllAnswers={showGlobalAnswers}
           gameEnded={!quizState.isGameActive && quizState.score > 0}
           showConnections={settings.showConnections}
           isAuthenticated={authState.isAuthenticated}
