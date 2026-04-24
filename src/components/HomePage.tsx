@@ -23,21 +23,21 @@ export default function HomePage({ stations, lines, enrichedStations, dataError 
           <div className="flex items-center gap-4">
             <span className="text-3xl grayscale">🚇</span>
             <div className="flex flex-col -space-y-1">
-              <span className="font-black text-2xl tracking-tighter uppercase">Fou du métro</span>
+              <span className="font-black text-2xl tracking-tighter">Fou du métro</span>
             </div>
           </div>
 
-          <div className="flex border-2 border-border">
+          <div className="flex border border-border">
             <button 
               onClick={() => setActiveQuiz('classic')}
-              className={`flex items-center gap-2 px-6 py-2 text-[10px] font-black uppercase transition-all ${activeQuiz === 'classic' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'}`}
+              className={`flex items-center gap-2 px-6 py-2 text-[11px] font-bold transition-all ${activeQuiz === 'classic' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'}`}
             >
               <LayoutGrid size={14} />
               Classique
             </button>
             <button 
               onClick={() => setActiveQuiz('intersection')}
-              className={`flex items-center gap-2 px-6 py-2 text-[10px] font-black uppercase transition-all ${activeQuiz === 'intersection' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'}`}
+              className={`flex items-center gap-2 px-6 py-2 text-[11px] font-bold transition-all ${activeQuiz === 'intersection' ? 'bg-accent text-accent-foreground' : 'hover:bg-muted'}`}
             >
               <Blend size={14} />
               Intersection
@@ -51,7 +51,7 @@ export default function HomePage({ stations, lines, enrichedStations, dataError 
           <div className="mx-6 mt-6 p-4 bg-red-50 border-2 border-red-500 text-red-700 flex items-center gap-3">
             <span className="text-xl">⚠️</span>
             <div>
-              <p className="font-black uppercase text-xs tracking-widest">Erreur de données</p>
+              <p className="font-black text-xs tracking-widest">Erreur de données</p>
               <p className="text-[10px] font-medium">Le fichier des stations enrichies (stations-enriched.csv) est introuvable ou corrompu. Le mode Intersection peut ne pas fonctionner correctement.</p>
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function HomePage({ stations, lines, enrichedStations, dataError 
       </main>
       
       <footer className="border-t-2 border-border p-8 text-center bg-card transition-colors duration-300">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">© Pseudo, 2025-2026</p>
+        <p className="text-[10px] font-bold text-gray-400 tracking-widest">© Pseudo, 2025-2026</p>
       </footer>
     </div>
   );

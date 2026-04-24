@@ -202,7 +202,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
         <div className="space-y-8 flex-1">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Catégorie 1</label>
+                    <label className="text-[10px] font-bold text-gray-400 tracking-wider">Catégorie 1</label>
                     <select value={meta1} onChange={(e) => setMeta1(e.target.value)} className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground">
                         {Object.entries(MetaCategories).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                     </select>
@@ -218,7 +218,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
 
                 {gameMode === 'intersection' && (
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Catégorie 2</label>
+                        <label className="text-[10px] font-bold text-gray-400 tracking-wider">Catégorie 2</label>
                         <select value={meta2} onChange={(e) => setMeta2(e.target.value)} className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground">
                             {Object.entries(MetaCategories).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                         </select>
@@ -237,13 +237,13 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
             <div className="space-y-3 pt-4">
                 <button 
                     onClick={shuffleAll}
-                    className="w-full bg-card text-foreground py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-border hover:bg-accent hover:text-accent-foreground transition-all"
+                    className="w-full bg-card text-foreground py-2 text-[10px] font-black tracking-[0.2em] border border-border hover:bg-accent hover:text-accent-foreground transition-all"
                 >
                     Tout mélanger
                 </button>
                 <button 
                     onClick={setupGame}
-                    className="w-full bg-card text-foreground py-2 text-[10px] font-black uppercase tracking-[0.2em] border border-border hover:bg-accent hover:text-accent-foreground transition-all"
+                    className="w-full bg-card text-foreground py-2 text-[10px] font-black tracking-[0.2em] border border-border hover:bg-accent hover:text-accent-foreground transition-all"
                 >
                     Recommencer
                 </button>
@@ -293,7 +293,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 <div className="text-4xl font-bold tracking-tight">
                     {foundStations.length} / {targetStations.length}
                 </div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Progression</div>
+                <div className="text-[10px] text-gray-400 font-bold tracking-widest">Progression</div>
             </div>
         </header>
 
@@ -313,7 +313,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                     
                     {targetStations.length === 0 && (
                         <div className="absolute inset-0 flex items-center justify-start pointer-events-none">
-                            <span className="text-red-500 text-xs font-black uppercase tracking-widest bg-card pr-4">Attention : Aucune station trouvée avec ces critères</span>
+                            <span className="text-red-500 text-xs font-black tracking-widest bg-card pr-4">Attention : Aucune station trouvée avec ces critères</span>
                         </div>
                     )}
                     
@@ -340,7 +340,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
 
             {/* Results */}
             <section className="space-y-6">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Stations trouvées</h3>
+                <h3 className="text-[11px] font-bold tracking-widest text-gray-400">Stations trouvées</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-border border border-border">
                     {targetStations.map(name => {
                         const isFound = foundStations.includes(name);
@@ -368,7 +368,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 
                 {targetStations.length === 0 && (
                     <div className="py-32 text-center border-2 border-dashed border-red-100 bg-red-50/30">
-                        <p className="text-red-600 font-black text-xs uppercase tracking-[0.2em]">Intersection vide</p>
+                        <p className="text-red-600 font-black text-xs tracking-[0.2em]">Intersection vide</p>
                         <p className="text-[10px] text-red-400 mt-2 font-medium">Veuillez modifier vos critères de recherche dans la barre latérale</p>
                     </div>
                 )}
@@ -377,7 +377,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
             {foundStations.length === targetStations.length && targetStations.length > 0 && (
                 <div className="bg-card text-foreground py-12 px-6 text-center border-2 border-border">
                     <h4 className="text-3xl font-bold tracking-tight mb-2 font-parisine">Quiz terminé</h4>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Toutes les stations ont été identifiées</p>
+                    <p className="text-[10px] font-black tracking-[0.3em] opacity-40">Toutes les stations ont été identifiées</p>
                 </div>
             )}
         </div>

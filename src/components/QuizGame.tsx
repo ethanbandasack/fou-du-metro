@@ -415,10 +415,10 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="text-center py-4 border-b-2 border-border">
-            <h1 className="text-4xl font-black uppercase tracking-tighter text-foreground mb-2">
-              QUIZ DES TRANSPORTS
+            <h1 className="text-4xl font-black tracking-tighter text-foreground mb-2">
+              Quiz des Transports
             </h1>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            <p className="text-[10px] font-bold text-gray-400 tracking-widest">
               Identifiez les gares du réseau pour valider votre expertise
             </p>
           </div>
@@ -446,42 +446,42 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2 border border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-bold uppercase"
+                    className="flex items-center gap-2 px-3 py-1.5 border border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-[11px] font-bold"
                   >
-                    <LogOut size={16} />
-                    Deconnexion
+                    <LogOut size={14} />
+                    Déconnexion
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setShowLoginForm(!showLoginForm)}
-                  className="flex items-center gap-2 px-4 py-2 border-2 border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground transition-all text-xs font-black uppercase"
+                  className="flex items-center gap-2 px-4 py-2 border border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground transition-all text-[11px] font-bold"
                 >
-                  <LogIn size={20} />
+                  <LogIn size={16} />
                   Connexion
                 </button>
               )}
               
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className={`flex items-center gap-2 px-4 py-2 border-2 border-border text-xs font-black uppercase transition-all ${showSettings ? 'bg-accent text-accent-foreground' : 'bg-card text-foreground hover:bg-accent hover:text-accent-foreground'}`}
+                className={`flex items-center gap-2 px-4 py-2 border border-border text-[11px] font-bold transition-all ${showSettings ? 'bg-accent text-accent-foreground' : 'bg-card text-foreground hover:bg-accent hover:text-accent-foreground'}`}
               >
-                <Settings size={20} />
+                <Settings size={16} />
                 Paramètres
               </button>
               
               <button
                 onClick={() => setShowScores(!showScores)}
-                className={`flex items-center gap-2 px-4 py-2 border-2 border-border text-xs font-black uppercase transition-all ${showScores ? 'bg-accent text-accent-foreground' : 'bg-card text-foreground hover:bg-accent hover:text-accent-foreground'}`}
+                className={`flex items-center gap-2 px-4 py-2 border border-border text-[11px] font-bold transition-all ${showScores ? 'bg-accent text-accent-foreground' : 'bg-card text-foreground hover:bg-accent hover:text-accent-foreground'}`}
                 disabled={authLoading}
               >
-                <Trophy size={20} />
+                <Trophy size={16} />
                 Scores
               </button>
               
               <button
                 onClick={toggleShowConnections}
-                className={`flex items-center gap-2 px-4 py-2 border-2 border-border text-[10px] font-black uppercase transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 border border-border text-[11px] font-bold transition-all ${
                   settings.showConnections
                     ? 'bg-accent text-accent-foreground'
                     : 'bg-card text-foreground hover:bg-muted'
@@ -494,7 +494,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
               {!quizState.isGameActive ? (
                 <button
                   onClick={startGame}
-                  className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground border-2 border-border hover:opacity-80 transition-colors text-xs font-black uppercase"
+                  className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground border border-border hover:opacity-80 transition-colors text-[11px] font-bold uppercase tracking-wide"
                 >
                   <Play size={16} />
                   Lancer le Quiz
@@ -503,7 +503,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                 <>
                   <button
                     onClick={pauseGame}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground transition-all text-xs font-black uppercase"
+                    className="flex items-center gap-2 px-4 py-2 border border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground transition-all text-[11px] font-bold"
                   >
                     <Pause size={16} />
                     {quizState.isPaused ? 'Reprendre' : 'Pause'}
@@ -511,7 +511,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                   
                   <button
                     onClick={stopGame}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-border bg-accent text-accent-foreground hover:opacity-90 transition-all text-xs font-black uppercase"
+                    className="flex items-center gap-2 px-4 py-2 border border-border bg-accent text-accent-foreground hover:opacity-90 transition-all text-[11px] font-bold"
                   >
                     <RotateCcw size={16} />
                     Sauvegarder
@@ -521,7 +521,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
 
               <button
                 onClick={() => setShowGlobalAnswers(!showGlobalAnswers)}
-                className={`flex items-center gap-2 px-4 py-2 border-2 border-border text-xs font-black uppercase transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 border border-border text-[11px] font-bold transition-all ${
                   showGlobalAnswers 
                     ? 'bg-accent text-accent-foreground' 
                     : 'bg-card text-foreground hover:bg-muted'
@@ -546,7 +546,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Tapez le nom d'une gare..."
                 disabled={quizState.isPaused}
-                className="block w-full px-8 py-4 border-2 border-border bg-card text-foreground placeholder-gray-400 focus:outline-none focus:bg-accent focus:text-accent-foreground text-xl font-black uppercase tracking-tight font-parisine transition-colors"
+                className="block w-full px-8 py-4 border-2 border-border bg-card text-foreground placeholder-gray-400 focus:outline-none focus:bg-accent focus:text-accent-foreground text-xl font-black tracking-tight font-parisine transition-colors"
               />
               {lastFoundStation && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-green-500 text-white px-2 py-1 rounded text-sm animate-pulse">
@@ -560,7 +560,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
           {gameStations.length > 0 && (
             <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Progression globale</span>
+                <span className="text-[10px] font-black text-gray-400 tracking-wider">Progression globale</span>
                 <span className="text-[10px] font-black text-gray-600 dark:text-gray-400">
                   {quizState.score} / {uniqueStationNames.size} gares ({Math.round(progress)}%)
                 </span>
@@ -679,7 +679,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mb-4">
               <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200 text-sm">
                 <LogIn size={16} />
-                <span className="font-medium uppercase text-[10px] tracking-widest">Connectez-vous pour sauvegarder</span>
+                <span className="font-medium text-[10px] tracking-widest">Connectez-vous pour sauvegarder</span>
               </div>
               <p className="text-blue-700 dark:text-blue-300 text-[10px] mt-1 font-bold">
                 Vous pouvez voir tous les scores, mais la connexion est requise pour sauvegarder vos propres résultats.
