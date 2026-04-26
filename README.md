@@ -8,13 +8,21 @@ An interactive quiz about the rail transport network in Île-de-France (Paris).
 ## Getting Started
 
 ```bash
+git clone https://github.com/ethanbandasack/fou-du-metro.git
+
+cd fou-du-metro
+
 npm install
+
 npm run dev
 ```
 
 ## About the Game
 
 Test your knowledge of the Parisian transport network (Metro, RER, Train, Tramway) through various game modes, including a classic quiz and an advanced "Intersection" mode to master the network.
+
+> [!IMPORTANT]
+> **Data Quality**: The `stations-enriched.csv` file is currently undergoing a manual checking process. While most data is accurate, some entries may still need verification. Users are encouraged to contribute to this process or modify the data as needed.
 
 ## Font Installation
 
