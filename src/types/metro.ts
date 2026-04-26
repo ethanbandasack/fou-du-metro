@@ -11,6 +11,7 @@ export interface EnrichedStation {
   ouverte_apres_1980: boolean;
   rive_gauche: boolean;
   has_rer: boolean;
+  has_tram: boolean;
 }
 
 export interface MetroStation {

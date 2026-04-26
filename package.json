@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "populate-data": "python3 dev/scripts/populate_enriched_stations.py"
   },
   "dependencies": {
     "lucide-react": "^0.534.0",

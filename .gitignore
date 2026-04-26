@@ -75,6 +75,6 @@ storybook-static
 # Project specific
 src/data/users.json
 src/data/arrondissements.geojson
-fonts/
 src/app/fonts/
 docs/
+dev/
