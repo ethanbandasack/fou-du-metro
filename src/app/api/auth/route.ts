@@ -2,12 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-interface User {
-  id: string;
-  username: string;
-  hash: string;
-  createdAt: string;
-}
+import { User } from '@/types/metro';
 
 export async function POST(request: NextRequest) {
   try {
