@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { EnrichedStation } from '@/types/metro';
+import { MetroStation, MetroLine, EnrichedStation } from "@/types/metro";
+// Build trigger: Updated at 2026-04-27 03:13
 import { 
   getAvailableCategories, 
   MetaCategories, 
-  LINE_COLORS 
+  LINE_COLORS,
+  LINE_TEXT_COLORS
 } from '@/utils/intersectionUtils';
 import { 
   Shuffle
@@ -22,8 +24,8 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const [meta2, setMeta2] = useState<string>('geo');
   const [sub1, setSub1] = useState<string>('');
   const [sub2, setSub2] = useState<string>('');
-  const [customLines] = useState<string>('');
-  const [customArrs] = useState<string>('');
+  const [customGroup1, setCustomGroup1] = useState<string>('');
+  const [customGroup2, setCustomGroup2] = useState<string>('');
   const [suggestionsEnabled, setSuggestionsEnabled] = useState(true);
   
   const [targetStations, setTargetStations] = useState<string[]>([]);
@@ -35,9 +37,14 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const metroOnlyStations = useMemo(() => 
+    allStations.filter(s => s.lines.some(l => /^\d+(bis)?$/.test(l.toLowerCase()))),
+    [allStations]
+  );
+
   const categories = useMemo(() => 
-    getAvailableCategories(allStations, customLines, customArrs), 
-    [allStations, customLines, customArrs]
+    getAvailableCategories(metroOnlyStations), 
+    [metroOnlyStations]
   );
 
   const flatPool = useMemo(() => Object.values(categories).flat(), [categories]);
@@ -63,8 +70,8 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     setMeta2(m2);
 
     // Give react time to update categories pool if needed (though it shouldn't be strictly necessary since it's computed)
-    const cat1List = getAvailableCategories(allStations, customLines, customArrs)[m1];
-    const cat2List = getAvailableCategories(allStations, customLines, customArrs)[m2];
+    const cat1List = getAvailableCategories(allStations)[m1];
+    const cat2List = getAvailableCategories(allStations)[m2];
 
     if (cat1List.length > 0) {
         const r1 = cat1List[Math.floor(Math.random() * cat1List.length)];
@@ -98,14 +105,29 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     
     if (!catA) return;
 
+    const getFilter = (cat: any, customVal: string) => {
+      if (cat.id === 'group-groupe-personnalisé') {
+        const list = customVal.split(/[, ]+/).filter(x => x.trim()).map(x => x.toUpperCase());
+        return (s: EnrichedStation) => s.lines.some(l => list.includes(l.toUpperCase()));
+      }
+      if (cat.id === 'arr-custom') {
+        const list = customVal.split(/[, ]+/).filter(x => x.trim()).map(x => parseInt(x));
+        return (s: EnrichedStation) => list.includes(s.arrondissement);
+      }
+      return cat.filter;
+    };
+
+    const filterA = getFilter(catA, customGroup1);
+
     let targets: string[] = [];
     if (gameMode === 'intersection') {
       if (!catB) return;
-      const stationsA = allStations.filter(catA.filter);
-      const stationsB = allStations.filter(catB.filter);
+      const filterB = getFilter(catB, customGroup2);
+      const stationsA = metroOnlyStations.filter(filterA);
+      const stationsB = metroOnlyStations.filter(filterB);
       targets = stationsA.filter(s => stationsB.some(s2 => s2.nom === s.nom)).map(s => s.nom);
     } else {
-      targets = allStations.filter(catA.filter).map(s => s.nom);
+      targets = metroOnlyStations.filter(filterA).map(s => s.nom);
     }
 
     setTargetStations([...new Set(targets)]);
@@ -113,7 +135,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     setRevealed(false);
     setSearchInput('');
     setSuggestions([]);
-  }, [allStations, flatPool, sub1, sub2, gameMode]);
+  }, [metroOnlyStations, flatPool, sub1, sub2, gameMode, customGroup1, customGroup2]);
 
   useEffect(() => {
     setupGame();
@@ -203,33 +225,55 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
             <div className="space-y-4">
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-gray-400 tracking-wider">Catégorie 1</label>
-                    <select value={meta1} onChange={(e) => setMeta1(e.target.value)} className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground">
+                    <select value={meta1} onChange={(e) => setMeta1(e.target.value)} className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground truncate">
                         {Object.entries(MetaCategories).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                     </select>
-                    <div className="flex gap-2">
-                        <select value={sub1} onChange={(e) => setSub1(e.target.value)} disabled={meta1 === 'custom'} className="flex-1 bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground">
+                    <div className="flex gap-2 min-w-0">
+                        <select value={sub1} onChange={(e) => setSub1(e.target.value)} className="flex-1 bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground truncate">
                             {categories[meta1]?.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                         </select>
                         <button onClick={() => handleRandomSub(1)} className="border border-border aspect-square w-9 flex items-center justify-center bg-card hover:bg-accent hover:text-accent-foreground transition-all">
                             <Shuffle size={14} />
                         </button>
                     </div>
+                    {sub1 === 'group-groupe-personnalisé' || sub1 === 'arr-custom' ? (
+                        <input 
+                          type="text"
+                          value={customGroup1}
+                          onChange={(e) => setCustomGroup1(e.target.value)}
+                          placeholder={sub1 === 'arr-custom' ? "Ex: 1, 2, 8, 15" : "Ex: 1, 4, 14"}
+                          className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none text-foreground placeholder:text-gray-500"
+                        />
+                    ) : (
+                        <CategoryPreview category={categories[meta1]?.find(c => c.id === sub1)} />
+                    )}
                 </div>
 
                 {gameMode === 'intersection' && (
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-gray-400 tracking-wider">Catégorie 2</label>
-                        <select value={meta2} onChange={(e) => setMeta2(e.target.value)} className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground">
+                        <select value={meta2} onChange={(e) => setMeta2(e.target.value)} className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground truncate">
                             {Object.entries(MetaCategories).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                         </select>
-                        <div className="flex gap-2">
-                            <select value={sub2} onChange={(e) => setSub2(e.target.value)} disabled={meta2 === 'custom'} className="flex-1 bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground">
+                        <div className="flex gap-2 min-w-0">
+                            <select value={sub2} onChange={(e) => setSub2(e.target.value)} className="flex-1 bg-card border border-border p-2 text-xs font-medium focus:outline-none appearance-none text-foreground truncate">
                                 {categories[meta2]?.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                             </select>
                             <button onClick={() => handleRandomSub(2)} className="border border-border aspect-square w-9 flex items-center justify-center bg-card hover:bg-accent hover:text-accent-foreground transition-all">
                                 <Shuffle size={14} />
                             </button>
                         </div>
+                        {sub2 === 'group-groupe-personnalisé' || sub2 === 'arr-custom' ? (
+                            <input 
+                              type="text"
+                              value={customGroup2}
+                              onChange={(e) => setCustomGroup2(e.target.value)}
+                              placeholder={sub2 === 'arr-custom' ? "Ex: 1, 2, 8, 15" : "Ex: 1, 4, 14"}
+                              className="w-full bg-card border border-border p-2 text-xs font-medium focus:outline-none text-foreground placeholder:text-gray-500"
+                            />
+                        ) : (
+                            <CategoryPreview category={categories[meta2]?.find(c => c.id === sub2)} />
+                        )}
                     </div>
                 )}
             </div>
@@ -344,18 +388,27 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-border border border-border">
                     {targetStations.map(name => {
                         const isFound = foundStations.includes(name);
-                        const station = allStations.find(s => s.nom === name);
+                        const station = metroOnlyStations.find(s => s.nom === name);
                         if (!isFound && !revealed) return null;
+
+                        const displayLines = station?.lines.filter(l => {
+                            const upper = l.toUpperCase();
+                            const isRer = ['A', 'B', 'C', 'D', 'E'].includes(upper);
+                            const isMetro = /^\d+(BIS)?$/.test(upper);
+                            const isTram = /^T\d+[AB]?$/.test(upper);
+                            const isCable = upper === 'C1';
+                            return isRer || isMetro || isTram || isCable;
+                        }) || [];
 
                         return (
                             <div key={name} className={`bg-card p-5 flex flex-col justify-between h-32 font-parisine ${isFound ? '' : 'opacity-70 contrast-[0.8] italic'}`}>
                                 <span className="text-[11px] font-bold leading-tight">{name}</span>
                                 <div className="flex flex-wrap gap-1">
-                                    {station?.lines.map(l => (
+                                    {displayLines.map(l => (
                                         <div 
                                             key={l} 
                                             className="w-6 h-6 flex items-center justify-center text-[10px] font-bold border border-border font-parisine"
-                                            style={{backgroundColor: (isFound || revealed) ? LINE_COLORS[l] : '#eee', color: (isFound || revealed) ? 'white' : '#999'}}
+                                            style={{backgroundColor: (isFound || revealed) ? LINE_COLORS[l] : '#eee', color: (isFound || revealed) ? (LINE_TEXT_COLORS[l] || 'white') : '#999'}}
                                         >
                                             {l}
                                         </div>
@@ -382,6 +435,27 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
             )}
         </div>
       </main>
+    </div>
+  );
+}
+
+function CategoryPreview({ category }: { category?: any }) {
+  if (!category || !category.includedItems || category.includedItems.length === 0) return null;
+  
+  return (
+    <div className="flex flex-wrap gap-1 mt-2 p-2 bg-white/5 dark:bg-white/5 border border-border rounded animate-in fade-in slide-in-from-top-1 duration-300">
+      {category.includedItems.map((item: string) => (
+        <div 
+          key={item} 
+          className="px-1.5 py-0.5 rounded-sm text-[9px] font-black border border-border uppercase"
+          style={{ 
+            backgroundColor: LINE_COLORS[item] || '#333', 
+            color: LINE_TEXT_COLORS[item] || '#FFF' 
+          }}
+        >
+          {item}
+        </div>
+      ))}
     </div>
   );
 }

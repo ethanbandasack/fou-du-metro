@@ -1,11 +1,151 @@
 import { EnrichedStation } from '@/types/metro';
 
+// Official RATP/IDFM Color Palette
+const COLORS = {
+  ROUGE_COQUELICOT: { bg: "#E3051C", text: "#FFFFFF" },
+  ORANGE: { bg: "#F28E42", text: "#000000" },
+  JAUNE_VIF: { bg: "#FFCE00", text: "#000000" },
+  JAUNE_OCRE: { bg: "#E3B32A", text: "#000000" },
+  MARRON: { bg: "#8D5E2A", text: "#FFFFFF" },
+  OLIVE_CLAIR: { bg: "#D5C900", text: "#000000" },
+  OLIVE_FONCE: { bg: "#9F9825", text: "#FFFFFF" },
+  VERT_FONCE: { bg: "#00814F", text: "#FFFFFF" },
+  VERT_CLAIR: { bg: "#83C491", text: "#000000" },
+  TURQUOISE: { bg: "#00A88F", text: "#FFFFFF" },
+  BLEU_CLAIR: { bg: "#98D4E2", text: "#000000" },
+  BLEU_OUTREMER: { bg: "#5291CE", text: "#FFFFFF" },
+  BLEU_FONCE: { bg: "#0064B0", text: "#FFFFFF" },
+  VIOLET: { bg: "#662483", text: "#FFFFFF" },
+  MAGENTA: { bg: "#C04191", text: "#FFFFFF" },
+  LILAS: { bg: "#CEADD2", text: "#000000" },
+  ROSE: { bg: "#F3A4BA", text: "#000000" },
+  ROUGE_FRAMBOISE: { bg: "#B90845", text: "#FFFFFF" },
+  BLEU_NUIT: { bg: "#003264", text: "#FFFFFF" },
+};
+
+// Map of line identifiers to their official colors
 export const LINE_COLORS: Record<string, string> = {
-  '1': '#FFCD00', '2': '#0064B0', '3': '#9F9825', '3bis': '#98D4E2',
-  '4': '#C04191', '5': '#FF7E2E', '6': '#6ECA97', '7': '#FA9ABA',
-  '7bis': '#6ECA97', '8': '#E19BDF', '9': '#B6BD00', '10': '#C9910D',
-  '11': '#704B1C', '12': '#007852', '13': '#6EC4E8', '14': '#62259D',
-  'A': '#E2231A', 'B': '#7BA3DC', 'C': '#F99D1D', 'D': '#009639', 'E': '#E3B32A', 'C1': '#D11E81'
+  // Métro
+  "1": COLORS.JAUNE_VIF.bg,
+  "2": COLORS.BLEU_FONCE.bg,
+  "3": COLORS.OLIVE_FONCE.bg,
+  "3bis": COLORS.BLEU_CLAIR.bg,
+  "4": COLORS.MAGENTA.bg,
+  "5": COLORS.ORANGE.bg,
+  "6": COLORS.VERT_CLAIR.bg,
+  "7": COLORS.ROSE.bg,
+  "7bis": COLORS.VERT_CLAIR.bg,
+  "8": COLORS.LILAS.bg,
+  "9": COLORS.OLIVE_CLAIR.bg,
+  "10": COLORS.JAUNE_OCRE.bg,
+  "11": COLORS.MARRON.bg,
+  "12": COLORS.VERT_FONCE.bg,
+  "13": COLORS.BLEU_CLAIR.bg,
+  "14": COLORS.VIOLET.bg,
+  "15": COLORS.ROUGE_FRAMBOISE.bg,
+  "16": COLORS.ROSE.bg,
+  "17": COLORS.OLIVE_CLAIR.bg,
+  "18": COLORS.TURQUOISE.bg,
+
+  // RER
+  "A": COLORS.ROUGE_COQUELICOT.bg,
+  "B": COLORS.BLEU_OUTREMER.bg,
+  "C": COLORS.JAUNE_VIF.bg,
+  "D": COLORS.VERT_FONCE.bg,
+  "E": COLORS.MAGENTA.bg,
+
+  // Tramway
+  "T1": COLORS.BLEU_FONCE.bg,
+  "T2": COLORS.MAGENTA.bg,
+  "T3a": COLORS.ORANGE.bg,
+  "T3b": COLORS.VERT_FONCE.bg,
+  "T4": COLORS.JAUNE_OCRE.bg,
+  "T5": COLORS.VIOLET.bg,
+  "T6": COLORS.ROUGE_COQUELICOT.bg,
+  "T7": COLORS.MARRON.bg,
+  "T8": COLORS.OLIVE_FONCE.bg,
+  "T9": COLORS.BLEU_OUTREMER.bg,
+  "T10": COLORS.OLIVE_FONCE.bg,
+  "T11": COLORS.ORANGE.bg,
+  "T12": COLORS.ROUGE_FRAMBOISE.bg,
+  "T13": COLORS.MARRON.bg,
+  "T14": COLORS.TURQUOISE.bg,
+
+  // Transilien
+  "H": COLORS.MARRON.bg,
+  "J": COLORS.OLIVE_CLAIR.bg,
+  "K": COLORS.OLIVE_FONCE.bg,
+  "L": COLORS.LILAS.bg,
+  "N": COLORS.TURQUOISE.bg,
+  "P": COLORS.ORANGE.bg,
+  "R": COLORS.ROSE.bg,
+  "U": COLORS.ROUGE_FRAMBOISE.bg,
+  "V": COLORS.OLIVE_FONCE.bg,
+
+  // Cable
+  "C1": COLORS.BLEU_OUTREMER.bg,
+};
+
+export const LINE_TEXT_COLORS: Record<string, string> = {
+  // Métro
+  "1": COLORS.JAUNE_VIF.text,
+  "2": COLORS.BLEU_FONCE.text,
+  "3": COLORS.OLIVE_FONCE.text,
+  "3bis": COLORS.BLEU_CLAIR.text,
+  "4": COLORS.MAGENTA.text,
+  "5": COLORS.ORANGE.text,
+  "6": COLORS.VERT_CLAIR.text,
+  "7": COLORS.ROSE.text,
+  "7bis": COLORS.VERT_CLAIR.text,
+  "8": COLORS.LILAS.text,
+  "9": COLORS.OLIVE_CLAIR.text,
+  "10": COLORS.JAUNE_OCRE.text,
+  "11": COLORS.MARRON.text,
+  "12": COLORS.VERT_FONCE.text,
+  "13": COLORS.BLEU_CLAIR.text,
+  "14": COLORS.VIOLET.text,
+  "15": COLORS.ROUGE_FRAMBOISE.text,
+  "16": COLORS.ROSE.text,
+  "17": COLORS.OLIVE_CLAIR.text,
+  "18": COLORS.TURQUOISE.text,
+
+  // RER
+  "A": COLORS.ROUGE_COQUELICOT.text,
+  "B": COLORS.BLEU_OUTREMER.text,
+  "C": COLORS.JAUNE_VIF.text,
+  "D": COLORS.VERT_FONCE.text,
+  "E": COLORS.MAGENTA.text,
+
+  // Tramway
+  "T1": COLORS.BLEU_FONCE.text,
+  "T2": COLORS.MAGENTA.text,
+  "T3a": COLORS.ORANGE.text,
+  "T3b": COLORS.VERT_FONCE.text,
+  "T4": COLORS.JAUNE_OCRE.text,
+  "T5": COLORS.VIOLET.text,
+  "T6": COLORS.ROUGE_COQUELICOT.text,
+  "T7": COLORS.MARRON.text,
+  "T8": COLORS.OLIVE_FONCE.text,
+  "T9": COLORS.BLEU_OUTREMER.text,
+  "T10": COLORS.OLIVE_FONCE.text,
+  "T11": COLORS.ORANGE.text,
+  "T12": COLORS.ROUGE_FRAMBOISE.text,
+  "T13": COLORS.MARRON.text,
+  "T14": COLORS.TURQUOISE.text,
+
+  // Transilien
+  "H": COLORS.MARRON.text,
+  "J": COLORS.OLIVE_CLAIR.text,
+  "K": COLORS.OLIVE_FONCE.text,
+  "L": COLORS.LILAS.text,
+  "N": COLORS.TURQUOISE.text,
+  "P": COLORS.ORANGE.text,
+  "R": COLORS.ROSE.text,
+  "U": COLORS.ROUGE_FRAMBOISE.text,
+  "V": COLORS.OLIVE_FONCE.text,
+
+  // Cable
+  "C1": COLORS.BLEU_OUTREMER.text,
 };
 
 export interface Category {
@@ -14,101 +154,100 @@ export interface Category {
   name: string;
   filter: (s: EnrichedStation) => boolean;
   color?: string;
+  textColor?: string;
   isRandom?: boolean;
+  includedItems?: string[];
 }
 
 export const MetaCategories: Record<string, string> = {
   'line': 'Lignes de Métro',
   'groups': 'Groupes de Lignes',
   'geo': 'Géographie (Paris/Banlieue)',
-  'arr': 'Arrondissements',
+  'arr_single': 'Arrondissement (Unique)',
+  'arr_group': 'Groupes d\'Arrondissements',
   'connect': 'Connectivité',
   'special': 'Spécial (Histoire, Couleurs)',
-  'names': 'Noms & Lettres',
-  'custom': 'Filtrage Personnalisé'
+  'names': 'Noms & Lettres'
 };
 
-export function getAvailableCategories(allStations: EnrichedStation[], customLines = "", customArrs = ""): Record<string, Category[]> {
+export function getAvailableCategories(allStations: EnrichedStation[]): Record<string, Category[]> {
   const categories: Record<string, Category[]> = { 
-    line: [], groups: [], geo: [], arr: [], connect: [], special: [], names: [], custom: [] 
+    line: [], groups: [], geo: [], arr_single: [], arr_group: [], connect: [], special: [], names: [] 
   };
   
   const isRer = (l: string) => ['A', 'B', 'C', 'D', 'E'].includes(l.toUpperCase());
+  const isMetro = (l: string) => /^\d+(bis)?$/.test(l.toLowerCase());
 
   // Metro Lines
   const metroSet = new Set<string>();
-  allStations.forEach(s => s.lines.forEach(l => { if (!isRer(l)) metroSet.add(l); }));
+  allStations.forEach(s => s.lines.forEach(l => { if (isMetro(l)) metroSet.add(l); }));
 
   categories.line = Array.from(metroSet).sort((a, b) => {
     return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
   }).map(l => ({
-    type: 'line', id: `line-${l}`, name: `Métro ${l}`, filter: (s: EnrichedStation) => s.lines.includes(l), color: LINE_COLORS[l] || '#000'
+    type: 'line', id: `line-${l}`, name: `Métro ${l}`, filter: (s: EnrichedStation) => s.lines.includes(l), color: LINE_COLORS[l] || '#000', textColor: LINE_TEXT_COLORS[l] || '#FFF'
   }));
 
   // Groups
-  const lineGroups: Record<string, string[]> = {
-    "Automatiques": ["1", "4", "14"],
-    "Jaunes": ["1", "10"],
-    "Bleues": ["2", "3bis", "13"],
-    "Violettes": ["4", "7", "8", "14"],
-    "Vertes": ["3", "7bis", "9", "12"],
-    "Nord-Sud": ["12", "13", "4"],
-    "Est-Ouest": ["1", "3"],
-    "Périphériques": ["2", "6"]
+  const lineGroups: Record<string, {lines: string[], color: string, text: string}> = {
+    "Automatiques": { lines: ["1", "4", "14"], color: COLORS.VIOLET.bg, text: COLORS.VIOLET.text },
+    "Jaunes": { lines: ["1", "10"], color: COLORS.JAUNE_VIF.bg, text: COLORS.JAUNE_VIF.text },
+    "Bleues": { lines: ["2", "3bis", "13"], color: COLORS.BLEU_FONCE.bg, text: COLORS.BLEU_FONCE.text },
+    "Violettes": { lines: ["4", "7", "8", "14"], color: COLORS.MAGENTA.bg, text: COLORS.MAGENTA.text },
+    "Vertes": { lines: ["3", "7bis", "9", "12"], color: COLORS.VERT_FONCE.bg, text: COLORS.VERT_FONCE.text },
+    "Nord-Sud": { lines: ["12", "13", "4"], color: COLORS.BLEU_CLAIR.bg, text: COLORS.BLEU_CLAIR.text },
+    "Est-Ouest": { lines: ["1", "3"], color: COLORS.ORANGE.bg, text: COLORS.ORANGE.text },
+    "Périphériques": { lines: ["2", "6"], color: COLORS.BLEU_FONCE.bg, text: COLORS.BLEU_FONCE.text },
+    "Groupe Personnalisé": { lines: [], color: '#333', text: '#FFF' }
   };
-  categories.groups = Object.entries(lineGroups).map(([name, resLines]) => ({
-    type: 'groups', id: `group-${name}`, name: name,
-    filter: (s: EnrichedStation) => s.lines.some(l => resLines.includes(l)), color: '#333'
+  categories.groups = Object.entries(lineGroups).map(([name, data]) => ({
+    type: 'groups', id: `group-${name.toLowerCase().replace(/ /g, '-')}`, name: name,
+    filter: (s: EnrichedStation) => s.lines.some(l => data.lines.includes(l)), color: data.color, textColor: data.text,
+    includedItems: data.lines
   }));
 
   // Connectivité
   categories.connect = [
-    { type: 'connect', id: 'c1', name: 'Sur une seule ligne', filter: (s: EnrichedStation) => s.lines.filter(l => !isRer(l)).length === 1, color: '#333' },
-    { type: 'connect', id: 'c2', name: 'Sur exactement 2 lignes', filter: (s: EnrichedStation) => s.lines.filter(l => !isRer(l)).length === 2, color: '#333' },
-    { type: 'connect', id: 'c3', name: 'Sur 3+ lignes', filter: (s: EnrichedStation) => s.lines.length >= 3, color: '#333' },
-    { type: 'connect', id: 'has-rer', name: 'Correspondance RER', filter: (s: EnrichedStation) => s.has_rer, color: '#5291ce' },
-    { type: 'connect', id: 'has-tram', name: 'Correspondance Tramway', filter: (s: EnrichedStation) => s.has_tram, color: '#00a88f' }
+    { type: 'connect', id: 'c1', name: 'Sur une seule ligne', filter: (s: EnrichedStation) => s.lines.filter(l => !isRer(l)).length === 1, color: '#333', textColor: '#FFF' },
+    { type: 'connect', id: 'c2', name: 'Sur exactement 2 lignes', filter: (s: EnrichedStation) => s.lines.filter(l => !isRer(l)).length === 2, color: '#333', textColor: '#FFF' },
+    { type: 'connect', id: 'c3', name: 'Sur 3+ lignes', filter: (s: EnrichedStation) => s.lines.length >= 3, color: '#333', textColor: '#FFF' },
+    { type: 'connect', id: 'has-rer', name: 'Correspondance RER', filter: (s: EnrichedStation) => s.has_rer, color: COLORS.BLEU_OUTREMER.bg, textColor: COLORS.BLEU_OUTREMER.text },
+    { type: 'connect', id: 'has-tram', name: 'Correspondance Tramway', filter: (s: EnrichedStation) => s.has_tram, color: COLORS.TURQUOISE.bg, textColor: COLORS.TURQUOISE.text }
   ];
 
   // Geography
   categories.geo = [
-    { type: 'geo', id: 'intra', name: 'Paris Intra-muros', filter: (s: EnrichedStation) => s.arrondissement >= 1 && s.arrondissement <= 20, color: '#333' },
-    { type: 'geo', id: 'extra', name: 'Banlieue', filter: (s: EnrichedStation) => s.arrondissement > 20, color: '#333' },
-    { type: 'geo', id: 'rg', name: 'Rive Gauche', filter: (s: EnrichedStation) => s.rive_gauche, color: '#333' },
-    { type: 'geo', id: 'rd', name: 'Rive Droite', filter: (s: EnrichedStation) => !s.rive_gauche && s.arrondissement >= 1 && s.arrondissement <= 20 && s.nom !== 'Cité', color: '#333' }
+    { type: 'geo', id: 'intra', name: 'Paris Intra-muros', filter: (s: EnrichedStation) => s.arrondissement >= 1 && s.arrondissement <= 20, color: '#333', textColor: '#FFF' },
+    { type: 'geo', id: 'extra', name: 'Banlieue', filter: (s: EnrichedStation) => s.arrondissement > 20, color: '#333', textColor: '#FFF' },
+    { type: 'geo', id: 'rg', name: 'Rive Gauche', filter: (s: EnrichedStation) => s.rive_gauche, color: '#333', textColor: '#FFF' },
+    { type: 'geo', id: 'rd', name: 'Rive Droite', filter: (s: EnrichedStation) => !s.rive_gauche && s.arrondissement >= 1 && s.arrondissement <= 20 && s.nom !== 'Cité', color: '#333', textColor: '#FFF' }
   ];
 
   // Arrondissements
   for (let i = 1; i <= 20; i++) {
-    categories.arr.push({ type: 'arr', id: `arr-${i}`, name: `Arrondissement ${i}`, filter: (s: EnrichedStation) => s.arrondissement === i, color: '#333' });
+    categories.arr_single.push({ type: 'arr_single', id: `arr-${i}`, name: `Arrondissement ${i}`, filter: (s: EnrichedStation) => s.arrondissement === i, color: '#333', textColor: '#FFF' });
   }
-  categories.arr.push({ type: 'arr', id: 'arr-pair', name: 'Arrondissement Pair', filter: (s: EnrichedStation) => s.arrondissement > 0 && s.arrondissement <= 20 && s.arrondissement % 2 === 0, color: '#333' });
-  categories.arr.push({ type: 'arr', id: 'arr-impair', name: 'Arrondissement Impair', filter: (s: EnrichedStation) => s.arrondissement > 0 && s.arrondissement <= 20 && s.arrondissement % 2 !== 0, color: '#333' });
+  categories.arr_group.push({ type: 'arr_group', id: 'arr-group-1-9', name: 'Arrondissements 1-9', filter: (s: EnrichedStation) => s.arrondissement >= 1 && s.arrondissement <= 9, color: '#333', textColor: '#FFF', includedItems: ['1', '2', '3', '4', '5', '6', '7', '8', '9'] });
+  categories.arr_group.push({ type: 'arr_group', id: 'arr-group-10-20', name: 'Arrondissements 10-20', filter: (s: EnrichedStation) => s.arrondissement >= 10 && s.arrondissement <= 20, color: '#333', textColor: '#FFF', includedItems: ['10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'] });
+  categories.arr_group.push({ type: 'arr_group', id: 'arr-pair', name: 'Arrondissement Pair', filter: (s: EnrichedStation) => s.arrondissement > 0 && s.arrondissement <= 20 && s.arrondissement % 2 === 0, color: '#333', textColor: '#FFF', includedItems: ['2', '4', '6', '8', '10', '12', '14', '16', '18', '20'] });
+  categories.arr_group.push({ type: 'arr_group', id: 'arr-impair', name: 'Arrondissement Impair', filter: (s: EnrichedStation) => s.arrondissement > 0 && s.arrondissement <= 20 && s.arrondissement % 2 !== 0, color: '#333', textColor: '#FFF', includedItems: ['1', '3', '5', '7', '9', '11', '13', '15', '17', '19'] });
+  categories.arr_group.push({ type: 'arr_group', id: 'arr-custom', name: 'Groupe personnalisé', filter: (s: EnrichedStation) => false, color: '#333', textColor: '#FFF' });
 
   // Special
   categories.special = [
-    { type: 'special', id: 'hist', name: 'Figure Historique', filter: (s: EnrichedStation) => s.figure_historique, color: '#6366f1' },
-    { type: 'special', id: 'color', name: 'Nom avec une couleur', filter: (s: EnrichedStation) => s.couleur, color: '#ec4899' },
-    { type: 'special', id: 'modern', name: 'Ouverte après 1980', filter: (s: EnrichedStation) => s.ouverte_apres_1980, color: '#10b981' }
+    { type: 'special', id: 'hist', name: 'Figure Historique', filter: (s: EnrichedStation) => s.figure_historique, color: '#6366f1', textColor: '#FFF' },
+    { type: 'special', id: 'color', name: 'Nom avec une couleur', filter: (s: EnrichedStation) => s.couleur, color: '#ec4899', textColor: '#FFF' },
+    { type: 'special', id: 'modern', name: 'Ouverte après 1980', filter: (s: EnrichedStation) => s.ouverte_apres_1980, color: '#10b981', textColor: '#FFF' }
   ];
 
   // Noms & Lettres
   const commonLetters = ['A', 'E', 'S', 'M', 'P'];
   categories.names = [
-    ...commonLetters.map(l => ({ type: 'names', id: `contains-${l}`, name: `Contient la lettre '${l}'`, filter: (s: EnrichedStation) => s.nom.toUpperCase().includes(l), color: '#444' })),
-    ...['A', 'B', 'C', 'L', 'M', 'P', 'S'].map(l => ({ type: 'names', id: `starts-${l}`, name: `Commence par '${l}'`, filter: (s: EnrichedStation) => s.nom.toUpperCase().startsWith(l), color: '#444' })),
-    ...['E', 'S', 'T', 'N'].map(l => ({ type: 'names', id: `ends-${l}`, name: `Termine par '${l}'`, filter: (s: EnrichedStation) => s.nom.toUpperCase().endsWith(l), color: '#444' }))
+    ...commonLetters.map(l => ({ type: 'names', id: `contains-${l}`, name: `Contient la lettre '${l}'`, filter: (s: EnrichedStation) => s.nom.toUpperCase().includes(l), color: '#444', textColor: '#FFF' })),
+    ...['A', 'B', 'C', 'L', 'M', 'P', 'S'].map(l => ({ type: 'names', id: `starts-${l}`, name: `Commence par '${l}'`, filter: (s: EnrichedStation) => s.nom.toUpperCase().startsWith(l), color: '#444', textColor: '#FFF' })),
+    ...['E', 'S', 'T', 'N'].map(l => ({ type: 'names', id: `ends-${l}`, name: `Termine par '${l}'`, filter: (s: EnrichedStation) => s.nom.toUpperCase().endsWith(l), color: '#444', textColor: '#FFF' }))
   ];
 
-  // Custom
-  if (customLines.trim()) {
-    const list = customLines.split(/[, ]+/).filter(x => x.trim()).map(x => x.toUpperCase());
-    categories.custom.push({ type: 'custom', id: 'custom-lines', name: `Lignes: ${list.join(', ')}`, filter: (s: EnrichedStation) => s.lines.some(l => list.includes(l.toUpperCase())), color: '#000' });
-  }
-  if (customArrs.trim()) {
-    const list = customArrs.split(/[, ]+/).filter(x => x.trim()).map(x => parseInt(x));
-    categories.custom.push({ type: 'custom', id: 'custom-arrs', name: `Arr.: ${list.join(', ')}`, filter: (s: EnrichedStation) => list.includes(s.arrondissement), color: '#000' });
-  }
   
   return categories;
 }
