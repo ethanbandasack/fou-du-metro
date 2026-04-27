@@ -180,7 +180,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
       {/* Sidebar - Config Minimaliste */}
       <aside className="w-full md:w-[300px] bg-muted border-r border-border p-8 space-y-10 shrink-0 flex flex-col transition-colors duration-300">
         <header className="border-b border-border pb-4">
-            <h1 className="text-xl font-bold tracking-tight">Metrodoku</h1>
+            <h1 className="text-xl font-bold tracking-tight">Intersection</h1>
             <span className="text-[11px] text-gray-500 font-medium">Entraînement / Intersection</span>
         </header>
 

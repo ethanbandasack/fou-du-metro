@@ -385,26 +385,33 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   }, []);
 
   const progress = uniqueStationNames.size > 0 ? (quizState.score / uniqueStationNames.size) * 100 : 0;
+  
   // Dynamic sticky header offset calculation
   useEffect(() => {
     const updateOffset = () => {
-      if (stickyHeaderRef.current) {
-        document.documentElement.style.setProperty(
-          '--header-offset', 
-          `${stickyHeaderRef.current.offsetHeight}px`
-        );
-      }
+      const el = stickyHeaderRef.current;
+      if (!el) return;
+      
+      const height = el.offsetHeight;
+      const top = el.getBoundingClientRect().top;
+      
+      document.documentElement.style.setProperty('--quiz-header-height', `${height}px`);
+      document.documentElement.style.setProperty('--quiz-header-top', `${top}px`);
     };
     
     updateOffset();
     window.addEventListener('resize', updateOffset);
+    window.addEventListener('scroll', updateOffset);
     
-    // Also update after a short delay to account for dynamic content (e.g. settings appearing)
     const timer = setTimeout(updateOffset, 100);
+    const observer = new ResizeObserver(updateOffset);
+    if (stickyHeaderRef.current) observer.observe(stickyHeaderRef.current);
     
     return () => {
       window.removeEventListener('resize', updateOffset);
+      window.removeEventListener('scroll', updateOffset);
       clearTimeout(timer);
+      observer.disconnect();
     };
   }, [showSettings, showScores, quizState.isGameActive]);
 
@@ -413,15 +420,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
       {/* Sticky Header Container */}
       <div ref={stickyHeaderRef} className="sticky top-20 bg-card z-50 shadow-sm mb-6 transition-colors duration-300">
         <div className="p-6 space-y-6">
-          {/* Header */}
-          <div className="text-center py-4">
-            <h1 className="text-4xl font-black tracking-tighter text-foreground mb-2">
-              Quiz des Transports
-            </h1>
-            <p className="text-[10px] font-bold text-gray-400 tracking-widest">
-              Identifiez les gares du réseau pour valider votre expertise
-            </p>
-          </div>
+          {/* Header removed for more vertical space */}
 
           {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">

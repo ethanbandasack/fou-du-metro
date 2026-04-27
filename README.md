@@ -22,7 +22,7 @@ npm run dev
 Test your knowledge of the Parisian transport network (Metro, RER, Train, Tramway) through various game modes, including a classic quiz and an advanced "Intersection" mode to master the network.
 
 > [!IMPORTANT]
-> **Data Quality**: The `stations-enriched.csv` file is currently undergoing a manual checking process. While most data is accurate, some entries may still need verification. Users are encouraged to contribute to this process or modify the data as needed.
+> **Data Quality**: Due to heavy recent refactoring and automated data enrichment, it is possible to encounter minor errors in station connections or sequence ordering. The `stations.csv` file is under continuous improvement.
 
 ## Font Installation
 
