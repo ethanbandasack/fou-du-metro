@@ -15,12 +15,12 @@ export default async function Page() {
   let dataError = false;
   
   try {
-    const enrichedCsvPath = path.join(process.cwd(), 'src/data/stations-enriched.csv');
+    const enrichedCsvPath = path.join(process.cwd(), 'src/data/stations.csv');
     if (fs.existsSync(enrichedCsvPath)) {
       const enrichedCsvContent = fs.readFileSync(enrichedCsvPath, 'utf8');
       enrichedStations = parseEnrichedCSV(enrichedCsvContent);
     } else {
-      console.error('Data file missing: stations-enriched.csv');
+      console.error('Data file missing: stations.csv');
       dataError = true;
     }
   } catch (error) {

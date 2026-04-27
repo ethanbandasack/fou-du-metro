@@ -119,25 +119,47 @@ export function getAvailableCategories(allStations: EnrichedStation[], customLin
 
 export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
   const lines = csvContent.trim().split('\n');
-  const stations: EnrichedStation[] = [];
+  const stationMap = new Map<string, EnrichedStation>();
   
   for (let i = 1; i < lines.length; i++) {
     const fields = lines[i].split(',');
-    if (fields.length >= 11) {
-      stations.push({
-        nom: fields[0],
-        lines: fields[1].split(' '),
-        lat: parseFloat(fields[2]),
-        lon: parseFloat(fields[3]),
-        arrondissement: parseInt(fields[4]),
-        figure_historique: fields[5] === '1',
-        couleur: fields[6] === '1',
-        ouverte_apres_1980: fields[7] === '1',
-        rive_gauche: fields[8] === '1',
-        has_rer: fields[9] === '1',
-        has_tram: fields[10] === '1'
-      });
+    if (fields.length >= 13) {
+      const nom = fields[0];
+      const line = fields[1];
+      const order = parseInt(fields[3]);
+      const lat = parseFloat(fields[4]);
+      const lon = parseFloat(fields[5]);
+      const arrondissement = parseInt(fields[6]);
+      const figure_historique = fields[7] === '1';
+      const couleur = fields[8] === '1';
+      const ouverte_apres_1980 = fields[9] === '1';
+      const rive_gauche = fields[10] === '1';
+      const has_rer = fields[11] === '1';
+      const has_tram = fields[12] === '1';
+
+      if (!stationMap.has(nom)) {
+        stationMap.set(nom, {
+          nom,
+          lines: [line],
+          orders: { [line]: order },
+          lat,
+          lon,
+          arrondissement,
+          figure_historique,
+          couleur,
+          ouverte_apres_1980,
+          rive_gauche,
+          has_rer,
+          has_tram
+        });
+      } else {
+        const s = stationMap.get(nom)!;
+        if (!s.lines.includes(line)) {
+          s.lines.push(line);
+          s.orders[line] = order;
+        }
+      }
     }
   }
-  return stations;
+  return Array.from(stationMap.values());
 }

@@ -78,3 +78,8 @@ src/data/arrondissements.geojson
 src/app/fonts/
 docs/
 dev/
+public/file.svg
+public/globe.svg
+public/next.svg
+public/vercel.svg
+public/window.svg

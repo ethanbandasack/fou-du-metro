@@ -3,6 +3,7 @@
 export interface EnrichedStation {
   nom: string;
   lines: string[];
+  orders: Record<string, number>;
   lat: number;
   lon: number;
   arrondissement: number;
