@@ -23,7 +23,7 @@ export interface MetroStation {
   nom_su_gar?: string;
   line: string;
   lineColor?: string;
-  mode: 'METRO' | 'RER' | 'TRAIN' | 'TRAMWAY' | 'VAL' | 'CABLE';
+  mode: 'METRO' | 'RER' | 'TRAIN' | 'TRANSILIEN' | 'TRAMWAY' | 'VAL' | 'CABLE';
   exploitant: 'RATP' | 'SNCF';
   connections: string[];
   isGuessed?: boolean;
@@ -36,7 +36,7 @@ export interface MetroStation {
 
 export interface MetroLine {
   line: string;
-  mode: 'METRO' | 'RER' | 'TRAIN' | 'TRAMWAY' | 'VAL' | 'CABLE';
+  mode: 'METRO' | 'RER' | 'TRAIN' | 'TRANSILIEN' | 'TRAMWAY' | 'VAL' | 'CABLE';
   color?: string;
   stations: MetroStation[];
 }

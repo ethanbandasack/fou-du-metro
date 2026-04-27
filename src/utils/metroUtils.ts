@@ -203,7 +203,7 @@ export function groupStationsByLine(stations: MetroStation[]): MetroLine[] {
 
   // Sort lines: Metro first (by number), then TRAMWAY, then CABLE, then RER, then others
   return lines.sort((a, b) => {
-    const modeOrder = ["METRO", "TRAMWAY", "CABLE", "RER", "VAL", "TRAIN"];
+    const modeOrder = ["METRO", "TRAMWAY", "CABLE", "RER", "TRANSILIEN", "VAL", "TRAIN"];
     const aModeIndex = modeOrder.indexOf(a.mode);
     const bModeIndex = modeOrder.indexOf(b.mode);
 

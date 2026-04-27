@@ -1,5 +1,5 @@
 line: V
-mode: TRAIN
+mode: TRANSILIEN
 stations:
 - Massy - Palaiseau
 - Igny

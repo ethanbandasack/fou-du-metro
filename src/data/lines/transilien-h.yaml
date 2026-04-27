@@ -1,5 +1,5 @@
 line: H
-mode: TRAIN
+mode: TRANSILIEN
 stations:
 - Gare du Nord
 - Saint-Denis

@@ -40,7 +40,7 @@ export function StationTable({ stations, lines }: StationTableProps) {
     return result.sort((a, b) => {
       // Sort by mode first, then by line, then by name
       if (a.mode !== b.mode) {
-        const modeOrder = ['METRO', 'RER', 'TRAIN', 'TRAMWAY', 'VAL'];
+        const modeOrder = ['METRO', 'RER', 'TRANSILIEN', 'TRAIN', 'TRAMWAY', 'VAL'];
         return modeOrder.indexOf(a.mode) - modeOrder.indexOf(b.mode);
       }
       if (a.line !== b.line) {
@@ -82,7 +82,7 @@ export function StationTable({ stations, lines }: StationTableProps) {
       const [modeB, lineB] = keyB.split(' ');
       
       if (modeA !== modeB) {
-        const modeOrder = ['METRO', 'RER', 'TRAIN', 'TRAMWAY', 'VAL'];
+        const modeOrder = ['METRO', 'RER', 'TRANSILIEN', 'TRAIN', 'TRAMWAY', 'VAL'];
         return modeOrder.indexOf(modeA) - modeOrder.indexOf(modeB);
       }
       return lineA.localeCompare(lineB);

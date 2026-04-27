@@ -194,7 +194,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
       const bData = parseLineName(b);
       
       // First sort by mode
-      const modeOrder = ['METRO', 'TRAMWAY', 'CABLE', 'RER', 'TRANSILIEN'];
+      const modeOrder = ['METRO', 'TRAMWAY', 'CABLE', 'RER', 'TRANSILIEN', 'VAL', 'TRAIN'];
       const aModeIndex = modeOrder.indexOf(aData.mode);
       const bModeIndex = modeOrder.indexOf(bData.mode);
       
