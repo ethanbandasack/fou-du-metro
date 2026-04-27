@@ -5,7 +5,7 @@ export const LINE_COLORS: Record<string, string> = {
   '4': '#C04191', '5': '#FF7E2E', '6': '#6ECA97', '7': '#FA9ABA',
   '7bis': '#6ECA97', '8': '#E19BDF', '9': '#B6BD00', '10': '#C9910D',
   '11': '#704B1C', '12': '#007852', '13': '#6EC4E8', '14': '#62259D',
-  'A': '#E2231A', 'B': '#7BA3DC', 'C': '#F99D1D', 'D': '#009639', 'E': '#E3B32A', 'C1': '#DC006E'
+  'A': '#E2231A', 'B': '#7BA3DC', 'C': '#F99D1D', 'D': '#009639', 'E': '#E3B32A', 'C1': '#D11E81'
 };
 
 export interface Category {
@@ -39,12 +39,8 @@ export function getAvailableCategories(allStations: EnrichedStation[], customLin
   const metroSet = new Set<string>();
   allStations.forEach(s => s.lines.forEach(l => { if (!isRer(l)) metroSet.add(l); }));
 
-  categories.line = Array.from(metroSet).sort((a,b) => {
-    const numA = parseInt(a), numB = parseInt(b);
-    if (isNaN(numA) && isNaN(numB)) return a.localeCompare(b);
-    if (isNaN(numA)) return 1;
-    if (isNaN(numB)) return -1;
-    return numA - numB;
+  categories.line = Array.from(metroSet).sort((a, b) => {
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
   }).map(l => ({
     type: 'line', id: `line-${l}`, name: `Métro ${l}`, filter: (s: EnrichedStation) => s.lines.includes(l), color: LINE_COLORS[l] || '#000'
   }));

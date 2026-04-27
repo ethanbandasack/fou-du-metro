@@ -95,14 +95,16 @@ export function LineFilter({
       <div>
         <h4 className="font-medium text-sm text-foreground/70 mb-2">Lines:</h4>
         <div className="flex flex-wrap gap-2">
-          {lines
+            {lines
             .filter(line => selectedModes.length === 0 || selectedModes.includes(line.mode))
-            .map((line) => {
+            .map((line, index) => {
               const isSelected = selectedLines.includes(line.line);
+              // Larger rectangles only for long names (mostly TER lines)
+              const isLongName = line.line.length > 4 || line.line.includes(' ');
               
               return (
                 <button
-                  key={`${line.mode}-${line.line}`}
+                  key={`${line.mode}-${line.line}-${index}`}
                   onClick={() => toggleLine(line.line)}
                   className={`
                     flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all font-bold
@@ -113,15 +115,17 @@ export function LineFilter({
                   `}
                 >
                   <div 
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                    className={`flex items-center justify-center text-white text-[10px] font-black ${isLongName ? 'px-3 h-6 rounded-md min-w-[3rem]' : 'w-6 h-6 rounded-full'}`}
                     style={{ backgroundColor: line.color }}
                   >
                     {line.line}
                   </div>
-                  <span className="font-medium">
-                    {line.mode} {line.line}
-                  </span>
-                  <span className="text-sm opacity-50">
+                  {!isLongName && (
+                    <span className="font-medium text-xs">
+                      {line.mode} {line.line}
+                    </span>
+                  )}
+                  <span className="text-[10px] opacity-40 font-bold">
                     ({line.stations.length})
                   </span>
                 </button>

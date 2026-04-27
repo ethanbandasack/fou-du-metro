@@ -25,7 +25,7 @@ const LINE_COLORS: Record<string, string> = {
   C: "#F99D1D",
   D: "#009639",
   E: "#E3B32A",
-  C1: "#DC006E",
+  C1: "#D11E81",
 };
 
 export function parseCSVLine(line: string): string[] {
@@ -158,19 +158,31 @@ export function groupStationsByLine(stations: MetroStation[]): MetroLine[] {
     });
   });
 
-  // Sort lines: Metro first (by number), then RER (by letter), then others
+  // Sort lines: Metro first (by number), then TRAMWAY, then CABLE, then RER, then others
   return lines.sort((a, b) => {
-    if (a.mode === "METRO" && b.mode === "METRO") {
-      return parseInt(a.line) - parseInt(b.line);
+    const modeOrder = ["METRO", "TRAMWAY", "CABLE", "RER", "VAL", "TRAIN"];
+    const aModeIndex = modeOrder.indexOf(a.mode);
+    const bModeIndex = modeOrder.indexOf(b.mode);
+
+    if (aModeIndex !== bModeIndex) {
+      return aModeIndex - bModeIndex;
     }
-    if (a.mode === "RER" && b.mode === "RER") {
-      return a.line.localeCompare(b.line);
+
+    // Same mode: Sort by line identifier numerically if possible
+    const extractNum = (s: string) => {
+      const m = s.match(/\d+/);
+      return m ? parseInt(m[0]) : 0;
+    };
+
+    const numA = extractNum(a.line);
+    const numB = extractNum(b.line);
+
+    if (numA !== numB && numA !== 0 && numB !== 0) {
+      return numA - numB;
     }
-    if (a.mode === "METRO") return -1;
-    if (b.mode === "METRO") return 1;
-    if (a.mode === "RER") return -1;
-    if (b.mode === "RER") return 1;
-    return a.line.localeCompare(b.line);
+
+    // Fallback to alphabetical for same numbers (e.g., 3 and 3bis) or non-numeric
+    return a.line.localeCompare(b.line, undefined, { numeric: true, sensitivity: 'base' });
   });
 }
 
