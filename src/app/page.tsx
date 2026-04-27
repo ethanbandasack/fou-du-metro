@@ -1,11 +1,10 @@
 import HomePage from '@/components/HomePage';
 import { parseEnrichedCSV } from '@/utils/intersectionUtils';
-import { MetroLine, EnrichedStation, MetroStation } from '@/types/metro';
+import { MetroLine, EnrichedStation, MetroStation, MetroLineData } from '@/types/metro';
 import { groupStationsByLine, reorderStationsWithTS, getLineColor } from '@/utils/metroUtils';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { MetroLineData } from '@/data/lines/types';
 
 export default async function Page() {
   // 1. Load manual line orders from YAML files

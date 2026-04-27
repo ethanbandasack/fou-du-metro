@@ -1,24 +1,24 @@
-line: '14'
+line: "14"
 mode: METRO
 stations:
-- Aéroport d'Orly
-- Saint-Denis - Pleyel
-- Mairie de Saint-Ouen
-- Saint-Ouen
-- L'Haÿ-les-Roses
-- Porte de Clichy
-- Pont Cardinet
-- Saint-Lazare
-- Madeleine
-- Pyramides
-- Châtelet
-- Thiais - Orly (Pont de Rungis)
-- Chevilly-Larue (Marché International)
-- Villejuif - Gustave Roussy
-- Hôpital Bicêtre
-- Maison Blanche
-- Olympiades
-- Bibliothèque François Mitterrand
-- Bercy
-- Gare de Lyon
-- Cour Saint-Emilion
+  - Saint-Denis - Pleyel
+  - Mairie de Saint-Ouen
+  - Saint-Ouen
+  - Porte de Clichy
+  - Pont Cardinet
+  - Saint-Lazare
+  - Madeleine
+  - Pyramides
+  - Châtelet
+  - Gare de Lyon
+  - Bercy
+  - Cour Saint-Emilion
+  - Bibliothèque François Mitterrand
+  - Olympiades
+  - Maison Blanche
+  - Hôpital Bicêtre
+  - Villejuif - Gustave Roussy
+  - Chevilly-Larue (Marché International)
+  - Thiais - Orly (Pont de Rungis)
+  - L'Haÿ-les-Roses
+  - Aéroport d'Orly

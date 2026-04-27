@@ -41,6 +41,13 @@ export interface MetroLine {
   stations: MetroStation[];
 }
 
+export interface MetroLineData {
+  line: string;
+  mode: string;
+  color?: string;
+  stations: { name: string; connections?: string[] }[];
+}
+
 export interface QuizState {
   currentStation: MetroStation | null;
   guessedStations: string[];

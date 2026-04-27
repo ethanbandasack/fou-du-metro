@@ -1,5 +1,4 @@
-import { MetroStation, MetroLine, EnrichedStation } from "@/types/metro";
-import { MetroLineData } from "@/data/lines/types";
+import { MetroStation, MetroLine, EnrichedStation, MetroLineData } from "@/types/metro";
 // Build trigger: Updated at 2026-04-27 03:52
 
 // Official IDFM Color Palette
