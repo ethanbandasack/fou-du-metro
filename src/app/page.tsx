@@ -1,5 +1,6 @@
 import HomePage from '@/components/HomePage';
 import { parseEnrichedCSV } from '@/utils/intersectionUtils';
+import { findStationGroup } from '@/utils/connectionUtils';
 import { MetroLine, EnrichedStation, MetroStation, MetroLineData } from '@/types/metro';
 import { groupStationsByLine, reorderStationsWithTS, getLineColor, getLineTextColor } from '@/utils/metroUtils';
 import fs from 'fs';
@@ -83,29 +84,37 @@ export default async function Page() {
         }
       }
 
-      // 3. Calculate connections from the global pool (considering proximity)
-      const stationsByName = new Map<string, MetroStation[]>();
+      // 3. Calculate connections from the global pool (considering proximity and aliases)
+      const stationsByGroup = new Map<string, MetroStation[]>();
       rawStations.forEach(s => {
-        if (!stationsByName.has(s.nom_long)) stationsByName.set(s.nom_long, []);
-        stationsByName.get(s.nom_long)!.push(s);
+        const existingGroup = findStationGroup(Array.from(stationsByGroup.values()), s);
+        
+        if (existingGroup) {
+          existingGroup.push(s);
+        } else {
+          const lat = s.coordinates?.lat || 0;
+          const lng = s.coordinates?.lng || 0;
+          stationsByGroup.set(`${s.nom_long}-${lat}-${lng}`, [s]);
+        }
       });
 
       rawStations.forEach(s => {
-        const potentialConnections = stationsByName.get(s.nom_long) || [];
-        const validConnections = potentialConnections
+        // Find the group this station belongs to
+        let myGroup: MetroStation[] = [];
+        for (const group of stationsByGroup.values()) {
+          if (group.includes(s)) {
+            myGroup = group;
+            break;
+          }
+        }
+
+        const validConnections = myGroup
           .filter(p => p.line !== s.line)
           .filter(p => {
             // ONLY consider connections that are explicitly marked in the CSV flags
-            // If the target is RER/Tram, the source must have the corresponding flag
             if (p.mode === 'RER' && !s.has_rer) return false;
             if (p.mode === 'TRAMWAY' && !s.has_tram) return false;
-            
-            // For Metro/Train/Other, we still check proximity to avoid false positives 
-            // like Saint-Fargeau
-            if (!s.coordinates || !p.coordinates) return false;
-            const latDiff = Math.abs(s.coordinates.lat - p.coordinates.lat);
-            const lonDiff = Math.abs(s.coordinates.lng - p.coordinates.lng);
-            return latDiff < 0.01 && lonDiff < 0.01;
+            return true;
           })
           .map(p => p.line);
         

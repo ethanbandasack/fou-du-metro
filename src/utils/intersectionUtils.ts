@@ -257,6 +257,8 @@ export function getAvailableCategories(allStations: EnrichedStation[]): Record<s
   return categories;
 }
 
+import { areAliases, findStationGroup } from './connectionUtils';
+
 export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
   const lines = csvContent.trim().split('\n');
   const stationMap = new Map<string, EnrichedStation>();
@@ -279,22 +281,17 @@ export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
       const has_rer = fields[11] === '1';
       const has_tram = fields[12] === '1';
 
-      // Find if we already have a station with this name nearby (within ~1km)
-      let existingStation: EnrichedStation | undefined = undefined;
-      for (const s of stationMap.values()) {
-        if (s.nom === nom) {
-          const latDiff = Math.abs(s.lat - lat);
-          const lonDiff = Math.abs(s.lon - lon);
-          if (latDiff < 0.01 && lonDiff < 0.01) {
-            existingStation = s;
-            break;
-          }
-        }
-      }
+      const currentStation: any = { nom, lat, lon };
+      const existingGroup = findStationGroup(
+        Array.from(stationMap.values()).map(s => [s]), 
+        currentStation
+      );
+      const existingStation = existingGroup ? existingGroup[0] as unknown as EnrichedStation : undefined;
 
       if (!existingStation) {
         const newStation: EnrichedStation = {
           nom,
+          aliases: [nom],
           lines: [line],
           orders: { [line]: order },
           lat,
@@ -309,10 +306,16 @@ export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
         };
         stationMap.set(`${nom}-${lat}-${lon}`, newStation);
       } else {
+        if (!existingStation.aliases) existingStation.aliases = [existingStation.nom];
+        if (!existingStation.aliases.includes(nom)) {
+          existingStation.aliases.push(nom);
+        }
         if (!existingStation.lines.includes(line)) {
           existingStation.lines.push(line);
           existingStation.orders[line] = order;
         }
+        if (has_rer) existingStation.has_rer = true;
+        if (has_tram) existingStation.has_tram = true;
       }
     }
   }

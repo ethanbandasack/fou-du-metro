@@ -9,6 +9,7 @@ import {
   LINE_COLORS,
   LINE_TEXT_COLORS
 } from '@/utils/intersectionUtils';
+import { areAliases } from '@/utils/connectionUtils';
 import { 
   Shuffle
 } from 'lucide-react';
@@ -125,7 +126,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
       const filterB = getFilter(catB, customGroup2);
       const stationsA = metroOnlyStations.filter(filterA);
       const stationsB = metroOnlyStations.filter(filterB);
-      targets = stationsA.filter(s => stationsB.some(s2 => s2.nom === s.nom)).map(s => s.nom);
+      targets = stationsA.filter(s => stationsB.some(s2 => areAliases(s.nom, s2.nom))).map(s => s.nom);
     } else {
       targets = metroOnlyStations.filter(filterA).map(s => s.nom);
     }
@@ -154,9 +155,12 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     }
 
     const filtered = metroOnlyStations.filter(s => {
-      const norm1 = simpleNormalize(s.nom);
-      const norm2 = normalizeStationName(s.nom);
-      return norm1.includes(val) || norm2.includes(val);
+      const namesToSearch = [s.nom, ...(s.aliases || [])];
+      return namesToSearch.some(name => {
+        const norm1 = simpleNormalize(name);
+        const norm2 = normalizeStationName(name);
+        return norm1.includes(val) || norm2.includes(val);
+      });
     }).sort((a, b) => {
       const normA1 = simpleNormalize(a.nom);
       const normA2 = normalizeStationName(a.nom);
@@ -180,7 +184,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     if (!val) return;
 
     const matchedStation = allStations.find(s => 
-      fuzzyMatch(val, s.nom)
+      fuzzyMatch(val, s.nom) || (s.aliases && s.aliases.some(a => fuzzyMatch(val, a)))
     );
 
     if (matchedStation && targetStations.includes(matchedStation.nom)) {
@@ -414,7 +418,14 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
 
                         return (
                             <div key={name} className={`bg-card p-5 flex flex-col justify-between h-32 font-parisine ${isFound ? '' : 'opacity-70 contrast-[0.8] italic'}`}>
-                                <span className="text-[11px] font-bold leading-tight">{name}</span>
+                                <div>
+                                    <span className="text-[11px] font-bold leading-tight block">{name}</span>
+                                    {station?.aliases && station.aliases.length > 1 && (
+                                        <span className="text-[8px] text-gray-400 block mt-0.5">
+                                            {station.aliases.filter(a => a !== name).join(' / ')}
+                                        </span>
+                                    )}
+                                </div>
                                 <div className="flex flex-wrap gap-1">
                                     {displayLines.map(l => (
                                         <div 

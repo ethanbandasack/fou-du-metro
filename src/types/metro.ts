@@ -2,6 +2,7 @@
 
 export interface EnrichedStation {
   nom: string;
+  aliases?: string[];
   lines: string[];
   orders: Record<string, number>;
   lat: number;
