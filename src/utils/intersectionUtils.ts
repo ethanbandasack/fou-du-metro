@@ -5,7 +5,7 @@ export const LINE_COLORS: Record<string, string> = {
   '4': '#C04191', '5': '#FF7E2E', '6': '#6ECA97', '7': '#FA9ABA',
   '7bis': '#6ECA97', '8': '#E19BDF', '9': '#B6BD00', '10': '#C9910D',
   '11': '#704B1C', '12': '#007852', '13': '#6EC4E8', '14': '#62259D',
-  'A': '#E2231A', 'B': '#7BA3DC', 'C': '#F99D1D', 'D': '#009639', 'E': '#E3B32A'
+  'A': '#E2231A', 'B': '#7BA3DC', 'C': '#F99D1D', 'D': '#009639', 'E': '#E3B32A', 'C1': '#DC006E'
 };
 
 export interface Category {

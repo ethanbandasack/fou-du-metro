@@ -194,7 +194,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
       const bData = parseLineName(b);
       
       // First sort by mode
-      const modeOrder = ['METRO', 'TRAMWAY', 'RER', 'TRANSILIEN'];
+      const modeOrder = ['METRO', 'TRAMWAY', 'CABLE', 'RER', 'TRANSILIEN'];
       const aModeIndex = modeOrder.indexOf(aData.mode);
       const bModeIndex = modeOrder.indexOf(bData.mode);
       
@@ -253,7 +253,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
                     className={`sticky z-30 rounded-t-lg pt-2 ${
                       isLineCompleted ? 'bg-green-500/20' : 'bg-muted'
                     }`}
-                    style={{ top: 'calc(5rem + var(--header-offset, 250px) + 8px)' }}
+                    style={{ top: 'calc(var(--quiz-header-top, 80px) + var(--quiz-header-height, 100px) + 8px)' }}
                   >
                     {/* Line color indicator (now part of sticky header) */}
                     <div 

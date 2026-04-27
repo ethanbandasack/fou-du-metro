@@ -25,6 +25,7 @@ const LINE_COLORS: Record<string, string> = {
   C: "#F99D1D",
   D: "#009639",
   E: "#E3B32A",
+  C1: "#DC006E",
 };
 
 export function parseCSVLine(line: string): string[] {
@@ -89,7 +90,7 @@ export function parseMetroStationsCSV(csvContent: string): MetroStation[] {
       }
 
       // Only include transport modes we want for the quiz
-      if (["METRO", "RER", "TRAIN", "TRAMWAY", "VAL"].includes(mode)) {
+      if (["METRO", "RER", "TRAIN", "TRAMWAY", "VAL", "CABLE"].includes(mode)) {
         const station: MetroStation = {
           id: `${gares_id}-${indice_lig}`,
           gares_id,
@@ -200,6 +201,7 @@ export function normalizeStationName(name: string): string {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // Remove accents
     .replace(/[^a-z0-9]/g, "") // Remove special characters AND spaces
+    .replace(/^gare/g, "") // Remove leading "gare" for better matching
     .trim();
 }
 
