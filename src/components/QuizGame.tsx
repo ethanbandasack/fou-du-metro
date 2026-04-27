@@ -30,7 +30,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   const [settings, setSettings] = useState<QuizSettings>({
     showConnections: true,
     selectedLines: [],
-    selectedModes: ['METRO', 'CABLE'],
+    selectedModes: ['METRO'],
     randomOrder: true
   });
 

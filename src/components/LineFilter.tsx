@@ -67,7 +67,13 @@ export function LineFilter({
 
       {/* Mode Filter */}
       <div className="mb-4">
-        <h4 className="font-medium text-sm text-foreground/70 mb-2">Transport Type:</h4>
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="font-medium text-sm text-foreground/70">Transport Type:</h4>
+          <div className="flex gap-1">
+            <button onClick={() => onModeChange(availableModes)} className="px-2 py-0.5 bg-accent/10 text-accent-foreground rounded text-[10px] font-bold hover:bg-accent/20 transition-all">All</button>
+            <button onClick={() => onModeChange([])} className="px-2 py-0.5 bg-muted text-foreground/70 rounded text-[10px] font-bold hover:bg-muted/80 transition-all">None</button>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-2">
           {availableModes.map((mode) => {
             const isSelected = selectedModes.includes(mode);

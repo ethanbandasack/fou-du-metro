@@ -1,9 +1,6 @@
 import { MetroStation, MetroLine, EnrichedStation } from "@/types/metro";
-// Build trigger: Updated at 2026-04-27 03:22
-import {
-  getStationsFromLineData,
-  getOrderedStationsByLine,
-} from "@/data/lines";
+import { MetroLineData } from "@/data/lines/types";
+// Build trigger: Updated at 2026-04-27 03:52
 
 // Official IDFM Color Palette
 const COLORS = {
@@ -278,19 +275,45 @@ export function fuzzyMatch(input: string, stationName: string, altName?: string)
   return match(stationName) || (altName ? match(altName) : false);
 }
 
-// New optimized functions using generated line data
-export function getOptimizedStations(): MetroStation[] {
-  return getStationsFromLineData();
+/**
+ * Reorders stations from CSV based on the manual order defined in TS files.
+ * Ignores stations that don't match fuzzily.
+ */
+export function reorderStationsWithTS(csvStations: MetroStation[], tsLines: MetroLineData[]): MetroStation[] {
+  const result: MetroStation[] = [];
+  
+  tsLines.forEach(lineData => {
+    // 1. Find all CSV stations for this line
+    const csvLineStations = csvStations.filter(s => 
+      s.line.toUpperCase() === lineData.line.toUpperCase() && 
+      s.mode.toUpperCase() === lineData.mode.toUpperCase()
+    );
+    
+    // 2. Map them for fast lookup (fuzzy key)
+    const map = new Map<string, MetroStation>();
+    csvLineStations.forEach(s => {
+      map.set(normalizeStationName(s.nom_long), s);
+    });
+    
+    // 3. For each station in TS, find its CSV counterpart
+    lineData.stations.forEach((tsStation: { name: string }, idx: number) => {
+      const normalizedName = normalizeStationName(tsStation.name);
+      const matched = map.get(normalizedName);
+      
+      if (matched) {
+        // Use the CSV data but the TS order
+        result.push({
+          ...matched,
+          order: idx + 1
+        });
+      }
+    });
+  });
+  
+  return result;
 }
 
-export function getEnrichedStations(): EnrichedStation[] {
-  // This is a placeholder, in a real Next.js app we might fetch this from an API or use fs in server components
-  return [];
-}
 
-export function getOptimizedStationsByLine(): Record<string, MetroStation[]> {
-  return getOrderedStationsByLine();
-}
 
 export function getLineColor(lineName: string): string {
   // Extract line number/letter from "METRO 1", "RER A", etc.
