@@ -31,11 +31,13 @@ export const LINE_COLORS: Record<string, string> = {
   "2": COLORS.BLEU_FONCE.bg,
   "3": COLORS.OLIVE_FONCE.bg,
   "3bis": COLORS.BLEU_CLAIR.bg,
+  "3B": COLORS.BLEU_CLAIR.bg,
   "4": COLORS.MAGENTA.bg,
   "5": COLORS.ORANGE.bg,
   "6": COLORS.VERT_CLAIR.bg,
   "7": COLORS.ROSE.bg,
   "7bis": COLORS.VERT_CLAIR.bg,
+  "7B": COLORS.VERT_CLAIR.bg,
   "8": COLORS.LILAS.bg,
   "9": COLORS.OLIVE_CLAIR.bg,
   "10": COLORS.JAUNE_OCRE.bg,
@@ -93,11 +95,13 @@ export const LINE_TEXT_COLORS: Record<string, string> = {
   "2": COLORS.BLEU_FONCE.text,
   "3": COLORS.OLIVE_FONCE.text,
   "3bis": COLORS.BLEU_CLAIR.text,
+  "3B": COLORS.BLEU_CLAIR.text,
   "4": COLORS.MAGENTA.text,
   "5": COLORS.ORANGE.text,
   "6": COLORS.VERT_CLAIR.text,
   "7": COLORS.ROSE.text,
   "7bis": COLORS.VERT_CLAIR.text,
+  "7B": COLORS.VERT_CLAIR.text,
   "8": COLORS.LILAS.text,
   "9": COLORS.OLIVE_CLAIR.text,
   "10": COLORS.JAUNE_OCRE.text,
@@ -195,6 +199,7 @@ export function groupStationsByLine(stations: MetroStation[]): MetroLine[] {
       line,
       mode: mode as MetroLine["mode"],
       color: LINE_COLORS[line] || "#666666",
+      textColor: LINE_TEXT_COLORS[line] || "#FFFFFF",
       stations: stationsInLine.sort((a, b) =>
         a.nom_long.localeCompare(b.nom_long),
       ),
@@ -236,6 +241,14 @@ export function shuffleArray<T>(array: T[]): T[] {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+export function simpleNormalize(name: string): string {
+  if (!name) return "";
+  return name.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
 }
 
 export function normalizeStationName(name: string): string {
@@ -319,6 +332,13 @@ export function getLineColor(lineName: string): string {
   const parts = lineName.split(" ");
   const lineId = parts[parts.length - 1];
   return LINE_COLORS[lineId] || "#9CA3AF"; // Default gray color
+}
+
+export function getLineTextColor(lineName: string): string {
+  // Extract line number/letter from "METRO 1", "RER A", etc.
+  const parts = lineName.split(" ");
+  const lineId = parts[parts.length - 1];
+  return LINE_TEXT_COLORS[lineId] || "#FFFFFF"; // Default white color
 }
 
 export function formatTime(seconds: number): string {

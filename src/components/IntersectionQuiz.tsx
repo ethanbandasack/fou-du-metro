@@ -12,7 +12,7 @@ import {
 import { 
   Shuffle
 } from 'lucide-react';
-import { normalizeStationName, fuzzyMatch } from '@/utils/metroUtils';
+import { normalizeStationName, fuzzyMatch, simpleNormalize } from '@/utils/metroUtils';
 
 interface IntersectionQuizProps {
   allStations: EnrichedStation[];
@@ -38,7 +38,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const metroOnlyStations = useMemo(() => 
-    allStations.filter(s => s.lines.some(l => /^\d+(bis)?$/.test(l.toLowerCase()))),
+    allStations.filter(s => s.lines.some(l => /^\d+(bis|B)?$/i.test(l))),
     [allStations]
   );
 
@@ -141,26 +141,38 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     setupGame();
   }, [setupGame]);
 
-  // Autocomplete logic
   useEffect(() => {
     if (!suggestionsEnabled || searchInput.trim().length < 2) {
       setSuggestions([]);
       return;
     }
 
-    const val = normalizeStationName(searchInput);
+    const val = simpleNormalize(searchInput);
     if (!val) {
       setSuggestions([]);
       return;
     }
 
-    const filtered = allStations.filter(s => {
-      const normalizedNom = normalizeStationName(s.nom);
-      return normalizedNom.includes(val);
+    const filtered = metroOnlyStations.filter(s => {
+      const norm1 = simpleNormalize(s.nom);
+      const norm2 = normalizeStationName(s.nom);
+      return norm1.includes(val) || norm2.includes(val);
+    }).sort((a, b) => {
+      const normA1 = simpleNormalize(a.nom);
+      const normA2 = normalizeStationName(a.nom);
+      const normB1 = simpleNormalize(b.nom);
+      const normB2 = normalizeStationName(b.nom);
+      
+      const startsWithA = normA1.startsWith(val) || normA2.startsWith(val);
+      const startsWithB = normB1.startsWith(val) || normB2.startsWith(val);
+      
+      if (startsWithA && !startsWithB) return -1;
+      if (!startsWithA && startsWithB) return 1;
+      return a.nom.localeCompare(b.nom);
     }).slice(0, 8);
     
     setSuggestions(filtered);
-  }, [searchInput, allStations, suggestionsEnabled]);
+  }, [searchInput, metroOnlyStations, suggestionsEnabled]);
 
   const handleGuess = (e?: React.FormEvent, manualName?: string) => {
     if (e) e.preventDefault();
@@ -311,8 +323,8 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 <span 
                     className="px-3 py-1 border border-border font-bold text-sm"
                     style={{ 
-                        backgroundColor: currentCatA?.type === 'line' ? LINE_COLORS[currentCatA.id.replace('line-', '')] : 'var(--card)',
-                        color: currentCatA?.type === 'line' ? 'white' : 'var(--foreground)'
+                        backgroundColor: currentCatA?.color || 'var(--card)',
+                        color: currentCatA?.textColor || 'var(--foreground)'
                     }}
                 >
                     {currentCatA?.name}
@@ -323,8 +335,8 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                         <span 
                             className="px-3 py-1 border border-border font-bold text-sm"
                             style={{ 
-                                backgroundColor: currentCatB?.type === 'line' ? LINE_COLORS[currentCatB.id.replace('line-', '')] : 'var(--card)',
-                                color: currentCatB?.type === 'line' ? 'white' : 'var(--foreground)'
+                                backgroundColor: currentCatB?.color || 'var(--card)',
+                                color: currentCatB?.textColor || 'var(--foreground)'
                             }}
                         >
                             {currentCatB?.name}

@@ -163,8 +163,8 @@ export function StationTable({ stations, lines }: StationTableProps) {
                       `}
                     >
                       <div 
-                        className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[8px] font-bold"
-                        style={{ backgroundColor: line.color }}
+                        className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold"
+                        style={{ backgroundColor: line.color, color: line.textColor }}
                       >
                         {line.line}
                       </div>
@@ -191,8 +191,8 @@ export function StationTable({ stations, lines }: StationTableProps) {
           return (
             <div key={lineKey} className="bg-card border-2 border-border shadow-md overflow-hidden transition-colors duration-300">
               <div 
-                className="px-6 py-4 text-white font-semibold text-lg flex items-center gap-3"
-                style={{ backgroundColor: lineInfo?.color || '#666666' }}
+                className="px-6 py-4 font-semibold text-lg flex items-center gap-3"
+                style={{ backgroundColor: lineInfo?.color || '#666666', color: lineInfo?.textColor || '#FFFFFF' }}
               >
                 <div className="w-8 h-8 bg-white/20 border-2 border-white/40 flex items-center justify-center font-black">
                   {line}

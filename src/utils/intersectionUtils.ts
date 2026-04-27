@@ -30,11 +30,13 @@ export const LINE_COLORS: Record<string, string> = {
   "2": COLORS.BLEU_FONCE.bg,
   "3": COLORS.OLIVE_FONCE.bg,
   "3bis": COLORS.BLEU_CLAIR.bg,
+  "3B": COLORS.BLEU_CLAIR.bg,
   "4": COLORS.MAGENTA.bg,
   "5": COLORS.ORANGE.bg,
   "6": COLORS.VERT_CLAIR.bg,
   "7": COLORS.ROSE.bg,
   "7bis": COLORS.VERT_CLAIR.bg,
+  "7B": COLORS.VERT_CLAIR.bg,
   "8": COLORS.LILAS.bg,
   "9": COLORS.OLIVE_CLAIR.bg,
   "10": COLORS.JAUNE_OCRE.bg,
@@ -92,11 +94,13 @@ export const LINE_TEXT_COLORS: Record<string, string> = {
   "2": COLORS.BLEU_FONCE.text,
   "3": COLORS.OLIVE_FONCE.text,
   "3bis": COLORS.BLEU_CLAIR.text,
+  "3B": COLORS.BLEU_CLAIR.text,
   "4": COLORS.MAGENTA.text,
   "5": COLORS.ORANGE.text,
   "6": COLORS.VERT_CLAIR.text,
   "7": COLORS.ROSE.text,
   "7bis": COLORS.VERT_CLAIR.text,
+  "7B": COLORS.VERT_CLAIR.text,
   "8": COLORS.LILAS.text,
   "9": COLORS.OLIVE_CLAIR.text,
   "10": COLORS.JAUNE_OCRE.text,
@@ -176,7 +180,7 @@ export function getAvailableCategories(allStations: EnrichedStation[]): Record<s
   };
   
   const isRer = (l: string) => ['A', 'B', 'C', 'D', 'E'].includes(l.toUpperCase());
-  const isMetro = (l: string) => /^\d+(bis)?$/.test(l.toLowerCase());
+  const isMetro = (l: string) => /^\d+(bis|B)?$/i.test(l);
 
   // Metro Lines
   const metroSet = new Set<string>();
@@ -189,21 +193,22 @@ export function getAvailableCategories(allStations: EnrichedStation[]): Record<s
   }));
 
   // Groups
-  const lineGroups: Record<string, {lines: string[], color: string, text: string}> = {
-    "Automatiques": { lines: ["1", "4", "14"], color: COLORS.VIOLET.bg, text: COLORS.VIOLET.text },
-    "Jaunes": { lines: ["1", "10"], color: COLORS.JAUNE_VIF.bg, text: COLORS.JAUNE_VIF.text },
-    "Bleues": { lines: ["2", "3bis", "13"], color: COLORS.BLEU_FONCE.bg, text: COLORS.BLEU_FONCE.text },
-    "Violettes": { lines: ["4", "7", "8", "14"], color: COLORS.MAGENTA.bg, text: COLORS.MAGENTA.text },
-    "Vertes": { lines: ["3", "7bis", "9", "12"], color: COLORS.VERT_FONCE.bg, text: COLORS.VERT_FONCE.text },
-    "Nord-Sud": { lines: ["12", "13", "4"], color: COLORS.BLEU_CLAIR.bg, text: COLORS.BLEU_CLAIR.text },
-    "Est-Ouest": { lines: ["1", "3"], color: COLORS.ORANGE.bg, text: COLORS.ORANGE.text },
-    "Périphériques": { lines: ["2", "6"], color: COLORS.BLEU_FONCE.bg, text: COLORS.BLEU_FONCE.text },
-    "Groupe Personnalisé": { lines: [], color: '#333', text: '#FFF' }
+  const lineGroups: Record<string, string[]> = {
+    "Automatiques": ["1", "4", "14"],
+    "Jaunes": ["1", "10"],
+    "Bleues": ["2", "3bis", "13"],
+    "Violettes": ["4", "7", "8", "14"],
+    "Vertes": ["3", "7bis", "9", "12"],
+    "Nord-Sud": ["12", "13", "4"],
+    "Est-Ouest": ["1", "3"],
+    "Périphériques": ["2", "6"],
+    "Lignes bis": ["3bis", "7bis"],
+    "Groupe Personnalisé": []
   };
-  categories.groups = Object.entries(lineGroups).map(([name, data]) => ({
+  categories.groups = Object.entries(lineGroups).map(([name, lines]) => ({
     type: 'groups', id: `group-${name.toLowerCase().replace(/ /g, '-')}`, name: name,
-    filter: (s: EnrichedStation) => s.lines.some(l => data.lines.includes(l)), color: data.color, textColor: data.text,
-    includedItems: data.lines
+    filter: (s: EnrichedStation) => s.lines.some(l => lines.includes(l)), color: '#333', textColor: '#FFF',
+    includedItems: lines
   }));
 
   // Connectivité
@@ -211,8 +216,8 @@ export function getAvailableCategories(allStations: EnrichedStation[]): Record<s
     { type: 'connect', id: 'c1', name: 'Sur une seule ligne', filter: (s: EnrichedStation) => s.lines.filter(l => !isRer(l)).length === 1, color: '#333', textColor: '#FFF' },
     { type: 'connect', id: 'c2', name: 'Sur exactement 2 lignes', filter: (s: EnrichedStation) => s.lines.filter(l => !isRer(l)).length === 2, color: '#333', textColor: '#FFF' },
     { type: 'connect', id: 'c3', name: 'Sur 3+ lignes', filter: (s: EnrichedStation) => s.lines.length >= 3, color: '#333', textColor: '#FFF' },
-    { type: 'connect', id: 'has-rer', name: 'Correspondance RER', filter: (s: EnrichedStation) => s.has_rer, color: COLORS.BLEU_OUTREMER.bg, textColor: COLORS.BLEU_OUTREMER.text },
-    { type: 'connect', id: 'has-tram', name: 'Correspondance Tramway', filter: (s: EnrichedStation) => s.has_tram, color: COLORS.TURQUOISE.bg, textColor: COLORS.TURQUOISE.text }
+    { type: 'connect', id: 'has-rer', name: 'Correspondance RER', filter: (s: EnrichedStation) => s.has_rer, color: '#333', textColor: '#FFF' },
+    { type: 'connect', id: 'has-tram', name: 'Correspondance Tramway', filter: (s: EnrichedStation) => s.has_tram, color: '#333', textColor: '#FFF' }
   ];
 
   // Geography
@@ -235,9 +240,9 @@ export function getAvailableCategories(allStations: EnrichedStation[]): Record<s
 
   // Special
   categories.special = [
-    { type: 'special', id: 'hist', name: 'Figure Historique', filter: (s: EnrichedStation) => s.figure_historique, color: '#6366f1', textColor: '#FFF' },
-    { type: 'special', id: 'color', name: 'Nom avec une couleur', filter: (s: EnrichedStation) => s.couleur, color: '#ec4899', textColor: '#FFF' },
-    { type: 'special', id: 'modern', name: 'Ouverte après 1980', filter: (s: EnrichedStation) => s.ouverte_apres_1980, color: '#10b981', textColor: '#FFF' }
+    { type: 'special', id: 'hist', name: 'Figure Historique', filter: (s: EnrichedStation) => s.figure_historique, color: '#333', textColor: '#FFF' },
+    { type: 'special', id: 'color', name: 'Nom avec une couleur', filter: (s: EnrichedStation) => s.couleur, color: '#333', textColor: '#FFF' },
+    { type: 'special', id: 'modern', name: 'Ouverte après 1980', filter: (s: EnrichedStation) => s.ouverte_apres_1980, color: '#333', textColor: '#FFF' }
   ];
 
   // Noms & Lettres
@@ -260,7 +265,9 @@ export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
     const fields = lines[i].split(',');
     if (fields.length >= 13) {
       const nom = fields[0];
-      const line = fields[1];
+      let line = fields[1];
+      if (line === "3B") line = "3bis";
+      if (line === "7B") line = "7bis";
       const order = parseInt(fields[3]);
       const lat = parseFloat(fields[4]);
       const lon = parseFloat(fields[5]);
@@ -272,8 +279,21 @@ export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
       const has_rer = fields[11] === '1';
       const has_tram = fields[12] === '1';
 
-      if (!stationMap.has(nom)) {
-        stationMap.set(nom, {
+      // Find if we already have a station with this name nearby (within ~1km)
+      let existingStation: EnrichedStation | undefined = undefined;
+      for (const s of stationMap.values()) {
+        if (s.nom === nom) {
+          const latDiff = Math.abs(s.lat - lat);
+          const lonDiff = Math.abs(s.lon - lon);
+          if (latDiff < 0.01 && lonDiff < 0.01) {
+            existingStation = s;
+            break;
+          }
+        }
+      }
+
+      if (!existingStation) {
+        const newStation: EnrichedStation = {
           nom,
           lines: [line],
           orders: { [line]: order },
@@ -286,12 +306,12 @@ export function parseEnrichedCSV(csvContent: string): EnrichedStation[] {
           rive_gauche,
           has_rer,
           has_tram
-        });
+        };
+        stationMap.set(`${nom}-${lat}-${lon}`, newStation);
       } else {
-        const s = stationMap.get(nom)!;
-        if (!s.lines.includes(line)) {
-          s.lines.push(line);
-          s.orders[line] = order;
+        if (!existingStation.lines.includes(line)) {
+          existingStation.lines.push(line);
+          existingStation.orders[line] = order;
         }
       }
     }

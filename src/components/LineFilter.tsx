@@ -121,8 +121,8 @@ export function LineFilter({
                   `}
                 >
                   <div 
-                    className={`flex items-center justify-center text-white text-[10px] font-black ${isLongName ? 'px-3 h-6 rounded-md min-w-[3rem]' : 'w-6 h-6 rounded-full'}`}
-                    style={{ backgroundColor: line.color }}
+                    className={`flex items-center justify-center text-[10px] font-black ${isLongName ? 'px-3 h-6 rounded-md min-w-[3rem]' : 'w-6 h-6 rounded-full'}`}
+                    style={{ backgroundColor: line.color, color: line.textColor }}
                   >
                     {line.line}
                   </div>

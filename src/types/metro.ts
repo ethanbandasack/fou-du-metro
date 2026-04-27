@@ -23,9 +23,12 @@ export interface MetroStation {
   nom_su_gar?: string;
   line: string;
   lineColor?: string;
+  lineTextColor?: string;
   mode: 'METRO' | 'RER' | 'TRAIN' | 'TRANSILIEN' | 'TRAMWAY' | 'VAL' | 'CABLE';
   exploitant: 'RATP' | 'SNCF';
   connections: string[];
+  has_rer?: boolean;
+  has_tram?: boolean;
   isGuessed?: boolean;
   coordinates?: {
     lat: number;
@@ -38,6 +41,7 @@ export interface MetroLine {
   line: string;
   mode: 'METRO' | 'RER' | 'TRAIN' | 'TRANSILIEN' | 'TRAMWAY' | 'VAL' | 'CABLE';
   color?: string;
+  textColor?: string;
   stations: MetroStation[];
 }
 
@@ -45,6 +49,7 @@ export interface MetroLineData {
   line: string;
   mode: string;
   color?: string;
+  textColor?: string;
   stations: { name: string; connections?: string[] }[];
 }
 
