@@ -2,6 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
+import { LineBadge } from '@/components/LineBadge';
+import { lineShortId } from '@/domain/lines';
 import type { Line } from '@/domain/network';
 
 interface QuizTableProps {
@@ -119,8 +121,12 @@ const QuizTable: React.FC<QuizTableProps> = ({
                                 )}
                               </td>
                               {showConnections && (
-                                <td className="px-3 py-2 text-sm text-foreground/60">
-                                  {stop.connections.length > 0 ? stop.connections.join(', ') : '-'}
+                                <td className="px-3 py-2">
+                                  <div className="flex flex-wrap gap-1" aria-label={`Correspondances : ${stop.connections.join(', ') || 'aucune'}`}>
+                                    {stop.connections.length > 0
+                                      ? [...new Map(stop.connections.map(id => [lineShortId(id), id])).values()].map(id => <LineBadge key={id} id={id} size="sm" />)
+                                      : <span className="text-sm text-foreground/30">-</span>}
+                                  </div>
                                 </td>
                               )}
                             </tr>

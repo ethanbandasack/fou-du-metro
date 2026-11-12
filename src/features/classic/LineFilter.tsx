@@ -59,7 +59,7 @@ export function LineFilter({ lines, selectedLines, selectedModes, onSelectionCha
           {visibleLines.map(line => (
             <button key={line.id} onClick={() => onSelectionChange(toggled(selectedLines, line.id))} className={chip(selectedLines.includes(line.id))}>
               <LineBadge id={line.id} />
-              {line.id.length <= 4 && <span className="font-medium">{line.label}</span>}
+              <span className="font-medium">{line.label}</span>
               <span className="text-[10px] opacity-40">({line.stops.length})</span>
             </button>
           ))}

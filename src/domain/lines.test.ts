@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareLines, isMetroLine, lineColors, lineLabel, normalizeLineId } from "@/domain/lines";
+import { compareLines, isMetroLine, lineColors, lineLabel, lineShortId, normalizeLineId } from "@/domain/lines";
 
 describe("normalizeLineId", () => {
   it.each([
@@ -68,5 +68,18 @@ describe("isMetroLine", () => {
   it("recognises numbered and bis metro lines only", () => {
     expect(["1", "14", "3bis", "7bis"].every(isMetroLine)).toBe(true);
     expect(["A", "T1", "C1", "TER Normandie"].some(isMetroLine)).toBe(false);
+  });
+});
+
+describe("lineShortId", () => {
+  it.each([
+    ["TER Hauts-de-France", "TER"],
+    ["CDG VAL", "CDG"],
+    ["ORLYVAL", "Orly"],
+    ["FUNICULAIRE", "Funi"],
+    ["3bis", "3bis"],
+    ["T3a", "T3a"],
+  ])("shortens %s to %s", (id, expected) => {
+    expect(lineShortId(id)).toBe(expected);
   });
 });
