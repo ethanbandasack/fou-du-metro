@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { render, visibleRows, type Screen } from "@/tui/render";
+import { render, stationBar, visibleRows, type Screen } from "@/tui/render";
 import { initialTuiState } from "@/tui/state";
+
+/** `found` stations found out of `total`, the found ones first. */
+const flags = (found: number, total: number) => Array.from({ length: total }, (_, i) => i < found);
 
 const screen = (overrides: Partial<Screen> = {}): Screen => ({
   state: { ...initialTuiState("line"), input: "bas" },
   groups: [
-    { label: "Métro 1", found: 5, total: 25 },
-    { label: "Métro 2", found: 25, total: 25 },
+    { label: "Métro 1", stations: flags(5, 25) },
+    { label: "Métro 2", stations: flags(25, 25) },
   ],
   title: "Métro",
   found: 30,
@@ -27,7 +30,7 @@ describe("render", () => {
   });
 
   it("stays within narrow terminals", () => {
-    const lines = render(screen({ width: 24, groups: [{ label: "Tramway T3a", found: 120, total: 321 }] }));
+    const lines = render(screen({ width: 24, groups: [{ label: "Tramway T3a", stations: flags(120, 321) }] }));
     expect(lines.filter((line) => line.length > 24)).toEqual([]);
     expect(lines.find((line) => line.includes("120 / 321"))).toBeDefined();
   });
@@ -53,14 +56,28 @@ describe("render", () => {
   });
 
   it("says when more groups are below", () => {
-    const groups = Array.from({ length: 20 }, (_, i) => ({ label: `L${i}`, found: 0, total: 1 }));
+    const groups = Array.from({ length: 20 }, (_, i) => ({ label: `L${i}`, stations: [false] }));
     const lines = render(screen({ groups }));
     expect(lines.some((line) => line.includes("↓ 15 de plus"))).toBe(true);
   });
 
   it("colors line bars when asked", () => {
-    const lines = render(screen({ color: true, groups: [{ label: "Métro 1", found: 5, total: 25, color: "#FFCE00" }] }));
+    const lines = render(screen({ color: true, groups: [{ label: "Métro 1", stations: flags(5, 25), color: "#FFCE00" }] }));
     expect(lines.join("\n")).toContain("\x1b[38;2;255;206;0m");
+  });
+});
+
+describe("stationBar", () => {
+  it("draws each station at its relative position along the bar", () => {
+    expect(stationBar([true, false, false, true], 8)).toBe("██░░░░██");
+  });
+
+  it("gives every station a cell when the bar is not a multiple of the station count", () => {
+    expect(stationBar([false, true, false], 4)).toBe("░░█░");
+  });
+
+  it("shades a cell holding found and missing stations when stations outnumber cells", () => {
+    expect(stationBar([true, true, false, false, true, false, false, false], 4)).toBe("█░▒░");
   });
 });
 

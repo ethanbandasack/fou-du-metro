@@ -13,8 +13,8 @@ export const GROUPING_LABELS: Record<Grouping, string> = {
 
 export interface GroupProgress {
   label: string;
-  found: number;
-  total: number;
+  /** Whether each distinct station is found, along the lines in play (branches one after the other). */
+  stations: boolean[];
   /** Line color, when grouping by line. */
   color?: string;
 }
@@ -36,7 +36,7 @@ function arrondissementGroup(stop: Stop): Pick<Group, "label" | "order"> {
   return { label: `Hors Paris (${stop.arrondissement})`, order: 100 + stop.arrondissement };
 }
 
-/** Found / total distinct stations, overall or per line, arrondissement or commune. */
+/** Distinct stations found or not, overall or per line, arrondissement or commune. */
 export function progressBy(lines: Line[], found: ReadonlySet<string>, grouping: Grouping): GroupProgress[] {
   const groups = new Map<string, Group>();
   const add = (id: string, group: Omit<Group, "keys">, key: string) => {
@@ -65,8 +65,7 @@ export function progressBy(lines: Line[], found: ReadonlySet<string>, grouping: 
     )
     .map(({ label, keys, color }) => ({
       label,
-      found: [...keys].filter((key) => found.has(key)).length,
-      total: keys.size,
+      stations: [...keys].map((key) => found.has(key)),
       ...(color ? { color } : {}),
     }));
 }
