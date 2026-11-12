@@ -46,16 +46,26 @@ describe("parseOfficialLines", () => {
     networkname,
     colourweb_hexa: "ffbe00",
     textcolourweb_hexa: "000000",
+    status: "active",
   });
 
   it("reads the official web colors with our line ids", () => {
     expect(parseOfficialLines([line("3B", "metro"), line("FUN", "funicular")])).toEqual([
-      { lineId: "3bis", colors: { background: "#FFBE00", text: "#000000" } },
-      { lineId: "FUNICULAIRE", colors: { background: "#FFBE00", text: "#000000" } },
+      { lineId: "3bis", active: true, colors: { background: "#FFBE00", text: "#000000" } },
+      { lineId: "FUNICULAIRE", active: true, colors: { background: "#FFBE00", text: "#000000" } },
     ]);
   });
 
   it("skips the generic TER entries", () => {
     expect(parseOfficialLines([line("TER", "rail", "TER")])).toEqual([]);
+  });
+});
+
+describe("parseOfficialLines status", () => {
+  it("marks lines announced but not open as inactive", () => {
+    const [line] = parseOfficialLines([
+      { shortname_line: "15", transportmode: "metro", networkname: null, colourweb_hexa: "aaaaaa", textcolourweb_hexa: "000000", status: "prochainement active" },
+    ]);
+    expect(line.active).toBe(false);
   });
 });

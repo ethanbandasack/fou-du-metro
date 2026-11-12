@@ -24,6 +24,8 @@ export interface OfficialStop {
 
 export interface OfficialLine {
   lineId: string;
+  /** Open; lines announced for later carry placeholder colors. */
+  active: boolean;
   colors: LineColors;
 }
 
@@ -44,6 +46,7 @@ interface LineRecord {
   networkname: string | null;
   colourweb_hexa: string;
   textcolourweb_hexa: string;
+  status: string;
 }
 
 const NAMED_LINES: Record<string, string> = {
@@ -94,6 +97,7 @@ export function parseOfficialLines(records: unknown[]): OfficialLine[] {
     .filter((record) => record.networkname !== "TER")
     .map((record) => ({
       lineId: LINE_IDS[record.shortname_line] ?? normalizeLineId(record.shortname_line),
+      active: record.status === "active",
       colors: {
         background: `#${record.colourweb_hexa.toUpperCase()}`,
         text: `#${record.textcolourweb_hexa.toUpperCase()}`,

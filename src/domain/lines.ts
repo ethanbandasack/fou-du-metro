@@ -39,7 +39,10 @@ const LINE_PALETTE: Record<string, LineColors> = {
   "12": { background: "#00643C", text: "#FFFFFF" },
   "13": { background: "#82C8E6", text: "#000000" },
   "14": { background: "#640082", text: "#FFFFFF" },
-  "15": { background: "#AAAAAA", text: "#000000" },
+  // Lines 15 to 17: color of the IDFM project data (projets_lignes_idf), not open yet.
+  "15": { background: "#A50034", text: "#FFFFFF" },
+  "16": { background: "#FF82B4", text: "#000000" },
+  "17": { background: "#D2D200", text: "#000000" },
   "18": { background: "#00A092", text: "#FFFFFF" },
   T1: { background: "#0055C8", text: "#FFFFFF" },
   T2: { background: "#A0006E", text: "#FFFFFF" },
