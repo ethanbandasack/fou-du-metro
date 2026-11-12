@@ -103,3 +103,25 @@ describe("hardcore index", () => {
     ]);
   });
 });
+
+describe("spoken index", () => {
+  const names = ["Charles de Gaulle - Étoile", "Saint-Paul (Le Marais)", "Gare de Lyon"];
+  const answers = names.map((name) => ({ key: name, names: [name] }));
+  const spokenHardcore = buildAnswerIndex(answers, { hardcore: true, spoken: true });
+
+  it("forgives accents in hardcore, since speech recognition picks the spelling", () => {
+    expect(lookupAnswer(spokenHardcore, "charles de gaulle etoile")).toEqual(["Charles de Gaulle - Étoile"]);
+    expect(findMentionedAnswers(spokenHardcore, "alors Charles de Gaulle Etoile")).toEqual(["Charles de Gaulle - Étoile"]);
+  });
+
+  it("still requires every word and the 'Gare de' prefix in hardcore", () => {
+    expect(lookupAnswer(spokenHardcore, "Étoile")).toEqual([]);
+    expect(lookupAnswer(spokenHardcore, "Saint-Paul")).toEqual([]);
+    expect(lookupAnswer(spokenHardcore, "Lyon")).toEqual([]);
+    expect(lookupAnswer(spokenHardcore, "gare de lyon")).toEqual(["Gare de Lyon"]);
+  });
+
+  it("changes nothing outside hardcore", () => {
+    expect(lookupAnswer(buildAnswerIndex(answers, { spoken: true }), "Étoile")).toEqual(["Charles de Gaulle - Étoile"]);
+  });
+});
