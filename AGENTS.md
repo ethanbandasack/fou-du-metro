@@ -1,28 +1,29 @@
 # Agent guide
 
-Quiz about the Île-de-France rail network. Next.js 15, React 19, Tailwind 4, Vitest.
+Quiz about the Île-de-France rail network: Next.js app (`src/app`, `src/features`) and a terminal
+version (`src/tui`), both built on the pure `src/domain`. Scripts are in `package.json`.
 
-## Commands
+Read `docs/ARCHITECTURE.md` before changing code and `docs/DATA.md` before touching `src/data/`.
 
-- `npm run dev`: dev server (Turbopack)
-- `npm test`: unit tests (Vitest)
-- `npm run check`: lint + typecheck + tests (run before every commit)
-- `npm run build`: production build (also lints)
-- `npm run tui`: terminal version (`-- --help` for options)
-- `npm run data:communes`: refresh the `commune` column of `stations.csv` (network access)
+## Workflow
 
-Do not run `next build` while `next dev` is running: both write `.next/`.
-
-## Where things are
-
-Read `docs/ARCHITECTURE.md` (layers, vocabulary) and `docs/DATA.md` (data files).
-Logic goes in `src/domain` (pure) or in a feature's pure helpers, with a test
-next to it. Components stay thin.
+1. One feature or fix = one branch from `main`, named `feat/…`, `fix/…`, `refactor/…`, `docs/…` or `chore/…`.
+2. Test first: write the failing test, watch it go red, then implement. Logic lives in `src/domain` or a
+   feature's pure helpers, next to its test; components stay thin.
+3. Commit atomically with Conventional Commits. Every commit passes `npm run check`.
+4. Before the PR: `npm run build`, then exercise the changed UI in a real browser.
+5. Open a PR, merge it into `main` with a merge commit, delete the branch.
 
 ## Rules
 
-- Test first: write the failing test, watch it fail, then implement.
-- `src/domain` must not import React, Next or Node APIs.
-- Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`), one concern per commit.
-- UI copy in French with correct accents. Code, comments and commits in English.
-- Never commit `.claude/`, `src/data/users.json` or `dev/`.
+- `src/domain` imports no React, Next or Node API.
+- UI copy in French with correct accents; code, comments and commits in English.
+- `.claude/`, `src/data/users.json` and `dev/` stay out of git.
+
+## Gotchas
+
+- `next build` and `next dev` both write `.next/`: stop the dev server before building.
+- The home page is prerendered from `src/data/` at build time: data edits need a rebuild (or `next dev`).
+- `npm run data:communes` calls geo.api.gouv.fr; run it after adding rows to `stations.csv`.
+- Chrome now exposes `SpeechRecognition` unprefixed: a fake for tests must replace both it and
+  `webkitSpeechRecognition`.
