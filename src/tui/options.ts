@@ -24,7 +24,10 @@ export const USAGE = `Usage: npm run tui -- [options]
   --future          inclure les lignes et prolongements pas encore ouverts
   --hardcore        noms exacts uniquement (casse, espaces et ponctuation ignorés)
   --no-color        sans couleurs (aussi avec NO_COLOR)
-  -h, --help        cette aide`;
+  -h, --help        cette aide
+
+Dictée : la dictée du système écrit dans le terminal (macOS : Réglages Système > Clavier > Dictée).
+Chaque gare citée dans la phrase compte ; en hardcore, les accents ne sont pas exigés à la voix.`;
 
 const GROUPING_NAMES: Record<string, Grouping> = {
   global: "global",
