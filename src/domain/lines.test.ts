@@ -15,18 +15,27 @@ describe("normalizeLineId", () => {
 });
 
 describe("lineColors", () => {
-  it("returns the official IDFM colors of a known line", () => {
-    expect(lineColors("1")).toEqual({ background: "#FFCE00", text: "#000000" });
-    expect(lineColors("A")).toEqual({ background: "#E3051C", text: "#FFFFFF" });
+  it("returns the official IDFM web colors (referentiel-des-lignes)", () => {
+    expect(lineColors("1")).toEqual({ background: "#FFBE00", text: "#000000" });
+    expect(lineColors("A")).toEqual({ background: "#EB2132", text: "#FFFFFF" });
+    expect(lineColors("T6")).toEqual({ background: "#FF0000", text: "#FFFFFF" });
+    expect(lineColors("H")).toEqual({ background: "#84653D", text: "#FFFFFF" });
   });
 
-  it("knows the bis lines", () => {
-    expect(lineColors("3bis").background).toBe("#98D4E2");
-    expect(lineColors("7bis").background).toBe("#83C491");
+  it("knows the bis lines, shuttles and the cable car", () => {
+    expect(lineColors("3bis").background).toBe("#82C8E6");
+    expect(lineColors("7bis").background).toBe("#82DC73");
+    expect(lineColors("CDG VAL").background).toBe("#5CC5ED");
+    expect(lineColors("FUNICULAIRE")).toEqual({ background: "#AFAFAF", text: "#000000" });
+    expect(lineColors("C1").background).toBe("#3C91DC");
+  });
+
+  it("gives every TER line the official TER gray", () => {
+    expect(lineColors("TER Normandie")).toEqual({ background: "#AAAAAA", text: "#000000" });
   });
 
   it("falls back to neutral gray for unknown lines", () => {
-    expect(lineColors("TER Normandie")).toEqual({ background: "#666666", text: "#FFFFFF" });
+    expect(lineColors("Z42")).toEqual({ background: "#666666", text: "#FFFFFF" });
   });
 });
 
