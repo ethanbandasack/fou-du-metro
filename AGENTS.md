@@ -8,6 +8,8 @@ Quiz about the Île-de-France rail network. Next.js 15, React 19, Tailwind 4, Vi
 - `npm test`: unit tests (Vitest)
 - `npm run check`: lint + typecheck + tests (run before every commit)
 - `npm run build`: production build (also lints)
+- `npm run tui`: terminal version (`-- --help` for options)
+- `npm run data:communes`: refresh the `commune` column of `stations.csv` (network access)
 
 Do not run `next build` while `next dev` is running: both write `.next/`.
 
