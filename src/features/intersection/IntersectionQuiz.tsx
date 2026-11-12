@@ -249,11 +249,10 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
           </section>
 
           <section className="space-y-6">
-            <h3 className="text-[11px] font-bold tracking-widest text-foreground/40">Stations trouvées</h3>
+            <h3 className="text-[11px] font-bold tracking-widest text-foreground/40">Stations à trouver</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-border border border-border">
-              {targets.map(name => {
+              {(revealed ? targets : targets.filter(name => found.includes(name))).map(name => {
                 const isFound = found.includes(name);
-                if (!isFound && !revealed) return null;
                 const station = stations.find(s => s.name === name);
                 return (
                   <div key={name} className={`bg-card p-5 flex flex-col justify-between h-32 font-parisine ${isFound ? '' : 'opacity-70 contrast-[0.8] italic'}`}>
@@ -271,6 +270,11 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
                   </div>
                 );
               })}
+              {!revealed && Array.from({ length: targets.length - found.length }, (_, i) => (
+                <div key={`remaining-${i}`} className="bg-card p-5 h-32 flex items-center justify-center text-foreground/20 select-none" aria-hidden>
+                  ●●●●●
+                </div>
+              ))}
             </div>
 
             {isEmpty && (
