@@ -10,9 +10,9 @@ export interface UserRecord {
   createdAt: string;
 }
 
-const USERS_FILE = path.join(process.cwd(), "src/data/users.json");
-
-export function readUsers(file: string = USERS_FILE): UserRecord[] {
+export function readUsers(): UserRecord[] {
+  // Static path: a dynamic one makes the bundler trace the whole project into the server output.
+  const file = path.join(process.cwd(), "src/data/users.json");
   return fs.existsSync(file) ? (JSON.parse(fs.readFileSync(file, "utf8")) as UserRecord[]) : [];
 }
 
