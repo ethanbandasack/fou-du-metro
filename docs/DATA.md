@@ -75,7 +75,11 @@ the two stations. Both ends must be less than 0.01° apart.
 `npm run data:import -- --dedupe --remove --add` aligns `src/data/` with IDFM: it merges stations listed
 twice on one line, removes rows IDFM does not list on that line, and adds the missing official stations
 (placed in their line file at the smallest detour, curated columns copied from the same zone or listed
-for review). Review the diff, then update `src/server/loadNetwork.test.ts`.
+for review). `--projects` adds the stations of lines and extensions under construction from IDFM project
+data, with their estimated opening date and no zone; stations already on the line (same name, or less
+than 300 m away) are skipped. Future rows are never matched, removed or zoned by these scripts. Review the
+diff (branching or circular lines may need their order fixed by hand, like line 15), then update
+`src/server/loadNetwork.test.ts`.
 
 ## Checking against official data
 
