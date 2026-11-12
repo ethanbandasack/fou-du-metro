@@ -13,15 +13,8 @@ import { initialQuizState, quizReducer } from '@/features/classic/quizReducer';
 import { ScoresPanel } from '@/features/classic/ScoresPanel';
 import { addScore, createScore, parseStoredScores, SCORES_STORAGE_KEY, type QuizScore } from '@/features/classic/scores';
 import { answersOf, selectLines } from '@/features/classic/selection';
+import { DEFAULT_SETTINGS, parseStoredSettings, SETTINGS_STORAGE_KEY, type QuizSettings } from '@/features/classic/settings';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
-
-interface QuizSettings {
-  selectedModes: string[];
-  selectedLines: string[];
-  showConnections: boolean;
-}
-
-const DEFAULT_SETTINGS: QuizSettings = { selectedModes: ['METRO'], selectedLines: [], showConnections: true };
 
 const toolbarButton = (active: boolean) =>
   `flex items-center gap-2 px-4 py-2 border border-border text-[11px] font-bold transition-all ${
@@ -31,7 +24,7 @@ const toolbarButton = (active: boolean) =>
 export function QuizGame({ lines }: { lines: Line[] }) {
   const { player, loading: authLoading, login, logout } = useAuth();
   const [scores, setScores] = useLocalStorageState<QuizScore[]>(SCORES_STORAGE_KEY, [], parseStoredScores);
-  const [settings, setSettings] = useState<QuizSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useLocalStorageState<QuizSettings>(SETTINGS_STORAGE_KEY, DEFAULT_SETTINGS, parseStoredSettings);
   const [showSettings, setShowSettings] = useState(false);
   const [showScores, setShowScores] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
