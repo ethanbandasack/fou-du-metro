@@ -35,15 +35,22 @@ function hexToAnsi(hex: string): string {
   return `38;2;${(value >> 16) & 255};${(value >> 8) & 255};${value & 255}`;
 }
 
+const MIN_BAR_WIDTH = 4;
+
 function groupRow(group: GroupProgress, labelWidth: number, countWidth: number, width: number, color: boolean): string {
-  const barWidth = Math.max(5, width - labelWidth - countWidth - 3);
-  const filled = group.total > 0 ? Math.round((group.found / group.total) * barWidth) : 0;
   const complete = group.total > 0 && group.found === group.total;
+  const count = `${group.found} / ${group.total}`.padStart(countWidth);
+  const barWidth = width - labelWidth - countWidth - 3;
+  if (barWidth < MIN_BAR_WIDTH) {
+    // Too narrow for a bar: label and count only.
+    const narrowLabel = fit(group.label, Math.max(0, width - countWidth - 2)).padEnd(Math.max(0, width - countWidth - 2));
+    return ` ${paint(narrowLabel, color && complete, "32")} ${count}`;
+  }
+  const filled = group.total > 0 ? Math.round((group.found / group.total) * barWidth) : 0;
   const label = fit(group.label, labelWidth).padEnd(labelWidth);
   const bar =
     paint("█".repeat(filled), color, complete ? "32" : group.color ? hexToAnsi(group.color) : "37") +
     paint("░".repeat(barWidth - filled), color, "90");
-  const count = `${group.found} / ${group.total}`.padStart(countWidth);
   return ` ${paint(label, color && complete, "32")} ${bar} ${count}`;
 }
 

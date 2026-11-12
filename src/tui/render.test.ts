@@ -26,6 +26,12 @@ describe("render", () => {
     expect(lines.every((line) => line.length <= 60)).toBe(true);
   });
 
+  it("stays within narrow terminals", () => {
+    const lines = render(screen({ width: 24, groups: [{ label: "Tramway T3a", found: 120, total: 321 }] }));
+    expect(lines.filter((line) => line.length > 24)).toEqual([]);
+    expect(lines.find((line) => line.includes("120 / 321"))).toBeDefined();
+  });
+
   it("shows overall progress, time and grouping in the header", () => {
     const [header] = render(screen());
     expect(header).toContain("30 / 321 (9 %)");
