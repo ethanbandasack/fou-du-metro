@@ -1,11 +1,10 @@
 /**
  * Compares src/data with Île-de-France Mobilités open data and prints a report:
- * missing or unknown stations, connections that differ from the official
- * transfer zones, line colors that differ from the official ones.
+ * missing or unknown stations, transfer zones to refresh, line colors that
+ * differ from the official ones.
  *
  * Usage: npm run data:audit
  */
-import { buildNetwork } from "@/domain/network";
 import { auditNetwork, formatAudit } from "@/server/idfm/audit";
 import { IDFM_API, parseOfficialLines, parseOfficialStops } from "@/server/idfm/official";
 import { loadSources } from "@/server/loadNetwork";
@@ -22,10 +21,8 @@ async function main() {
     fetchExport("emplacement-des-gares-idf"),
     fetchExport("referentiel-des-lignes", 'transportmode in ("metro", "rail", "tram", "funicular", "cableway")'),
   ]);
-  const sources = loadSources();
   const audit = auditNetwork({
-    rows: sources.rows,
-    stations: buildNetwork(sources).stations,
+    rows: loadSources().rows,
     official: parseOfficialStops(stations),
     officialLines: parseOfficialLines(lines),
   });

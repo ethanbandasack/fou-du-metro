@@ -1,20 +1,18 @@
 import { describe, expect, it } from "vitest";
 import type { StopRow } from "@/domain/csv";
-import { buildNetwork } from "@/domain/network";
 import { auditNetwork, formatAudit } from "@/server/idfm/audit";
 import type { OfficialStop } from "@/server/idfm/official";
 
-const row = (name: string, lineId: string, lat = 48.85, lon = 2.35): StopRow => ({
+const row = (name: string, lineId: string, lat = 48.85, lon = 2.35, zone = ""): StopRow => ({
   name, lineId, mode: "METRO", order: 0, lat, lon, arrondissement: 1, historicFigure: false, colorInName: false,
-  openedAfter1980: false, leftBank: false, hasRer: false, hasTram: false, commune: "Paris",
+  openedAfter1980: false, leftBank: false, commune: "Paris", zone,
 });
 const official = (name: string, lineId: string, zdcId: string, lat = 48.85, lon = 2.35): OfficialStop => ({
   name, lineId, mode: "METRO", lat, lon, zdcId, zdcName: name, openedOn: null,
 });
 
 function audit(rows: StopRow[], officialStops: OfficialStop[], officialLines = []) {
-  const { stations } = buildNetwork({ rows, lineOrders: [], aliases: [] });
-  return auditNetwork({ rows, stations, official: officialStops, officialLines });
+  return auditNetwork({ rows, official: officialStops, officialLines });
 }
 
 describe("auditNetwork", () => {
@@ -33,10 +31,10 @@ describe("auditNetwork", () => {
     ]);
   });
 
-  it("compares the lines of each station with its official transfer zone", () => {
-    const rows = [row("Châtelet", "1"), row("Châtelet", "4"), row("Rivoli", "7", 48.86)];
-    const officialStops = [official("Châtelet", "1", "z1"), official("Châtelet", "4", "z1"), official("Châtelet", "7", "z1", 48.851)];
-    expect(audit(rows, officialStops).connections).toEqual([{ station: "Châtelet", local: ["1", "4"], official: ["1", "4", "7"] }]);
+  it("reports rows whose stored zone differs from the official one", () => {
+    const rows = [row("Châtelet", "1", 48.85, 2.35, "old"), row("Châtelet", "4", 48.85, 2.35, "z1")];
+    const officialStops = [official("Châtelet", "1", "z1"), official("Châtelet", "4", "z1")];
+    expect(audit(rows, officialStops).zones).toEqual([{ lineId: "1", name: "Châtelet", local: "old", official: "z1" }]);
   });
 
   it("reports colors that differ from the official ones, for local lines only", () => {
@@ -50,9 +48,9 @@ describe("auditNetwork", () => {
 
 describe("formatAudit", () => {
   it("summarizes each section with its count", () => {
-    const text = formatAudit({ unmatched: [], missing: [{ lineId: "18", name: "Polytechnique" }], connections: [], colors: [] });
+    const text = formatAudit({ unmatched: [], missing: [{ lineId: "18", name: "Polytechnique" }], zones: [], colors: [] });
     expect(text).toContain("Gares officielles absentes localement : 1");
     expect(text).toContain("- 18 · Polytechnique");
-    expect(text).toContain("Correspondances différentes : 0");
+    expect(text).toContain("Zones de correspondance à mettre à jour : 0");
   });
 });

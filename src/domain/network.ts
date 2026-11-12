@@ -1,6 +1,6 @@
 import type { StopRow } from "@/domain/csv";
 import { compareLines, lineColors, lineLabel, type LineColors, type Mode } from "@/domain/lines";
-import { createAliasMatcher, normalizeName, type AliasPair } from "@/domain/names";
+import { normalizeName } from "@/domain/names";
 
 /** A station as served by one line. */
 export interface Stop {
@@ -29,10 +29,11 @@ export interface Line {
   stops: Stop[];
 }
 
-/** A physical interchange: every row of the same place, across lines and spellings. */
+/** An interchange: the rows of one official transfer zone, across lines and spellings. */
 export interface Station {
   name: string;
   aliases: string[];
+  /** Lines serving the zone itself (not those across a corridor). */
   lines: string[];
   lat: number;
   lon: number;
@@ -41,7 +42,9 @@ export interface Station {
   colorInName: boolean;
   openedAfter1980: boolean;
   leftBank: boolean;
+  /** An RER line serves the zone or a zone linked by a corridor. */
   hasRer: boolean;
+  /** A tram line serves the zone or a zone linked by a corridor. */
   hasTram: boolean;
 }
 
@@ -57,46 +60,69 @@ export interface LineOrder {
   stations: string[];
 }
 
-/** Two rows are the same place when their names are aliases and they lie within ~1 km. */
-export const PROXIMITY_DEGREES = 0.01;
+/** Walking link between two transfer zones, named by one station of each (src/data/corridors.json). */
+export interface Corridor {
+  name1: string;
+  name2: string;
+}
 
-export function buildNetwork(input: { rows: StopRow[]; lineOrders: LineOrder[]; aliases: AliasPair[] }): Network {
-  const groups = groupRows(input.rows, createAliasMatcher(input.aliases));
-  const connections = connectionsByRow(groups);
+/** Rows without a zone, and corridor ends, must lie within this box (~1 km). */
+const PROXIMITY_DEGREES = 0.01;
+
+const near = (a: StopRow, b: StopRow) =>
+  Math.abs(a.lat - b.lat) < PROXIMITY_DEGREES && Math.abs(a.lon - b.lon) < PROXIMITY_DEGREES;
+
+export function buildNetwork(input: { rows: StopRow[]; lineOrders: LineOrder[]; corridors: Corridor[] }): Network {
+  const groups = groupRows(input.rows);
+  const linked = linkGroups(groups, input.corridors);
+  const reachable = (group: StopRow[]) => [group, ...(linked.get(group) ?? [])].flat();
+
+  const connections = new Map<StopRow, string[]>();
+  for (const group of groups) {
+    const lines = [...new Set(reachable(group).map((row) => row.lineId))];
+    for (const row of group) connections.set(row, lines.filter((line) => line !== row.lineId));
+  }
+
   return {
     lines: orderLines(input.rows, input.lineOrders, connections),
-    stations: groups.map(toStation),
+    stations: groups.map((group) => toStation(group, reachable(group))),
   };
 }
 
-/** Assigns each row to the first group whose first row is a nearby alias (input order matters). */
-function groupRows(rows: StopRow[], areAliases: (a: string, b: string) => boolean): StopRow[][] {
+/** One group per official zone; rows without a zone join a nearby row with the same name. */
+function groupRows(rows: StopRow[]): StopRow[][] {
   const groups: StopRow[][] = [];
+  const byZone = new Map<string, StopRow[]>();
   for (const row of rows) {
-    const group = groups.find(([first]) => {
-      const near =
-        Math.abs(first.lat - row.lat) < PROXIMITY_DEGREES && Math.abs(first.lon - row.lon) < PROXIMITY_DEGREES;
-      return near && areAliases(first.name, row.name);
-    });
-    if (group) group.push(row);
-    else groups.push([row]);
+    const group = row.zone
+      ? byZone.get(row.zone)
+      : groups.find(([first]) => !first.zone && near(first, row) && normalizeName(first.name) === normalizeName(row.name));
+    if (group) {
+      group.push(row);
+    } else {
+      groups.push([row]);
+      if (row.zone) byZone.set(row.zone, groups[groups.length - 1]);
+    }
   }
   return groups;
 }
 
-function connectionsByRow(groups: StopRow[][]): Map<StopRow, string[]> {
-  const result = new Map<StopRow, string[]>();
-  for (const group of groups) {
-    for (const row of group) {
-      const others = group
-        .filter((other) => other.lineId !== row.lineId)
-        .filter((other) => (other.mode === "RER" ? row.hasRer : true))
-        .filter((other) => (other.mode === "TRAMWAY" ? row.hasTram : true))
-        .map((other) => other.lineId);
-      result.set(row, [...new Set(others)]);
+/** Groups reachable through each corridor (not transitive: a corridor links its two ends only). */
+function linkGroups(groups: StopRow[][], corridors: Corridor[]): Map<StopRow[], StopRow[][]> {
+  const links = new Map<StopRow[], StopRow[][]>();
+  const named = (name: string) => groups.filter((group) => group.some((row) => normalizeName(row.name) === normalizeName(name)));
+  const link = (from: StopRow[], to: StopRow[]) => links.set(from, [...(links.get(from) ?? []), to]);
+  for (const { name1, name2 } of corridors) {
+    for (const a of named(name1)) {
+      for (const b of named(name2)) {
+        if (a !== b && near(a[0], b[0])) {
+          link(a, b);
+          link(b, a);
+        }
+      }
     }
   }
-  return result;
+  return links;
 }
 
 function orderLines(rows: StopRow[], lineOrders: LineOrder[], connections: Map<StopRow, string[]>): Line[] {
@@ -137,7 +163,7 @@ function toStop(row: StopRow, order: number, connections: string[]): Stop {
   };
 }
 
-function toStation(group: StopRow[]): Station {
+function toStation(group: StopRow[], reachable: StopRow[]): Station {
   const [first] = group;
   return {
     name: first.name,
@@ -150,7 +176,7 @@ function toStation(group: StopRow[]): Station {
     colorInName: first.colorInName,
     openedAfter1980: first.openedAfter1980,
     leftBank: first.leftBank,
-    hasRer: group.some((row) => row.hasRer),
-    hasTram: group.some((row) => row.hasTram),
+    hasRer: reachable.some((row) => row.mode === "RER"),
+    hasTram: reachable.some((row) => row.mode === "TRAMWAY"),
   };
 }

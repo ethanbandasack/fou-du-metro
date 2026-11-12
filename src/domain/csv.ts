@@ -15,10 +15,10 @@ export interface StopRow {
   colorInName: boolean;
   openedAfter1980: boolean;
   leftBank: boolean;
-  hasRer: boolean;
-  hasTram: boolean;
   /** Commune ("Paris" for the 20 arrondissements). */
   commune: string;
+  /** Official IDFM transfer zone (zone de correspondance) id, "" when unknown. */
+  zone: string;
 }
 
 const COLUMNS = [
@@ -33,9 +33,8 @@ const COLUMNS = [
   "couleur",
   "ouverte_apres_1980",
   "rive_gauche",
-  "has_rer",
-  "has_tram",
   "commune",
+  "zone",
 ] as const;
 
 /** Parses `stations.csv` (comma separated, no quoting). Throws on malformed input. */
@@ -55,15 +54,14 @@ function parseRow(line: string, lineNumber: number): StopRow {
   if (fields.length !== COLUMNS.length) fail(`expected ${COLUMNS.length} fields, got ${fields.length}`);
 
   const [name, line_, mode, order, lat, lon, arrondissement, ...rest] = fields;
-  const flags = rest.slice(0, 6);
-  const commune = rest[6].trim();
+  const [historicFigure, colorInName, openedAfter1980, leftBank] = rest.slice(0, 4).map((f) => f === "1");
+  const commune = rest[4].trim();
   if (!commune) fail(`"commune" is empty`);
   if (!MODES.includes(mode as Mode)) fail(`unknown mode "${mode}"`);
   const number = (value: string, column: string) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : fail(`"${column}" is not a number`);
   };
-  const [historicFigure, colorInName, openedAfter1980, leftBank, hasRer, hasTram] = flags.map((f) => f === "1");
 
   return {
     name,
@@ -77,8 +75,30 @@ function parseRow(line: string, lineNumber: number): StopRow {
     colorInName,
     openedAfter1980,
     leftBank,
-    hasRer,
-    hasTram,
     commune,
+    zone: rest[5].trim(),
   };
+}
+
+/** Inverse of parseStationsCsv (LF line endings, bis lines written "3bis"). */
+export function formatStationsCsv(rows: StopRow[]): string {
+  const flag = (value: boolean) => (value ? "1" : "0");
+  const lines = rows.map((r) =>
+    [
+      r.name,
+      r.lineId,
+      r.mode,
+      r.order,
+      r.lat,
+      r.lon,
+      r.arrondissement,
+      flag(r.historicFigure),
+      flag(r.colorInName),
+      flag(r.openedAfter1980),
+      flag(r.leftBank),
+      r.commune,
+      r.zone,
+    ].join(","),
+  );
+  return [COLUMNS.join(","), ...lines].join("\n") + "\n";
 }

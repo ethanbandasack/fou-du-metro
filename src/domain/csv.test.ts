@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { parseStationsCsv } from "@/domain/csv";
+import { formatStationsCsv, parseStationsCsv } from "@/domain/csv";
 
 const HEADER =
-  "nom,line,mode,order,lat,lon,arrondissement,figure_historique,couleur,ouverte_apres_1980,rive_gauche,has_rer,has_tram,commune";
+  "nom,line,mode,order,lat,lon,arrondissement,figure_historique,couleur,ouverte_apres_1980,rive_gauche,commune,zone";
 
 describe("parseStationsCsv", () => {
   it("parses a row into a typed stop row", () => {
-    const rows = parseStationsCsv(`${HEADER}\nGambetta,3B,METRO,1,48.86,2.39,20,1,0,0,0,0,1,Paris\n`);
+    const rows = parseStationsCsv(`${HEADER}\nGambetta,3B,METRO,1,48.86,2.39,20,1,0,0,0,Paris,71645\n`);
     expect(rows).toEqual([
       {
         name: "Gambetta",
@@ -20,16 +20,25 @@ describe("parseStationsCsv", () => {
         colorInName: false,
         openedAfter1980: false,
         leftBank: false,
-        hasRer: false,
-        hasTram: true,
         commune: "Paris",
+        zone: "71645",
       },
     ]);
   });
 
   it("accepts CRLF line endings and blank trailing lines", () => {
-    const rows = parseStationsCsv(`${HEADER}\r\nNation,1,METRO,21,48.84,2.39,12,0,0,0,0,1,0,Paris\r\n\r\n`);
+    const rows = parseStationsCsv(`${HEADER}\r\nNation,1,METRO,21,48.84,2.39,12,0,0,0,0,Paris,\r\n\r\n`);
     expect(rows.map((r) => r.name)).toEqual(["Nation"]);
+  });
+
+  it("leaves the zone empty when unknown", () => {
+    const [row] = parseStationsCsv(`${HEADER}\nNation,1,METRO,21,48.84,2.39,12,0,0,0,0,Paris,\n`);
+    expect(row.zone).toBe("");
+  });
+
+  it("writes rows back in the same format", () => {
+    const text = `${HEADER}\nGambetta,3bis,METRO,1,48.86,2.39,20,1,0,0,0,Paris,71645\n`;
+    expect(formatStationsCsv(parseStationsCsv(text))).toBe(text);
   });
 
   it("rejects an unexpected header", () => {
@@ -41,6 +50,6 @@ describe("parseStationsCsv", () => {
   });
 
   it("rejects an unknown transport mode", () => {
-    expect(() => parseStationsCsv(`${HEADER}\nNation,1,BUS,21,48.84,2.39,12,0,0,0,0,1,0,Paris`)).toThrow(/mode/);
+    expect(() => parseStationsCsv(`${HEADER}\nNation,1,BUS,21,48.84,2.39,12,0,0,0,0,Paris,`)).toThrow(/mode/);
   });
 });
