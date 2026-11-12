@@ -70,12 +70,13 @@ server).
 - `features/auth`: optional login by code (`/api/auth`, users in the untracked `src/data/users.json`).
 - `domain/selection.ts`: lines in play for a mode/line selection and a day (future stations hidden unless
   included), their answers (one per key), open lines and stations. `hooks/useToday.ts` gives the day.
-- `tui/`: `progress.ts` (found flag of each station per group: global, line, arrondissement, commune;
-  in line order, branches one after the other), `state.ts` (input, guesses, grouping, scroll; `paste`
-  is text read in one go, matched as typed; `hear` is the microphone transcript, matched by sound),
-  `render.ts` (pure frame of strings; `stationBar` draws each station at its relative position),
-  `options.ts` (CLI flags), `voice.ts` (compiles `listen.swift` into `node_modules/.cache` on first
-  `--voice`, streams its transcripts as `hear` actions) and `main.ts` (raw-mode keyboard and screen IO only).
+- `tui/`: `progress.ts` (found flag of each station per group: global, line, arrondissement, commune,
+  first letter; in line order, branches one after the other, or alphabetically by letter), `state.ts`
+  (input, guesses, grouping, scroll; `paste` is text read in one go, matched as typed; `hear` is the
+  microphone transcript, matched by sound), `render.ts` (pure frame of strings; `stationBar` draws each
+  station at its relative position), `options.ts` (CLI flags), `voice.ts` (compiles `listen.swift` into
+  `node_modules/.cache` on first `--voice`, streams its transcripts as `hear` actions) and `main.ts`
+  (raw-mode keyboard and screen IO only).
 - `hooks/useLocalStorageState.ts`: localStorage through `useSyncExternalStore`, shared by every
   component using a key (scores, player, settings); `hooks/useHardcore.ts` is one such shared flag.
 

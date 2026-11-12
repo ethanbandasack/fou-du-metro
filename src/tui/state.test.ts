@@ -90,7 +90,8 @@ describe("tuiReducer", () => {
   it("cycles through groupings and resets the scroll", () => {
     const state = run([{ type: "scroll", delta: 5, max: 10 }, { type: "nextGrouping" }]);
     expect(state).toMatchObject({ grouping: "arrondissement", scroll: 0 });
-    expect(run([{ type: "nextGrouping" }], initialTuiState("commune")).grouping).toBe("global");
+    expect(run([{ type: "nextGrouping" }], initialTuiState("commune")).grouping).toBe("letter");
+    expect(run([{ type: "nextGrouping" }], initialTuiState("letter")).grouping).toBe("global");
   });
 
   it("scrolls within the list", () => {

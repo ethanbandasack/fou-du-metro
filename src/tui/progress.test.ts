@@ -42,6 +42,14 @@ describe("progressBy", () => {
     expect(progressBy(first, new Set(), "arrondissement")[0].label).toBe("Paris 1er");
   });
 
+  it("counts per first letter, accents ignored, stations in alphabetical order", () => {
+    const named = [line("9", [stop("Europe", 8, "Paris"), stop("Gare de Lyon", 12, "Paris"), stop("Étoile", 8, "Paris"), stop("Église d'Auteuil", 16, "Paris")])];
+    expect(progressBy(named, new Set(["étoile"]), "letter").map((g) => [g.label, g.stations])).toEqual([
+      ["E", [false, true, false]],
+      ["G", [false]],
+    ]);
+  });
+
   it("counts per commune, alphabetically", () => {
     expect(progressBy(lines, found, "commune").map((g) => [g.label, g.stations])).toEqual([
       ["Paris", [true, false, false]],
