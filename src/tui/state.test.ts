@@ -14,7 +14,8 @@ const indexes = (hardcore = false) => ({
 });
 const run = (actions: TuiAction[], state: TuiState = initialTuiState("line"), hardcore = false) =>
   actions.reduce((s, action) => tuiReducer(s, action, indexes(hardcore)), state);
-const said = (text: string): TuiAction => ({ type: "say", text });
+const pasted = (text: string): TuiAction => ({ type: "paste", text });
+const heard = (transcript: string): TuiAction => ({ type: "hear", transcript });
 const typed = (text: string): TuiAction[] => [...text].map((char) => ({ type: "type", text: char }));
 
 describe("tuiReducer", () => {
@@ -42,24 +43,27 @@ describe("tuiReducer", () => {
     expect(state.feedback).toBe("« Nation » : déjà trouvée");
   });
 
-  it("finds every station named in a dictated sentence", () => {
-    const state = run([said("alors Nation et Bastille")]);
+  it("finds every station named in pasted text", () => {
+    const state = run([pasted("alors Nation et Bastille")]);
     expect(state).toMatchObject({ input: "", found: ["nation", "bastille"], lastFound: ["nation", "bastille"] });
   });
 
-  it("keeps dictated words until they name a station", () => {
-    expect(run([said("euh Porte"), said(" de")]).input).toBe("euh Porte de");
-    expect(run([said("euh Porte"), said(" de"), said(" Vanves")])).toMatchObject({ input: "", found: ["vanves"] });
+  it("keeps pasted words until they name a station", () => {
+    expect(run([pasted("euh Porte"), pasted(" de")]).input).toBe("euh Porte de");
+    expect(run([pasted("euh Porte"), pasted(" de"), pasted(" Vanves")])).toMatchObject({ input: "", found: ["vanves"] });
   });
 
-  it("says when every dictated station is already found", () => {
-    const state = run([said("Nation"), said("encore Nation")]);
+  it("says when every pasted station is already found", () => {
+    const state = run([pasted("Nation"), pasted("encore Nation")]);
     expect(state).toMatchObject({ input: "", found: ["nation"], feedback: "« encore Nation » : déjà trouvée" });
   });
 
-  it("forgives accents when dictating in hardcore, not when typing", () => {
+  it("forgives spelling only for what the microphone hears", () => {
     expect(run(typed("gaite"), undefined, true).found).toEqual([]);
-    expect(run([said("la gaite")], undefined, true).found).toEqual(["gaite"]);
+    expect(run([pasted("la gaite")], undefined, true).found).toEqual([]);
+    expect(run([pasted("porte de vanve")]).found).toEqual([]);
+    expect(run([heard("la gaite")], undefined, true).found).toEqual(["gaite"]);
+    expect(run([heard("porte de vanve")]).found).toEqual(["vanves"]);
   });
 
   it("finds stations heard among other words, leaving the typed input alone", () => {

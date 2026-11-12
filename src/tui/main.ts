@@ -137,7 +137,7 @@ function main() {
   const flush = () => {
     const text = pending;
     pending = "";
-    if (text) dispatch(text.length > 1 ? { type: "say", text } : { type: "type", text });
+    if (text) dispatch(text.length > 1 ? { type: "paste", text } : { type: "type", text });
   };
 
   process.stdin.on("keypress", (text: string | undefined, key: readline.Key | undefined) => {
