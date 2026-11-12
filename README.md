@@ -52,7 +52,8 @@ npm run dev
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md): layers, data flow, vocabulary
-- [Data](docs/DATA.md): `stations.csv`, line files, aliases
+- [Data](docs/DATA.md): `stations.csv`, line files, transfer zones and corridors
+- [Data sources](docs/DATA-SOURCES.md): official IDFM open data, audit (`npm run data:audit`)
 - [Agent guide](AGENTS.md): commands and rules for contributors and coding agents
 
 > [!IMPORTANT]

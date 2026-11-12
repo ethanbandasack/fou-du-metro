@@ -8,7 +8,7 @@ objects.
 
 ```
 src/
-  data/       raw data: stations.csv, lines/*.yaml, connection-aliases.json  (see DATA.md)
+  data/       raw data: stations.csv, lines/*.yaml, corridors.json  (see DATA.md)
   domain/     pure TypeScript, no React / Next / fs. Fully unit tested.
   server/     Node-only code reading files (build time, API route, CLI)
   features/   one folder per feature: React components + hooks + pure helpers
@@ -28,7 +28,7 @@ Dependencies point inwards: `app -> features -> domain`, `server -> domain`,
 ```
 stations.csv ──parseStationsCsv──┐
 lines/*.yaml ──(server)──────────┼─ buildNetwork ─> Network { lines, stations }
-connection-aliases.json ─────────┘
+corridors.json ─────────┘
 ```
 
 `src/app/page.tsx` calls `loadNetwork()` (server) and renders `HomePage`.
@@ -41,16 +41,17 @@ server).
 |------|---------|------|
 | Stop | a station as served by one line (one CSV row kept by the line's YAML order) | `Stop` |
 | Line | ordered stops of one line, with label and official colors | `Line` |
-| Station | a physical interchange: CSV rows with alias names within ~1 km, merged | `Station` |
+| Station | an interchange: the CSV rows of one official transfer zone (`zone`) | `Station` |
+| Corridor | hand-curated walking link between two zones: adds connections, never merges stations | `Corridor` |
 | Key | `normalizeName(name)`: stops sharing a key are found together in the classic quiz | `Stop.key` |
 | Answer | something to find: a key plus every name that designates it | `Answer` |
 
 ## Modules
 
 - `domain/lines.ts`: modes, line ids (`3B` -> `3bis`), IDFM palette, labels, sort order.
-- `domain/names.ts`: name normalization and alias matching.
-- `domain/csv.ts`: strict parser for `stations.csv` (throws with a line number).
-- `domain/network.ts`: `buildNetwork`, groups rows into stations, computes connections, orders lines.
+- `domain/names.ts`: name normalization.
+- `domain/csv.ts`: strict parser and writer for `stations.csv` (throws with a line number).
+- `domain/network.ts`: `buildNetwork`, groups rows by transfer zone, adds corridors, computes connections, orders lines.
 - `domain/matching.ts`: answer index. A guess matches a full name, or a part of a dashed or
   parenthesised name that only one station has. Prefixes never match.
 - `domain/format.ts`: durations.

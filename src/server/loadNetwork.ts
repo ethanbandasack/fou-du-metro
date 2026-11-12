@@ -3,8 +3,7 @@ import path from "node:path";
 import yaml from "js-yaml";
 import { parseStationsCsv, type StopRow } from "@/domain/csv";
 import { MODES, normalizeLineId, type Mode } from "@/domain/lines";
-import type { AliasPair } from "@/domain/names";
-import { buildNetwork, type LineOrder, type Network } from "@/domain/network";
+import { buildNetwork, type Corridor, type LineOrder, type Network } from "@/domain/network";
 
 const DEFAULT_DATA_DIR = path.join(process.cwd(), "src/data");
 
@@ -12,13 +11,13 @@ const DEFAULT_DATA_DIR = path.join(process.cwd(), "src/data");
 export function loadSources(dataDir: string = DEFAULT_DATA_DIR): {
   rows: StopRow[];
   lineOrders: LineOrder[];
-  aliases: AliasPair[];
+  corridors: Corridor[];
 } {
   const rows = parseStationsCsv(fs.readFileSync(path.join(dataDir, "stations.csv"), "utf8"));
-  const { aliases } = JSON.parse(fs.readFileSync(path.join(dataDir, "connection-aliases.json"), "utf8")) as {
-    aliases: AliasPair[];
+  const { corridors } = JSON.parse(fs.readFileSync(path.join(dataDir, "corridors.json"), "utf8")) as {
+    corridors: Corridor[];
   };
-  return { rows, lineOrders: loadLineOrders(path.join(dataDir, "lines")), aliases };
+  return { rows, lineOrders: loadLineOrders(path.join(dataDir, "lines")), corridors };
 }
 
 export function loadNetwork(dataDir: string = DEFAULT_DATA_DIR): Network {

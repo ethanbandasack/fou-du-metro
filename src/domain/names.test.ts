@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createAliasMatcher, normalizeName, simplifyName } from "@/domain/names";
+import { normalizeName, simplifyName } from "@/domain/names";
 
 describe("normalizeName", () => {
   it("ignores case, accents, spaces and punctuation", () => {
@@ -21,26 +21,5 @@ describe("normalizeName", () => {
 describe("simplifyName", () => {
   it("folds case, accents and punctuation but keeps 'Gare de'", () => {
     expect(simplifyName("Gare de l'Est")).toBe("garedelest");
-  });
-});
-
-describe("createAliasMatcher", () => {
-  const areAliases = createAliasMatcher([{ name1: "Saint-Lazare", name2: "Haussmann Saint-Lazare" }]);
-
-  it("matches identical names", () => {
-    expect(areAliases("Nation", "Nation")).toBe(true);
-  });
-
-  it("treats hyphens and ' - ' as spaces, case-insensitively", () => {
-    expect(areAliases("Viroflay - Rive Gauche", "viroflay rive gauche")).toBe(true);
-  });
-
-  it("matches declared pairs in both directions", () => {
-    expect(areAliases("Saint-Lazare", "Haussmann Saint-Lazare")).toBe(true);
-    expect(areAliases("haussmann saint lazare", "SAINT-LAZARE")).toBe(true);
-  });
-
-  it("rejects unrelated names", () => {
-    expect(areAliases("Saint-Lazare", "Nation")).toBe(false);
   });
 });

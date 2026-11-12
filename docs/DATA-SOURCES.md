@@ -58,10 +58,10 @@ differences.
 
 1. **Now (automatic check)**: `npm run data:audit` compares `src/data/` with IDFM open data and lists
    differences. Run it before editing data and after each IDFM update.
-2. **Colors**: take the official web colors from `referentiel-des-lignes`.
-3. **Connections**: group stations by official transfer zone (`id_ref_zdc`) instead of name aliases and
-   distance, keep a short manual list of corridors between zones (Saint-Lazare ↔ Haussmann
-   Saint-Lazare ↔ Auber), and drop the hand-set `has_rer` / `has_tram` flags.
+2. **Colors** (done): the palette uses the official web colors from `referentiel-des-lignes`.
+3. **Connections** (done): stations are grouped by official transfer zone (`zone` column, filled by
+   `npm run data:zones`), `corridors.json` keeps the hand-curated links between zones, and the hand-set
+   `has_rer` / `has_tram` flags are gone. Next: cross-check corridors with GTFS `transfers.txt`.
 4. **Later**: regenerate `stations.csv` from `emplacement-des-gares-idf` (names, coordinates, commune
    from the ZdC, opening date) with the hand-curated columns kept in an overrides file; derive line order
    from GTFS stop sequences; derive `figure_historique` from Wikidata.

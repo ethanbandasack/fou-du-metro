@@ -21,13 +21,14 @@ Comma separated, no quoting, header required:
 | `couleur` | `1` if the name contains a color |
 | `ouverte_apres_1980` | `1` if opened after 1980 |
 | `rive_gauche` | `1` if on the left bank |
-| `has_rer` | `1` if RER connections should be listed for this row |
-| `has_tram` | `1` if tram connections should be listed for this row |
 | `commune` | commune of the station (`Paris` for arrondissements 1-20) |
+| `zone` | official IDFM transfer zone id (`id_ref_zdc`); empty when IDFM has no such station on that line |
 
 `commune` is filled by `npm run data:communes` (`scripts/add-communes.ts`), which looks up the
 coordinates of non-Paris rows on [geo.api.gouv.fr](https://geo.api.gouv.fr). Run it after adding rows
-(`-- --force` refreshes every value). The parser accepts LF and CRLF line endings.
+(`-- --force` refreshes every value). `zone` is filled by `npm run data:zones`
+(`scripts/sync-zones.ts`), which matches each row to its IDFM station. The parser accepts LF and CRLF
+line endings.
 
 ## `lines/*.yaml`
 
@@ -45,18 +46,24 @@ stations:
 Names are matched with `normalizeName` (case, accents and punctuation
 ignored). Branching lines list their branches one after the other.
 
-## `connection-aliases.json`
+## Stations and connections
 
-Pairs of names that designate the same interchange even though they differ,
-for example `Saint-Lazare` / `Haussmann Saint-Lazare`. Two CSV rows are merged
-into one station when their names are equal or aliased and they are less than
-0.01° apart in latitude and longitude (~1 km).
+Rows sharing a `zone` form one station: its names are the rows' names, its lines the rows' lines, and
+each stop lists the other lines of the zone as connections. Rows without a zone join a row of the same
+name less than 0.01° away (~1 km).
+
+## `corridors.json`
+
+Hand-curated walking links between two different zones, named by one station of each, for example
+`Saint-Lazare` ↔ `Haussmann Saint-Lazare` or `Châtelet` ↔ `Châtelet - Les Halles`. A corridor adds the
+lines of the other zone to the connections (and to the RER / tram flags) of each side; it never merges
+the two stations. Both ends must be less than 0.01° apart.
 
 ## Adding or fixing a line
 
-1. Add or edit its rows in `stations.csv`, then run `npm run data:communes`.
+1. Add or edit its rows in `stations.csv`, then run `npm run data:zones` and `npm run data:communes`.
 2. List its stations in order in `lines/<mode>-<id>.yaml`.
-3. Add alias pairs if a connection is spelled differently on each line.
+3. Add a corridor only for a walking link between two different zones.
 4. Run `npm test` (the dataset characterization test lists expected counts; update it on purpose).
 
 ## Checking against official data

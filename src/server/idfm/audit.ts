@@ -1,7 +1,6 @@
 import type { StopRow } from "@/domain/csv";
 import { lineColors } from "@/domain/lines";
 import { simplifyName } from "@/domain/names";
-import { PROXIMITY_DEGREES, type Station } from "@/domain/network";
 import type { OfficialLine, OfficialStop } from "@/server/idfm/official";
 
 /** Differences between the local data and IDFM open data. */
@@ -10,8 +9,8 @@ export interface Audit {
   unmatched: { lineId: string; name: string }[];
   /** Official stops with no local counterpart. */
   missing: { lineId: string; name: string }[];
-  /** Stations whose lines differ from their official transfer zone (ZdC). */
-  connections: { station: string; local: string[]; official: string[] }[];
+  /** Rows whose stored transfer zone differs from the official one (run npm run data:zones). */
+  zones: { lineId: string; name: string; local: string; official: string }[];
   /** Local line colors that differ from the official web colors. */
   colors: { lineId: string; local: string; official: string }[];
 }
@@ -20,7 +19,6 @@ const MAX_MATCH_KM = 1.5;
 const MIN_MATCH_SCORE = -0.5;
 const STOP_WORDS = new Set(["de", "la", "le", "les", "du", "des", "d", "l", "gare", "et"]);
 
-const byId = (a: string, b: string) => a.localeCompare(b, "fr", { numeric: true });
 const km = (a: { lat: number; lon: number }, b: { lat: number; lon: number }) =>
   Math.hypot((a.lat - b.lat) * 110.574, (a.lon - b.lon) * 73.3);
 const bare = (name: string) => simplifyName(name.replace(/\([^)]*\)/g, ""));
@@ -55,31 +53,17 @@ export function matchRows(rows: StopRow[], official: OfficialStop[]): Map<StopRo
   return matches;
 }
 
-/** Same rule as buildNetwork: an alias name of the station within the proximity box. */
-const belongsTo = (row: StopRow, station: Station) =>
-  station.aliases.includes(row.name) &&
-  station.lines.includes(row.lineId) &&
-  Math.abs(row.lat - station.lat) < PROXIMITY_DEGREES &&
-  Math.abs(row.lon - station.lon) < PROXIMITY_DEGREES;
-
-export function auditNetwork(input: {
-  rows: StopRow[];
-  stations: Station[];
-  official: OfficialStop[];
-  officialLines: OfficialLine[];
-}): Audit {
-  const { rows, stations, official, officialLines } = input;
+export function auditNetwork(input: { rows: StopRow[]; official: OfficialStop[]; officialLines: OfficialLine[] }): Audit {
+  const { rows, official, officialLines } = input;
   const matches = matchRows(rows, official);
   const matched = new Set(matches.values());
   const localLines = new Set(rows.map((row) => row.lineId));
 
-  const connections = stations.flatMap((station) => {
-    const zones = new Set(rows.filter((row) => belongsTo(row, station)).flatMap((row) => matches.get(row)?.zdcId ?? []));
-    if (zones.size === 0) return [];
-    const officialIds = [...new Set(official.filter((s) => zones.has(s.zdcId) && localLines.has(s.lineId)).map((s) => s.lineId))];
-    const local = [...station.lines].sort(byId);
-    const officialSorted = officialIds.sort(byId);
-    return local.join() === officialSorted.join() ? [] : [{ station: station.name, local, official: officialSorted }];
+  const zones = rows.flatMap((row) => {
+    const officialZone = matches.get(row)?.zdcId;
+    return officialZone && officialZone !== row.zone
+      ? [{ lineId: row.lineId, name: row.name, local: row.zone, official: officialZone }]
+      : [];
   });
 
   const colors = officialLines.flatMap(({ lineId, colors: expected }) => {
@@ -92,7 +76,7 @@ export function auditNetwork(input: {
   return {
     unmatched: rows.filter((row) => !matches.has(row)).map(({ lineId, name }) => ({ lineId, name })),
     missing: official.filter((stop) => !matched.has(stop)).map(({ lineId, name }) => ({ lineId, name })),
-    connections,
+    zones,
     colors,
   };
 }
@@ -109,7 +93,7 @@ export function formatAudit(audit: Audit, limit = 30): string {
     "# Audit des données (source : Île-de-France Mobilités open data)",
     section("Gares locales sans équivalent officiel", audit.unmatched, (s) => `${s.lineId} · ${s.name}`),
     section("Gares officielles absentes localement", audit.missing, (s) => `${s.lineId} · ${s.name}`),
-    section("Correspondances différentes", audit.connections, (c) => `${c.station} : local ${c.local.join(", ")} / officiel ${c.official.join(", ")}`),
+    section("Zones de correspondance à mettre à jour", audit.zones, (z) => `${z.lineId} · ${z.name} : local ${z.local || "(vide)"} / officiel ${z.official}`),
     section("Couleurs différentes", audit.colors, (c) => `${c.lineId} : local ${c.local} / officiel ${c.official}`),
   ].join("\n\n");
 }
