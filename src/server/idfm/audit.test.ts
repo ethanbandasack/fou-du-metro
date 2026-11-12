@@ -31,6 +31,12 @@ describe("auditNetwork", () => {
     ]);
   });
 
+  it("ignores official duplicates and stations whose zone the line already serves", () => {
+    const rows = [row("Paris Saint-Lazare", "J", 48.876, 2.325, "z1")];
+    const officialStops = [official("Saint-Lazare", "J", "z1", 48.876, 2.325), official("Saint-Lazare", "J", "z1", 48.876, 2.325)];
+    expect(audit(rows, officialStops).missing).toEqual([]);
+  });
+
   it("reports rows whose stored zone differs from the official one", () => {
     const rows = [row("Châtelet", "1", 48.85, 2.35, "old"), row("Châtelet", "4", 48.85, 2.35, "z1")];
     const officialStops = [official("Châtelet", "1", "z1"), official("Châtelet", "4", "z1")];

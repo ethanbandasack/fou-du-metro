@@ -53,6 +53,21 @@ export function matchRows(rows: StopRow[], official: OfficialStop[]): Map<StopRo
   return matches;
 }
 
+/**
+ * Official stops with no local counterpart: unmatched, and neither a duplicate record nor a zone
+ * the line already serves locally under another name.
+ */
+export function missingStops(rows: StopRow[], official: OfficialStop[], matched: Set<OfficialStop>): OfficialStop[] {
+  const served = new Set(rows.map((row) => `${row.lineId}|${row.zone}`));
+  const seen = new Set<string>();
+  return official.filter((stop) => {
+    const key = `${stop.lineId}|${stop.zdcId}`;
+    if (matched.has(stop) || served.has(key) || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function auditNetwork(input: { rows: StopRow[]; official: OfficialStop[]; officialLines: OfficialLine[] }): Audit {
   const { rows, official, officialLines } = input;
   const matches = matchRows(rows, official);
@@ -75,7 +90,7 @@ export function auditNetwork(input: { rows: StopRow[]; official: OfficialStop[];
 
   return {
     unmatched: rows.filter((row) => !matches.has(row)).map(({ lineId, name }) => ({ lineId, name })),
-    missing: official.filter((stop) => !matched.has(stop)).map(({ lineId, name }) => ({ lineId, name })),
+    missing: missingStops(rows, official, matched).map(({ lineId, name }) => ({ lineId, name })),
     zones,
     colors,
   };
