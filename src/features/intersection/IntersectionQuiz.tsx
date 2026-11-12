@@ -43,10 +43,8 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   };
 
   const [twoCategories, setTwoCategories] = useState(true);
-  const [picks, setPicks] = useState<[Pick, Pick]>(() => [
-    { group: 'line', categoryId: categories.line[0]?.id ?? '', custom: '' },
-    { group: 'geo', categoryId: 'intra', custom: '' },
-  ]);
+  // Random start: this component only renders after a click, never on the server.
+  const [picks, setPicks] = useState<[Pick, Pick]>(() => [randomPick('line'), randomPick('geo')]);
   const [suggestionsEnabled, setSuggestionsEnabled] = useState(true);
   const [found, setFound] = useState<string[]>([]);
   const [input, setInput] = useState('');
@@ -54,12 +52,6 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   const [errorShake, setErrorShake] = useState(false);
   const [round, setRound] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Start on a random line (client only, avoids a hydration mismatch)
-  useEffect(() => {
-    setPicks(prev => [randomPick(prev[0].group), randomPick(prev[1].group)]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const findCategory = (pick: Pick) => categories[pick.group].find(c => c.id === pick.categoryId);
   const activePicks = twoCategories ? picks : [picks[0]];
@@ -74,11 +66,13 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   }, [stations, categories, twoCategories, picks]);
 
   // New question or explicit restart: clear progress
-  useEffect(() => {
+  const [question, setQuestion] = useState({ targets, round });
+  if (question.targets !== targets || question.round !== round) {
+    setQuestion({ targets, round });
     setFound([]);
     setRevealed(false);
     setInput('');
-  }, [targets, round]);
+  }
 
   const suggestions = useMemo(
     () => (suggestionsEnabled ? suggestStations(stations, input) : []),

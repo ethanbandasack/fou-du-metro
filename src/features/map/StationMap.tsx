@@ -44,7 +44,12 @@ export function StationMap({ lines, found, highlighted, revealAll, showUnfound, 
   );
   const initialView = useMemo(() => fitViewBox(stops, { margin: 1, trim: 0.02 }), [stops]);
   const [view, setView] = useState(initialView);
-  useEffect(() => setView(initialView), [initialView]);
+  // Reframe when the lines in play change.
+  const [framed, setFramed] = useState(initialView);
+  if (framed !== initialView) {
+    setFramed(initialView);
+    setView(initialView);
+  }
 
   // Wheel zoom needs a non-passive listener to keep the page from scrolling.
   useEffect(() => {
