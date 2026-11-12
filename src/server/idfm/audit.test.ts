@@ -5,7 +5,7 @@ import type { OfficialStop } from "@/server/idfm/official";
 
 const row = (name: string, lineId: string, lat = 48.85, lon = 2.35, zone = ""): StopRow => ({
   name, lineId, mode: "METRO", order: 0, lat, lon, arrondissement: 1, historicFigure: false, colorInName: false,
-  openedAfter1980: false, leftBank: false, commune: "Paris", zone,
+  openedAfter1980: false, leftBank: false, commune: "Paris", zone, opening: null,
 });
 const official = (name: string, lineId: string, zdcId: string, lat = 48.85, lon = 2.35): OfficialStop => ({
   name, lineId, mode: "METRO", lat, lon, zdcId, zdcName: name, openedOn: null,

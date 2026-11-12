@@ -11,7 +11,8 @@ describe("loadNetwork (real data)", () => {
   it("loads every line and stop, one station per official transfer zone", () => {
     expect(network.lines).toHaveLength(54);
     expect(network.lines.flatMap((l) => l.stops)).toHaveLength(1279);
-    expect(network.stations).toHaveLength(999);
+    // 999 official zones, minus 11 rows without zone that join a zone with the same name nearby
+    expect(network.stations).toHaveLength(988);
   });
 
   it("orders stops along the line and lists the lines of the zone, then across corridors", () => {

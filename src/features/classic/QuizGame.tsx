@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { BookOpen, Eye, EyeOff, Flame, LogIn, LogOut, Map as MapIcon, Settings, Trophy, User as UserIcon } from 'lucide-react';
+import { BookOpen, CalendarClock, Eye, EyeOff, Flame, LogIn, LogOut, Map as MapIcon, Settings, Trophy, User as UserIcon } from 'lucide-react';
 import { ToolbarButton } from '@/components/ToolbarButton';
 import { formatDuration } from '@/domain/format';
 import { buildAnswerIndex, findMentionedAnswers, lookupAnswer } from '@/domain/matching';
@@ -14,12 +14,13 @@ import { initialQuizState, quizReducer } from '@/features/classic/quizReducer';
 import { PlayBar } from '@/features/classic/PlayBar';
 import { ScoresPanel } from '@/features/classic/ScoresPanel';
 import { addScore, createScore, parseStoredScores, SCORES_STORAGE_KEY, type QuizScore } from '@/features/classic/scores';
-import { answersOf, selectLines } from '@/domain/selection';
+import { answersOf, openLineIds, selectLines } from '@/domain/selection';
 import { DEFAULT_SETTINGS, parseStoredSettings, SETTINGS_STORAGE_KEY, type QuizSettings } from '@/features/classic/settings';
 import { StationMap } from '@/features/map/StationMap';
 import { useVoice } from '@/features/voice/useVoice';
 import { useHardcore } from '@/hooks/useHardcore';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
+import { useToday } from '@/hooks/useToday';
 
 export function QuizGame({ lines }: { lines: Line[] }) {
   const { player, loading: authLoading, login, logout } = useAuth();
@@ -33,12 +34,14 @@ export function QuizGame({ lines }: { lines: Line[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
+  const today = useToday();
   const playLines = useMemo(
-    () => selectLines(lines, settings),
+    () => selectLines(lines, { ...settings, today }),
     // Only the line selection matters, not display options.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lines, settings.selectedModes, settings.selectedLines]
+    [lines, settings.selectedModes, settings.selectedLines, settings.includeFuture, today]
   );
+  const openLines = useMemo(() => openLineIds(lines, today), [lines, today]);
   const answers = useMemo(() => answersOf(playLines), [playLines]);
   const [hardcore, setHardcore] = useHardcore();
   const answerIndex = useMemo(() => buildAnswerIndex(answers, { hardcore }), [answers, hardcore]);
@@ -146,6 +149,12 @@ export function QuizGame({ lines }: { lines: Line[] }) {
         <ToolbarButton icon={MapIcon} label="Carte" active={settings.showMap} onClick={() => updateSettings({ showMap: !settings.showMap })} />
         <ToolbarButton icon={BookOpen} label="Solutions" active={showAllAnswers} onClick={() => setShowAllAnswers(!showAllAnswers)} />
         <ToolbarButton icon={Flame} label="Hardcore" active={hardcore} onClick={() => setHardcore(!hardcore)} />
+        <ToolbarButton
+          icon={CalendarClock}
+          label="Lignes futures"
+          active={settings.includeFuture}
+          onClick={() => updateSettings({ includeFuture: !settings.includeFuture })}
+        />
       </div>
 
       <PlayBar
@@ -229,6 +238,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
             gameEnded={quiz.status === 'finished'}
             showConnections={settings.showConnections}
             isAuthenticated={player !== null}
+            showLine={(id) => settings.includeFuture || openLines.has(id)}
           />
         ) : (
           <div className="text-center py-12">

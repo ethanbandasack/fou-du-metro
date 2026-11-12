@@ -9,6 +9,7 @@ describe("parseOptions", () => {
       grouping: "line",
       color: true,
       hardcore: false,
+      future: false,
       help: false,
     });
   });
@@ -24,6 +25,10 @@ describe("parseOptions", () => {
 
   it("turns on the hardcore mode", () => {
     expect(parseOptions(["--hardcore"], {}).hardcore).toBe(true);
+  });
+
+  it("includes future stations with --future", () => {
+    expect(parseOptions(["--future"], {}).future).toBe(true);
   });
 
   it("disables colors with --no-color or NO_COLOR", () => {

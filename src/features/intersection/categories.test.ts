@@ -15,6 +15,7 @@ const station = (name: string, overrides: Partial<Station> = {}): Station => ({
   leftBank: false,
   hasRer: false,
   hasTram: false,
+  opening: null,
   ...overrides,
 });
 

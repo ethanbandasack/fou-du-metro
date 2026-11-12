@@ -17,6 +17,7 @@ function row(name: string, lineId: string, overrides: Partial<StopRow> = {}): St
     leftBank: false,
     commune: "Paris",
     zone: "",
+    opening: null,
     ...overrides,
   };
 }
@@ -107,5 +108,32 @@ describe("buildNetwork", () => {
     const rows = [row("Porte de Vincennes", "1", { zone: "z1" }), row("Porte de Vincennes", "T3a", { mode: "TRAMWAY", zone: "z1" })];
     const { stations } = buildNetwork({ rows, lineOrders: [], corridors: [] });
     expect(stations[0]).toMatchObject({ hasTram: true, hasRer: false });
+  });
+});
+
+describe("future stations", () => {
+  it("lets a stop without zone join a nearby station of the same name", () => {
+    const rows = [
+      row("Pont de Sèvres", "9", { zone: "z1" }),
+      row("Pont de Sèvres", "15", { zone: "", opening: "2027-12-31", lat: 48.852 }),
+    ];
+    const { lines, stations } = buildNetwork({ rows, lineOrders: [order("9", ["Pont de Sèvres"])], corridors: [] });
+    expect(stations.map((s) => s.lines)).toEqual([["9", "15"]]);
+    expect(lines[0].stops[0].connections).toEqual(["15"]);
+  });
+
+  it("keeps opening dates on stops and gives a station its earliest one, none when already open", () => {
+    const rows = [
+      row("Pont de Sèvres", "9", { zone: "z1" }),
+      row("Pont de Sèvres", "15", { opening: "2027-12-31" }),
+      row("Polytechnique", "18", { zone: "z2", opening: "2026-12-01", lat: 48.7 }),
+    ];
+    const { lines, stations } = buildNetwork({
+      rows,
+      lineOrders: [order("15", ["Pont de Sèvres"]), order("18", ["Polytechnique"])],
+      corridors: [],
+    });
+    expect(lines.map((l) => l.stops[0].opening)).toEqual(["2027-12-31", "2026-12-01"]);
+    expect(stations.map((s) => s.opening)).toEqual([null, "2026-12-01"]);
   });
 });

@@ -3,7 +3,7 @@ import { DEFAULT_SETTINGS, parseStoredSettings } from "@/features/classic/settin
 
 describe("parseStoredSettings", () => {
   it("hides the map by default but shows unfound stations on it", () => {
-    expect(DEFAULT_SETTINGS).toMatchObject({ showMap: false, showUnfoundOnMap: true });
+    expect(DEFAULT_SETTINGS).toMatchObject({ showMap: false, showUnfoundOnMap: true, includeFuture: false });
   });
 
   it("falls back to the defaults when nothing valid is stored", () => {

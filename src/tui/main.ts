@@ -42,7 +42,12 @@ function main() {
     process.exit(1);
   }
 
-  const lines = selectLines(loadNetwork().lines, { selectedModes: options.modes, selectedLines: options.lines });
+  const lines = selectLines(loadNetwork().lines, {
+    selectedModes: options.modes,
+    selectedLines: options.lines,
+    includeFuture: options.future,
+    today: new Date().toISOString().slice(0, 10),
+  });
   if (lines.length === 0) {
     console.error("Aucune ligne ne correspond à ces options.\n\n" + USAGE);
     process.exit(1);

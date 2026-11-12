@@ -65,7 +65,8 @@ server).
   `useVoice` + `VoiceControls` plug it into a quiz. `findMentionedAnswers` (matching) extracts every
   station named in a transcript.
 - `features/auth`: optional login by code (`/api/auth`, users in the untracked `src/data/users.json`).
-- `domain/selection.ts`: lines in play for a mode/line selection, and their answers (one per key).
+- `domain/selection.ts`: lines in play for a mode/line selection and a day (future stations hidden unless
+  included), their answers (one per key), open lines and stations. `hooks/useToday.ts` gives the day.
 - `tui/`: `progress.ts` (found / total per group: global, line, arrondissement, commune),
   `state.ts` (input, guesses, grouping, scroll), `render.ts` (pure frame of strings),
   `options.ts` (CLI flags) and `main.ts` (raw-mode keyboard and screen IO only).

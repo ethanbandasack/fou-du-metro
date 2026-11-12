@@ -16,6 +16,8 @@ export interface Stop {
   lon: number;
   arrondissement: number;
   commune: string;
+  /** ISO date a future stop opens, null when open. */
+  opening: string | null;
   /** Other lines reachable at this interchange. */
   connections: string[];
 }
@@ -46,6 +48,8 @@ export interface Station {
   hasRer: boolean;
   /** A tram line serves the zone or a zone linked by a corridor. */
   hasTram: boolean;
+  /** Earliest opening date when every row is a future one, null when open. */
+  opening: string | null;
 }
 
 export interface Network {
@@ -89,14 +93,14 @@ export function buildNetwork(input: { rows: StopRow[]; lineOrders: LineOrder[]; 
   };
 }
 
-/** One group per official zone; rows without a zone join a nearby row with the same name. */
+/** One group per official zone; rows without a zone (future stations) join a nearby group with the same name. */
 function groupRows(rows: StopRow[]): StopRow[][] {
   const groups: StopRow[][] = [];
   const byZone = new Map<string, StopRow[]>();
   for (const row of rows) {
     const group = row.zone
       ? byZone.get(row.zone)
-      : groups.find(([first]) => !first.zone && near(first, row) && normalizeName(first.name) === normalizeName(row.name));
+      : groups.find((g) => g.some((other) => near(other, row) && normalizeName(other.name) === normalizeName(row.name)));
     if (group) {
       group.push(row);
     } else {
@@ -159,6 +163,7 @@ function toStop(row: StopRow, order: number, connections: string[]): Stop {
     lon: row.lon,
     arrondissement: row.arrondissement,
     commune: row.commune,
+    opening: row.opening,
     connections,
   };
 }
@@ -178,5 +183,6 @@ function toStation(group: StopRow[], reachable: StopRow[]): Station {
     leftBank: first.leftBank,
     hasRer: reachable.some((row) => row.mode === "RER"),
     hasTram: reachable.some((row) => row.mode === "TRAMWAY"),
+    opening: group.some((row) => !row.opening) ? null : group.map((row) => row.opening!).sort()[0],
   };
 }
