@@ -13,6 +13,8 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
   `Charles de Gaulle - Étoile`).
 - **Intersection**: find the metro stations matching one or two categories (line, line group, Paris or
   suburbs, arrondissement, connections, names...).
+- **Carte** (classic mode): a map of the lines in play that fills in as you find stations. Zoom with the
+  wheel or buttons, drag to pan; hide it, or hide the gray dots of the stations still to find.
 
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 
