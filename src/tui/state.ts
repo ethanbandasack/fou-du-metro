@@ -16,7 +16,7 @@ export interface TuiState {
   heard: string;
 }
 
-/** Typed input must be a name; spoken input (dictation) may name stations among other words. */
+/** Keyboard text is matched as written; what the microphone hears, by sound (see buildAnswerIndex). */
 export interface TuiIndexes {
   typed: AnswerIndex;
   spoken: AnswerIndex;
@@ -24,7 +24,8 @@ export interface TuiIndexes {
 
 export type TuiAction =
   | { type: "type"; text: string }
-  | { type: "say"; text: string }
+  /** Text read in one go: a paste or the system dictation. */
+  | { type: "paste"; text: string }
   /** The microphone's transcript so far, which grows until the recognizer starts a new one. */
   | { type: "hear"; transcript: string }
   | { type: "notice"; text: string }
@@ -37,6 +38,9 @@ export type TuiAction =
 export function initialTuiState(grouping: Grouping): TuiState {
   return { input: "", found: [], lastFound: [], grouping, scroll: 0, feedback: "", heard: "" };
 }
+
+/** Enough words for the longest name and what came just before it. */
+const RECENT_WORDS = 24;
 
 const record = (state: TuiState, fresh: string[]): TuiState => ({
   ...state,
@@ -52,8 +56,8 @@ function guess(state: TuiState, input: string, index: AnswerIndex): TuiState {
   return fresh.length === 0 ? { ...state, input } : record(state, fresh);
 }
 
-/** Dictated words wait in the input until they name a station, which may span several dictations. */
-function hear(state: TuiState, input: string, index: AnswerIndex): TuiState {
+/** Pasted words wait in the input until they name a station, which may span several pastes. */
+function paste(state: TuiState, input: string, index: AnswerIndex): TuiState {
   const named = findMentionedAnswers(index, input);
   if (named.length === 0) return { ...state, input };
   const fresh = named.filter((key) => !state.found.includes(key));
@@ -65,10 +69,12 @@ export function tuiReducer(state: TuiState, action: TuiAction, indexes: TuiIndex
   switch (action.type) {
     case "type":
       return guess(state, state.input + action.text, indexes.typed);
-    case "say":
-      return hear(state, state.input + action.text, indexes.spoken);
+    case "paste":
+      return paste(state, state.input + action.text, indexes.typed);
     case "hear": {
-      const fresh = findMentionedAnswers(indexes.spoken, action.transcript).filter((key) => !state.found.includes(key));
+      // Earlier words were read with earlier transcripts.
+      const recent = action.transcript.split(/\s+/).slice(-RECENT_WORDS).join(" ");
+      const fresh = findMentionedAnswers(indexes.spoken, recent).filter((key) => !state.found.includes(key));
       const heard = { ...state, heard: action.transcript };
       return fresh.length === 0 ? heard : { ...heard, found: [...state.found, ...fresh], lastFound: fresh, feedback: "" };
     }

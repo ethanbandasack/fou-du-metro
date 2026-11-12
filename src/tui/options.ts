@@ -29,8 +29,8 @@ export const USAGE = `Usage: npm run tui -- [options]
   --no-color        sans couleurs (aussi avec NO_COLOR)
   -h, --help        cette aide
 
-Avec --voice ou la dictée du système, chaque gare citée dans une phrase compte ; en hardcore,
-les accents ne sont pas exigés à la voix.`;
+Avec --voice, chaque gare citée compte, même mal orthographiée par la reconnaissance vocale ;
+en hardcore, le nom complet reste exigé. Le texte collé ou dicté par le système est lu comme tapé.`;
 
 const GROUPING_NAMES: Record<string, Grouping> = {
   global: "global",

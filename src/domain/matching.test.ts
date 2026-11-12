@@ -125,3 +125,49 @@ describe("spoken index", () => {
     expect(lookupAnswer(buildAnswerIndex(answers, { spoken: true }), "Étoile")).toEqual(["Charles de Gaulle - Étoile"]);
   });
 });
+
+describe("spoken index: names that sound close", () => {
+  const names = ["Invalides", "Pernety", "Corvisart", "Nation", "Nationale", "Bobigny - Pablo Picasso", "Bobigny - Pantin - Raymond Queneau"];
+  const answers = names.map((name) => ({ key: name, names: [name] }));
+  const spoken = buildAnswerIndex(answers, { spoken: true });
+
+  it("accepts a name spelled as it sounds", () => {
+    expect(findMentionedAnswers(spoken, "alors les invalide et pernetti")).toEqual(["Invalides", "Pernety"]);
+    expect(findMentionedAnswers(spoken, "Pablo Picaso")).toEqual(["Bobigny - Pablo Picasso"]);
+  });
+
+  it("accepts the one name a slightly misheard word is close to", () => {
+    expect(findMentionedAnswers(spoken, "euh corbisart")).toEqual(["Corvisart"]);
+  });
+
+  it("keeps close names apart and ignores unrelated words", () => {
+    expect(findMentionedAnswers(spoken, "Nation")).toEqual(["Nation"]);
+    expect(findMentionedAnswers(spoken, "nationale")).toEqual(["Nationale"]);
+    expect(findMentionedAnswers(spoken, "je crois que c'est le corbeau")).toEqual([]);
+  });
+
+  it("refuses a guess equally close to two names", () => {
+    const twins = buildAnswerIndex(["Mabillon", "Mabilloux"].map((name) => ({ key: name, names: [name] })), { spoken: true });
+    expect(findMentionedAnswers(twins, "mabillo")).toEqual([]);
+  });
+
+  it("is for speech only: typing still needs the name", () => {
+    expect(lookupAnswer(buildAnswerIndex(answers), "invalide")).toEqual([]);
+  });
+
+  it("wants every word, in order, in hardcore", () => {
+    const levallois = [{ key: "levallois", names: ["Pont de Levallois - Bécon"] }];
+    const hardcore = buildAnswerIndex(levallois, { hardcore: true, spoken: true });
+    expect(findMentionedAnswers(hardcore, "Bécon")).toEqual([]);
+    expect(findMentionedAnswers(hardcore, "Levallois Bécon")).toEqual([]);
+    expect(findMentionedAnswers(hardcore, "Bécon Pont de Levallois")).toEqual([]);
+    expect(findMentionedAnswers(hardcore, "alors pont de levalois becon")).toEqual(["levallois"]);
+  });
+
+  it("still wants the full name in hardcore", () => {
+    const hardcore = buildAnswerIndex(answers, { hardcore: true, spoken: true });
+    expect(findMentionedAnswers(hardcore, "les invalide et corbisart")).toEqual(["Invalides", "Corvisart"]);
+    expect(findMentionedAnswers(hardcore, "Pablo Picaso")).toEqual([]);
+    expect(findMentionedAnswers(hardcore, "bobigny pablo picaso")).toEqual(["Bobigny - Pablo Picasso"]);
+  });
+});
