@@ -1,22 +1,16 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { MetroStation, MetroLine, EnrichedStation } from "@/types/metro";
-// Build trigger: Updated at 2026-04-27 03:13
-import { 
-  getAvailableCategories, 
-  MetaCategories, 
-  LINE_COLORS,
-  LINE_TEXT_COLORS
-} from '@/utils/intersectionUtils';
-import { areAliases } from '@/utils/connectionUtils';
+import type { Station } from "@/domain/network";
+import { lineColors } from "@/domain/lines";
+import { getAvailableCategories, MetaCategories } from '@/utils/intersectionUtils';
 import { 
   Shuffle
 } from 'lucide-react';
 import { normalizeStationName, fuzzyMatch, simpleNormalize } from '@/utils/metroUtils';
 
 interface IntersectionQuizProps {
-  allStations: EnrichedStation[];
+  allStations: Station[];
 }
 
 export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
@@ -34,7 +28,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const [searchInput, setSearchInput] = useState('');
   const [revealed, setRevealed] = useState(false);
   const [errorShake, setErrorShake] = useState(false);
-  const [suggestions, setSuggestions] = useState<EnrichedStation[]>([]);
+  const [suggestions, setSuggestions] = useState<Station[]>([]);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -109,11 +103,11 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     const getFilter = (cat: any, customVal: string) => {
       if (cat.id === 'group-groupe-personnalisé') {
         const list = customVal.split(/[, ]+/).filter(x => x.trim()).map(x => x.toUpperCase());
-        return (s: EnrichedStation) => s.lines.some(l => list.includes(l.toUpperCase()));
+        return (s: Station) => s.lines.some(l => list.includes(l.toUpperCase()));
       }
       if (cat.id === 'arr-custom') {
         const list = customVal.split(/[, ]+/).filter(x => x.trim()).map(x => parseInt(x));
-        return (s: EnrichedStation) => list.includes(s.arrondissement);
+        return (s: Station) => list.includes(s.arrondissement);
       }
       return cat.filter;
     };
@@ -126,9 +120,9 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
       const filterB = getFilter(catB, customGroup2);
       const stationsA = metroOnlyStations.filter(filterA);
       const stationsB = metroOnlyStations.filter(filterB);
-      targets = stationsA.filter(s => stationsB.some(s2 => areAliases(s.nom, s2.nom))).map(s => s.nom);
+      targets = stationsA.filter(s => stationsB.includes(s)).map(s => s.name);
     } else {
-      targets = metroOnlyStations.filter(filterA).map(s => s.nom);
+      targets = metroOnlyStations.filter(filterA).map(s => s.name);
     }
 
     setTargetStations([...new Set(targets)]);
@@ -155,24 +149,24 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     }
 
     const filtered = metroOnlyStations.filter(s => {
-      const namesToSearch = [s.nom, ...(s.aliases || [])];
+      const namesToSearch = [s.name, ...(s.aliases || [])];
       return namesToSearch.some(name => {
         const norm1 = simpleNormalize(name);
         const norm2 = normalizeStationName(name);
         return norm1.includes(val) || norm2.includes(val);
       });
     }).sort((a, b) => {
-      const normA1 = simpleNormalize(a.nom);
-      const normA2 = normalizeStationName(a.nom);
-      const normB1 = simpleNormalize(b.nom);
-      const normB2 = normalizeStationName(b.nom);
+      const normA1 = simpleNormalize(a.name);
+      const normA2 = normalizeStationName(a.name);
+      const normB1 = simpleNormalize(b.name);
+      const normB2 = normalizeStationName(b.name);
       
       const startsWithA = normA1.startsWith(val) || normA2.startsWith(val);
       const startsWithB = normB1.startsWith(val) || normB2.startsWith(val);
       
       if (startsWithA && !startsWithB) return -1;
       if (!startsWithA && startsWithB) return 1;
-      return a.nom.localeCompare(b.nom);
+      return a.name.localeCompare(b.name);
     }).slice(0, 8);
     
     setSuggestions(filtered);
@@ -184,12 +178,12 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     if (!val) return;
 
     const matchedStation = allStations.find(s => 
-      fuzzyMatch(val, s.nom) || (s.aliases && s.aliases.some(a => fuzzyMatch(val, a)))
+      fuzzyMatch(val, s.name) || (s.aliases && s.aliases.some(a => fuzzyMatch(val, a)))
     );
 
-    if (matchedStation && targetStations.includes(matchedStation.nom)) {
-      if (!foundStations.includes(matchedStation.nom)) {
-        setFoundStations(prev => [...prev, matchedStation.nom]);
+    if (matchedStation && targetStations.includes(matchedStation.name)) {
+      if (!foundStations.includes(matchedStation.name)) {
+        setFoundStations(prev => [...prev, matchedStation.name]);
         setSearchInput('');
         setSuggestions([]);
       } else {
@@ -382,11 +376,11 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                         <div className="absolute top-full left-0 right-0 z-50 bg-card border border-border mt-1">
                             {suggestions.map(s => (
                                 <div 
-                                    key={s.nom}
-                                    onClick={() => handleGuess(undefined, s.nom)}
+                                    key={s.name}
+                                    onClick={() => handleGuess(undefined, s.name)}
                                     className="p-4 border-b border-border hover:bg-muted cursor-pointer font-bold text-sm flex justify-between items-center"
                                 >
-                                    <span>{s.nom}</span>
+                                    <span>{s.name}</span>
                                 </div>
                             ))}
                         </div>
@@ -404,7 +398,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-border border border-border">
                     {targetStations.map(name => {
                         const isFound = foundStations.includes(name);
-                        const station = metroOnlyStations.find(s => s.nom === name);
+                        const station = metroOnlyStations.find(s => s.name === name);
                         if (!isFound && !revealed) return null;
 
                         const displayLines = station?.lines.filter(l => {
@@ -431,7 +425,7 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
                                         <div 
                                             key={l} 
                                             className="w-6 h-6 flex items-center justify-center text-[10px] font-bold border border-border font-parisine"
-                                            style={{backgroundColor: (isFound || revealed) ? LINE_COLORS[l] : '#eee', color: (isFound || revealed) ? (LINE_TEXT_COLORS[l] || 'white') : '#999'}}
+                                            style={{backgroundColor: lineColors(l).background, color: lineColors(l).text}}
                                         >
                                             {l}
                                         </div>
@@ -472,8 +466,8 @@ function CategoryPreview({ category }: { category?: any }) {
           key={item} 
           className="px-1.5 py-0.5 rounded-sm text-[9px] font-black border border-border uppercase"
           style={{ 
-            backgroundColor: LINE_COLORS[item] || '#333', 
-            color: LINE_TEXT_COLORS[item] || '#FFF' 
+            backgroundColor: lineColors(item).background,
+            color: lineColors(item).text
           }}
         >
           {item}

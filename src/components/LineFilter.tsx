@@ -1,9 +1,9 @@
 'use client';
 
-import { MetroLine } from '@/types/metro';
+import type { Line } from '@/domain/network';
 
 interface LineFilterProps {
-  lines: MetroLine[];
+  lines: Line[];
   selectedLines: string[];
   selectedModes: string[];
   onSelectionChange: (selectedLines: string[]) => void;
@@ -36,7 +36,7 @@ export function LineFilter({
   };
 
   const selectAll = () => {
-    onSelectionChange(lines.map(line => line.line));
+    onSelectionChange(lines.map(line => line.id));
   };
 
   const clearAll = () => {
@@ -103,15 +103,15 @@ export function LineFilter({
         <div className="flex flex-wrap gap-2">
             {lines
             .filter(line => selectedModes.length === 0 || selectedModes.includes(line.mode))
-            .map((line, index) => {
-              const isSelected = selectedLines.includes(line.line);
+            .map((line) => {
+              const isSelected = selectedLines.includes(line.id);
               // Larger rectangles only for long names (mostly TER lines)
-              const isLongName = line.line.length > 4 || line.line.includes(' ');
+              const isLongName = line.id.length > 4 || line.id.includes(' ');
               
               return (
                 <button
-                  key={`${line.mode}-${line.line}-${index}`}
-                  onClick={() => toggleLine(line.line)}
+                  key={line.id}
+                  onClick={() => toggleLine(line.id)}
                   className={`
                     flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all font-bold
                     ${isSelected 
@@ -122,17 +122,17 @@ export function LineFilter({
                 >
                   <div 
                     className={`flex items-center justify-center text-[10px] font-black ${isLongName ? 'px-3 h-6 rounded-md min-w-[3rem]' : 'w-6 h-6 rounded-full'}`}
-                    style={{ backgroundColor: line.color, color: line.textColor }}
+                    style={{ backgroundColor: line.colors.background, color: line.colors.text }}
                   >
-                    {line.line}
+                    {line.id}
                   </div>
                   {!isLongName && (
                     <span className="font-medium text-xs">
-                      {line.mode} {line.line}
+                      {line.label}
                     </span>
                   )}
                   <span className="text-[10px] opacity-40 font-bold">
-                    ({line.stations.length})
+                    ({line.stops.length})
                   </span>
                 </button>
               );

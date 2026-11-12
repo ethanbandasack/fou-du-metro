@@ -1,61 +1,6 @@
 // Types for the Paris Metro Quiz Application
 
-export interface EnrichedStation {
-  nom: string;
-  aliases?: string[];
-  lines: string[];
-  orders: Record<string, number>;
-  lat: number;
-  lon: number;
-  arrondissement: number;
-  figure_historique: boolean;
-  couleur: boolean;
-  ouverte_apres_1980: boolean;
-  rive_gauche: boolean;
-  has_rer: boolean;
-  has_tram: boolean;
-}
-
-export interface MetroStation {
-  id: string;
-  gares_id: string;
-  nom_long: string;
-  nom_so_gar?: string;
-  nom_su_gar?: string;
-  line: string;
-  lineColor?: string;
-  lineTextColor?: string;
-  mode: 'METRO' | 'RER' | 'TRAIN' | 'TRANSILIEN' | 'TRAMWAY' | 'VAL' | 'CABLE';
-  exploitant: 'RATP' | 'SNCF';
-  connections: string[];
-  has_rer?: boolean;
-  has_tram?: boolean;
-  isGuessed?: boolean;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
-  order?: number; // For manual ordering within lines
-}
-
-export interface MetroLine {
-  line: string;
-  mode: 'METRO' | 'RER' | 'TRAIN' | 'TRANSILIEN' | 'TRAMWAY' | 'VAL' | 'CABLE';
-  color?: string;
-  textColor?: string;
-  stations: MetroStation[];
-}
-
-export interface MetroLineData {
-  line: string;
-  mode: string;
-  color?: string;
-  textColor?: string;
-  stations: { name: string; connections?: string[] }[];
-}
-
 export interface QuizState {
-  currentStation: MetroStation | null;
   guessedStations: string[];
   totalStations: number;
   score: number;
@@ -63,7 +8,6 @@ export interface QuizState {
   isPaused: boolean;
   isGameActive: boolean;
   showConnections: boolean;
-  selectedLine?: string;
   searchInput: string;
 }
 
@@ -91,8 +35,6 @@ export interface QuizSettings {
   showConnections: boolean;
   selectedLines: string[];
   selectedModes: string[];
-  timeLimit?: number; // in minutes
-  randomOrder: boolean;
 }
 
 export interface User {

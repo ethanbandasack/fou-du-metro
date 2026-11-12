@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { MetroStation } from '@/types/metro';
-import { normalizeStationName, getLineColor } from '@/utils/metroUtils';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
+import type { Line } from '@/domain/network';
 
 interface QuizTableProps {
-  stations: MetroStation[];
-  filteredStations: MetroStation[];
+  lines: Line[];
   guessedStations: string[];
   showAllAnswers?: boolean;
   gameEnded?: boolean;
@@ -15,9 +13,15 @@ interface QuizTableProps {
   isAuthenticated?: boolean;
 }
 
-const QuizTable: React.FC<QuizTableProps> = ({ 
-  stations, 
-  filteredStations, 
+function toggle(set: Set<string>, id: string): Set<string> {
+  const next = new Set(set);
+  if (next.has(id)) next.delete(id);
+  else next.add(id);
+  return next;
+}
+
+const QuizTable: React.FC<QuizTableProps> = ({
+  lines,
   guessedStations,
   showAllAnswers = false,
   gameEnded = false,
@@ -26,335 +30,111 @@ const QuizTable: React.FC<QuizTableProps> = ({
 }) => {
   const [visibleLines, setVisibleLines] = useState<Set<string>>(new Set());
   const [collapsedLines, setCollapsedLines] = useState<Set<string>>(new Set());
+  const guessed = useMemo(() => new Set(guessedStations), [guessedStations]);
 
-  const toggleLineVisibility = (lineName: string) => {
-    setVisibleLines(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(lineName)) {
-        newSet.delete(lineName);
-      } else {
-        newSet.add(lineName);
-      }
-      return newSet;
-    });
-  };
-
-
-  const toggleLineCollapse = (lineName: string) => {
-    setCollapsedLines(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(lineName)) {
-        newSet.delete(lineName);
-      } else {
-        newSet.add(lineName);
-      }
-      return newSet;
-    });
-  };
-
-  const isStationGuessed = useCallback((station: MetroStation): boolean => {
-    return guessedStations.includes(normalizeStationName(station.nom_long));
-  }, [guessedStations]);
-
-  const getStationConnections = (station: MetroStation): string => {
-    if (station.connections.length === 0) return '-';
-    
-    // Format connections properly
-    const formattedConnections = station.connections.map(conn => {
-      // Check if this connection is a tram line (pure number means it's likely a tram)
-      if (/^[0-9]+$/.test(conn)) {
-        // Check if this is a tram connection by looking at the full stations list
-        const isTramConnection = stations.some(s => 
-          s.line === conn && s.mode === 'TRAMWAY'
-        );
-        if (isTramConnection) {
-          return `T${conn}`;
-        }
-        return conn; // Metro lines stay as numbers
-      }
-      return conn; // RER A, Train H, etc. stay as is
-    });
-    
-    return formattedConnections.join(', ');
-  };
-
-  // Group stations by line with memoization for performance
-  const stationsByLine = React.useMemo(() => {
-    const lineMap = new Map<string, MetroStation[]>();
-    
-    // Simply group stations by their line - each station should only appear once per line
-    filteredStations.forEach(station => {
-      const lineName = `${station.mode} ${station.line}`;
-      if (!lineMap.has(lineName)) {
-        lineMap.set(lineName, []);
-      }
-      lineMap.get(lineName)!.push(station);
-    });
-
-    // Sort stations within each line by order or geographic position
-    lineMap.forEach((stationList) => {
-      if (stationList.length > 1) {
-        // Check if stations have order field (from line data files)
-        const hasOrderField = stationList.some(s => s.order !== undefined);
-        
-        if (hasOrderField) {
-          // Use manual ordering from line data files
-          stationList.sort((a, b) => (a.order || 0) - (b.order || 0));
-        } else {
-          // Fallback to geographic ordering for CSV data
-          const coords = stationList
-            .map(s => s.coordinates)
-            .filter(c => c !== undefined) as Array<{lat: number, lng: number}>;
-          
-          if (coords.length > 1) {
-            const lngSpread = Math.max(...coords.map(c => c.lng)) - Math.min(...coords.map(c => c.lng));
-            const latSpread = Math.max(...coords.map(c => c.lat)) - Math.min(...coords.map(c => c.lat));
-            
-            if (lngSpread > latSpread) {
-              // East-west line, sort by longitude (x-axis)
-              stationList.sort((a, b) => {
-                if (!a.coordinates || !b.coordinates) return a.nom_long.localeCompare(b.nom_long);
-                return a.coordinates.lng - b.coordinates.lng;
-              });
-            } else {
-              // North-south line, sort by latitude (y-axis) 
-              stationList.sort((a, b) => {
-                if (!a.coordinates || !b.coordinates) return a.nom_long.localeCompare(b.nom_long);
-                return b.coordinates.lat - a.coordinates.lat; // North to south
-              });
-            }
-          } else {
-            // Fallback to alphabetical if no coordinates
-            stationList.sort((a, b) => a.nom_long.localeCompare(b.nom_long));
-          }
-        }
-      }
-    });
-
-    return lineMap;
-  }, [filteredStations]);
+  const guessedCount = (line: Line) => line.stops.filter(stop => guessed.has(stop.key)).length;
 
   // Auto-collapse completed lines
-  React.useEffect(() => {
-    const completedLines = new Set<string>();
-    stationsByLine.forEach((lineStations, lineName) => {
-      const guessedStationsInLine = lineStations.filter(station => isStationGuessed(station)).length;
-      const totalStationsInLine = lineStations.length;
-      const isLineCompleted = guessedStationsInLine === totalStationsInLine && totalStationsInLine > 0;
-      
-      if (isLineCompleted) {
-        completedLines.add(lineName);
-      }
-    });
-    
-    setCollapsedLines(prev => {
-      const newSet = new Set(prev);
-      completedLines.forEach(line => newSet.add(line));
-      return newSet;
-    });
-  }, [stationsByLine, guessedStations, isStationGuessed]);
+  useEffect(() => {
+    const completed = lines.filter(line => line.stops.length > 0 && line.stops.every(stop => guessed.has(stop.key)));
+    if (completed.length === 0) return;
+    setCollapsedLines(prev => new Set([...prev, ...completed.map(line => line.id)]));
+  }, [lines, guessed]);
 
-  // Convert to array and sort lines for consistent display
-  const sortedLines = React.useMemo(() => {
-    return Array.from(stationsByLine.entries()).sort(([a], [b]) => {
-      // Custom sorting function for transport lines
-      const parseLineName = (lineName: string) => {
-        const parts = lineName.split(' ');
-        const mode = parts[0]; // METRO, TRAMWAY, RER, etc.
-        const line = parts[1]; // 1, 2, T3A, A, etc.
-        
-        // Extract numeric part for sorting
-        let numPart = 0;
-        let letterPart = '';
-        
-        if (line.startsWith('T')) {
-          // Tram lines: T1, T2, T3A, etc.
-          const lineNum = line.substring(1);
-          const match = lineNum.match(/^(\d+)(.*)$/);
-          if (match) {
-            numPart = parseInt(match[1]);
-            letterPart = match[2];
-          }
-        } else if (/^\d+/.test(line)) {
-          // Metro lines: 1, 2, 3bis, etc.
-          const match = line.match(/^(\d+)(.*)$/);
-          if (match) {
-            numPart = parseInt(match[1]);
-            letterPart = match[2];
-          }
-        } else {
-          // RER/Train lines: A, B, C, etc.
-          letterPart = line;
-        }
-        
-        return { mode, numPart, letterPart, originalLine: line };
-      };
-      
-      const aData = parseLineName(a);
-      const bData = parseLineName(b);
-      
-      // First sort by mode
-      const modeOrder = ['METRO', 'TRAMWAY', 'CABLE', 'RER', 'TRANSILIEN', 'VAL', 'TRAIN'];
-      const aModeIndex = modeOrder.indexOf(aData.mode);
-      const bModeIndex = modeOrder.indexOf(bData.mode);
-      
-      if (aModeIndex !== bModeIndex) {
-        return aModeIndex - bModeIndex;
-      }
-      
-      // Then sort by number, then by letter part
-      if (aData.numPart !== bData.numPart) {
-        return aData.numPart - bData.numPart;
-      }
-      
-      return aData.letterPart.localeCompare(bData.letterPart);
-    });
-  }, [stationsByLine]);
-
-  // Calculate how many columns we want (responsive)
-  const numberOfColumns = Math.min(4, Math.max(2, sortedLines.length));
-  const linesPerColumn = Math.ceil(sortedLines.length / numberOfColumns);
-
-  // Split lines into columns
-  const columns = React.useMemo(() => {
-    const cols: Array<Array<[string, MetroStation[]]>> = [];
-    for (let i = 0; i < numberOfColumns; i++) {
-      const start = i * linesPerColumn;
-      const end = start + linesPerColumn;
-      cols.push(sortedLines.slice(start, end));
-    }
-    return cols;
-  }, [sortedLines, numberOfColumns, linesPerColumn]);
+  // Split lines into 2 to 4 columns
+  const numberOfColumns = Math.min(4, Math.max(2, lines.length));
+  const linesPerColumn = Math.ceil(lines.length / numberOfColumns);
+  const columns = Array.from({ length: numberOfColumns }, (_, i) =>
+    lines.slice(i * linesPerColumn, (i + 1) * linesPerColumn)
+  );
 
   return (
-    <div>
+    <div className={`grid gap-6 grid-cols-1 md:grid-cols-2 ${numberOfColumns > 2 ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-2'}`}>
+      {columns.map((columnLines, columnIndex) => (
+        <div key={columnIndex} className="space-y-4">
+          {columnLines.map(line => {
+            const isLineVisible = visibleLines.has(line.id);
+            const shouldShowAnswers = showAllAnswers || gameEnded || isLineVisible;
+            const found = guessedCount(line);
+            const isLineCompleted = found === line.stops.length;
+            const isCollapsed = collapsedLines.has(line.id);
 
-      {/* Lines Grid */}
-      <div className={`grid gap-6 grid-cols-1 md:grid-cols-2 ${numberOfColumns > 2 ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-2'}`}>
-        {columns.map((columnLines, columnIndex) => (
-          <div key={columnIndex} className="space-y-4">
-            {columnLines.map(([lineName, lineStations]) => {
-              const isLineVisible = visibleLines.has(lineName);
-              const shouldShowAnswers = showAllAnswers || gameEnded || isLineVisible;
-              
-              // Calculate guessed stations for this line
-              const guessedStationsInLine = lineStations.filter(station => isStationGuessed(station)).length;
-              const totalStationsInLine = lineStations.length;
-              
-              // Check if all stations in this line are guessed
-              const isLineCompleted = guessedStationsInLine === totalStationsInLine;
-              
-              // Check if line is collapsed
-              const isCollapsed = collapsedLines.has(lineName);
-              
-              return (
-                <div key={lineName} className={`border border-border rounded-lg ${isLineCompleted ? 'bg-green-500/10' : ''}`}>
-                  <div
-                    className={`sticky z-30 rounded-t-lg pt-2 ${
-                      isLineCompleted ? 'bg-green-500/20' : 'bg-muted'
-                    }`}
-                    style={{ top: 'calc(var(--quiz-header-top, 80px) + var(--quiz-header-height, 100px) + 8px)' }}
-                  >
-                    {/* Line color indicator (now part of sticky header) */}
-                    <div 
-                      className="h-1 w-full"
-                      style={{ backgroundColor: getLineColor(lineName) }}
-                    />
-                    <div
-                      className={`px-3 py-2 border-b border-border flex justify-between items-center ${
-                        isLineCompleted ? 'bg-green-500/10' : 'bg-muted'
-                      }`}
-                    >
+            return (
+              <div key={line.id} className={`border border-border rounded-lg ${isLineCompleted ? 'bg-green-500/10' : ''}`}>
+                <div
+                  className={`sticky z-30 rounded-t-lg pt-2 ${isLineCompleted ? 'bg-green-500/20' : 'bg-muted'}`}
+                  style={{ top: 'calc(var(--quiz-header-top, 80px) + var(--quiz-header-height, 100px) + 8px)' }}
+                >
+                  <div className="h-1 w-full" style={{ backgroundColor: line.colors.background }} />
+                  <div className={`px-3 py-2 border-b border-border flex justify-between items-center ${isLineCompleted ? 'bg-green-500/10' : 'bg-muted'}`}>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => toggleLineCollapse(lineName)}
+                        onClick={() => setCollapsedLines(prev => toggle(prev, line.id))}
                         className="text-foreground/60 hover:text-foreground transition-colors"
                         title={isCollapsed ? "Développer la ligne" : "Réduire la ligne"}
                       >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
                       </button>
                       <h4 className={`font-medium text-sm ${isLineCompleted ? 'text-green-600' : 'text-foreground'}`}>
-                        {lineName}
+                        {line.label}
                       </h4>
                       <span className={`text-xs px-2 py-1 rounded ${isLineCompleted ? 'bg-green-500/20 text-green-600' : 'bg-muted text-foreground/60'}`}>
-                        {guessedStationsInLine} / {totalStationsInLine}
+                        {found} / {line.stops.length}
                       </span>
                     </div>
                     {!isAuthenticated && (
                       <button
-                        onClick={() => toggleLineVisibility(lineName)}
+                        onClick={() => setVisibleLines(prev => toggle(prev, line.id))}
                         className="text-foreground/60 hover:text-foreground transition-colors"
                         title={isLineVisible ? "Masquer les réponses" : "Afficher les réponses"}
                       >
                         {isLineVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     )}
-                    </div>
                   </div>
-                  {!isCollapsed && (
-                    <div className="rounded-b-lg overflow-hidden">
-                    <table className="w-full">
-                    <thead>
-                      <tr className="bg-muted">
-                          <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 tracking-wider">
-                          Gare
-                        </th>
-                        {showConnections && (
-                            <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 tracking-wider">
-                            Correspondances
-                          </th>
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody className="bg-card divide-y divide-border">
-                      {lineStations.map((station: MetroStation, index: number) => {
-                        const isGuessed = isStationGuessed(station);
-                        const showStationName = isGuessed || shouldShowAnswers;
-                        
-                        let stationRowClass = '';
-                        if (gameEnded && !isGuessed) {
-                          stationRowClass = 'bg-red-500/10';
-                        } else if (isGuessed) {
-                          stationRowClass = 'bg-green-500/10';
-                        }
-                        
-                        return (
-                          <tr key={`${station.id}-${lineName}-${index}`} className={stationRowClass}>
-                            <td className="px-3 py-2 text-sm">
-                              {showStationName ? (
-                                <span className={`${
-                                  isGuessed 
-                                    ? "text-green-600 font-medium"
-                                    : gameEnded 
-                                    ? "text-red-600 font-medium"
-                                    : "text-blue-600 font-medium"
-                                } font-parisine`}>
-                                  {station.nom_long}
-                                </span>
-                              ) : (
-                                <span className="text-foreground/30 select-none">
-                                  ●●●●●
-                                </span>
-                              )}
-                            </td>
-                            {showConnections && (
-                              <td className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
-                                {getStationConnections(station)}
-                              </td>
-                            )}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                  </div>
-                  )}
                 </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+                {!isCollapsed && (
+                  <div className="rounded-b-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-muted">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 tracking-wider">Gare</th>
+                          {showConnections && (
+                            <th className="px-3 py-2 text-left text-xs font-medium text-foreground/60 tracking-wider">Correspondances</th>
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody className="bg-card divide-y divide-border">
+                        {line.stops.map(stop => {
+                          const isGuessed = guessed.has(stop.key);
+                          const rowClass = gameEnded && !isGuessed ? 'bg-red-500/10' : isGuessed ? 'bg-green-500/10' : '';
+                          const nameClass = isGuessed ? 'text-green-600' : gameEnded ? 'text-red-600' : 'text-blue-600';
+                          return (
+                            <tr key={`${stop.id}-${stop.order}`} className={rowClass}>
+                              <td className="px-3 py-2 text-sm">
+                                {isGuessed || shouldShowAnswers ? (
+                                  <span className={`${nameClass} font-medium font-parisine`}>{stop.name}</span>
+                                ) : (
+                                  <span className="text-foreground/30 select-none">●●●●●</span>
+                                )}
+                              </td>
+                              {showConnections && (
+                                <td className="px-3 py-2 text-sm text-foreground/60">
+                                  {stop.connections.length > 0 ? stop.connections.join(', ') : '-'}
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 };

@@ -1,21 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { MetroStation, MetroLine, QuizState, QuizSettings, QuizScore, AuthState, User } from '@/types/metro';
+import { QuizState, QuizSettings, QuizScore, AuthState, User } from '@/types/metro';
+import type { Line } from '@/domain/network';
 import { Timer } from './Timer';
 import QuizTable from './QuizTable';
 import { LineFilter } from './LineFilter';
 import { Settings, Play, Pause, RotateCcw, Trophy, Eye, EyeOff, Search, Trash2, X, LogIn, LogOut, User as UserIcon } from 'lucide-react';
-import { shuffleArray, normalizeStationName, fuzzyMatch } from '@/utils/metroUtils';
+import { fuzzyMatch } from '@/utils/metroUtils';
 
 interface QuizGameProps {
-  stations: MetroStation[];
-  lines: MetroLine[];
+  lines: Line[];
 }
 
-export function QuizGame({ stations, lines }: QuizGameProps) {
+export function QuizGame({ lines }: QuizGameProps) {
   const [quizState, setQuizState] = useState<QuizState>({
-    currentStation: null,
     guessedStations: [],
     totalStations: 0,
     score: 0,
@@ -23,7 +22,6 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
     isPaused: false,
     isGameActive: false,
     showConnections: false,
-    selectedLine: undefined,
     searchInput: ''
   });
 
@@ -31,11 +29,9 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
     showConnections: true,
     selectedLines: [],
     selectedModes: ['METRO'],
-    randomOrder: true
   });
 
   const [showSettings, setShowSettings] = useState(false);
-  const [gameStations, setGameStations] = useState<MetroStation[]>([]);
   const [savedScores, setSavedScores] = useState<QuizScore[]>([]);
   const [showScores, setShowScores] = useState(false);
   const [lastFoundStation, setLastFoundStation] = useState<string>('');
@@ -123,28 +119,19 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
     localStorage.setItem('metro-quiz-auth', JSON.stringify(authState));
   }, [authState]);
 
-  // Filter stations based on selected lines and modes - show stations on all their lines
-  const filteredStations = useMemo(() => {
-    let result = stations;
-    
-    // Filter by modes
-    if (settings.selectedModes.length > 0) {
-      result = result.filter(station => settings.selectedModes.includes(station.mode));
-    }
-    
-    // Filter by lines
-    if (settings.selectedLines.length > 0) {
-      result = result.filter(station => settings.selectedLines.includes(station.line));
-    }
-    
-    return result;
-  }, [stations, settings.selectedModes, settings.selectedLines]);
+  // Lines in play, filtered by the selected modes and lines
+  const filteredLines = useMemo(() => lines.filter(line =>
+    (settings.selectedModes.length === 0 || settings.selectedModes.includes(line.mode)) &&
+    (settings.selectedLines.length === 0 || settings.selectedLines.includes(line.id))
+  ), [lines, settings.selectedModes, settings.selectedLines]);
+
+  const filteredStations = useMemo(() => filteredLines.flatMap(line => line.stops), [filteredLines]);
 
   // Get unique station names for scoring (same station name across multiple lines should count as one)
   const uniqueStationNames = useMemo(() => {
     const uniqueNames = new Set<string>();
     filteredStations.forEach(station => {
-      uniqueNames.add(normalizeStationName(station.nom_long));
+      uniqueNames.add(station.key);
     });
     return uniqueNames;
   }, [filteredStations]);
@@ -158,7 +145,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
     // Check for matches when user types (exact matching required)
     if (value.trim().length >= 1) {
       const matches = filteredStations.filter(station => {
-        return fuzzyMatch(value, station.nom_long, station.nom_so_gar);
+        return fuzzyMatch(value, station.name);
       });
       
       // Reveal matching stations that haven't been guessed yet
@@ -167,7 +154,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
       const uniqueNewStations = new Set<string>();
       
       matches.forEach(station => {
-        const stationKey = normalizeStationName(station.nom_long);
+        const stationKey = station.key;
         if (!quizState.guessedStations.includes(stationKey)) {
           foundNew = true;
           newGuessedStations.push(stationKey);
@@ -198,21 +185,15 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
 
   // Initialize game when settings change
   useEffect(() => {
-    const stationsToUse = settings.randomOrder 
-      ? shuffleArray(filteredStations) 
-      : filteredStations;
-    
-    setGameStations(stationsToUse);
     setQuizState(prev => ({
       ...prev,
-      currentStation: stationsToUse[0] || null,
       totalStations: uniqueStationNames.size, // Use unique count for scoring
       guessedStations: [],
       score: 0,
       showConnections: settings.showConnections,
       searchInput: ''
     }));
-  }, [filteredStations, uniqueStationNames, settings]);
+  }, [uniqueStationNames, settings]);
 
   // Focus search input when game starts
   useEffect(() => {
@@ -292,12 +273,12 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
   const saveCurrentScore = () => {
     if (!authState.user) return;
     
-    const percentage = gameStations.length > 0 ? Math.round((quizState.score / uniqueStationNames.size) * 100) : 0;
+    const percentage = uniqueStationNames.size > 0 ? Math.round((quizState.score / uniqueStationNames.size) * 100) : 0;
     
     const newScore: QuizScore = {
       id: Date.now().toString(),
       score: quizState.score,
-      totalStations: gameStations.length,
+      totalStations: uniqueStationNames.size,
       timeElapsed: quizState.timeElapsed,
       percentage,
       date: new Date(),
@@ -556,7 +537,7 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
           )}
 
           {/* Progress (Now inside sticky header) */}
-          {gameStations.length > 0 && (
+          {filteredStations.length > 0 && (
             <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-[10px] font-black text-gray-400 tracking-wider">Progression globale</span>
@@ -762,10 +743,9 @@ export function QuizGame({ stations, lines }: QuizGameProps) {
       )}
 
       {/* Quiz Table */}
-      {gameStations.length > 0 && (
+      {filteredLines.length > 0 && (
         <QuizTable
-          stations={stations}
-          filteredStations={gameStations}
+          lines={filteredLines}
           guessedStations={quizState.guessedStations}
           showAllAnswers={showGlobalAnswers}
           gameEnded={!quizState.isGameActive && quizState.score > 0}
