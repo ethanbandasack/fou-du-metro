@@ -63,7 +63,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
               <div key={line.id} className={`border border-border rounded-lg ${isLineCompleted ? 'bg-green-500/10' : ''}`}>
                 <div
                   className={`sticky z-30 rounded-t-lg pt-2 ${isLineCompleted ? 'bg-green-500/20' : 'bg-muted'}`}
-                  style={{ top: 'calc(var(--quiz-header-top, 80px) + var(--quiz-header-height, 100px) + 8px)' }}
+                  style={{ top: 'calc(5rem + var(--quiz-header-height, 100px) + 8px)' }}
                 >
                   <div className="h-1 w-full" style={{ backgroundColor: line.colors.background }} />
                   <div className={`px-3 py-2 border-b border-border flex justify-between items-center ${isLineCompleted ? 'bg-green-500/10' : 'bg-muted'}`}>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QuizGame } from '@/components/QuizGame';
+import { QuizGame } from '@/features/classic/QuizGame';
 import { IntersectionQuiz } from '@/components/IntersectionQuiz';
 import type { Network } from '@/domain/network';
 import { LayoutGrid, Blend } from 'lucide-react';
