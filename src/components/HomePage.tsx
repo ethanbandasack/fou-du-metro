@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { QuizGame } from '@/features/classic/QuizGame';
-import { IntersectionQuiz } from '@/components/IntersectionQuiz';
+import { IntersectionQuiz } from '@/features/intersection/IntersectionQuiz';
 import type { Network } from '@/domain/network';
 import { LayoutGrid, Blend } from 'lucide-react';
 
