@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm test",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "data:communes": "tsx scripts/add-communes.ts"
   },
   "dependencies": {
     "js-yaml": "^4.1.1",

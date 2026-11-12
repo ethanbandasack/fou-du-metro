@@ -17,6 +17,7 @@ function row(name: string, lineId: string, overrides: Partial<StopRow> = {}): St
     leftBank: false,
     hasRer: false,
     hasTram: false,
+    commune: "Paris",
     ...overrides,
   };
 }

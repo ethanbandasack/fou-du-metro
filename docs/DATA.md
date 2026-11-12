@@ -23,8 +23,11 @@ Comma separated, no quoting, header required:
 | `rive_gauche` | `1` if on the left bank |
 | `has_rer` | `1` if RER connections should be listed for this row |
 | `has_tram` | `1` if tram connections should be listed for this row |
+| `commune` | commune of the station (`Paris` for arrondissements 1-20) |
 
-The file mixes CRLF and LF line endings; the parser accepts both.
+`commune` is filled by `npm run data:communes` (`scripts/add-communes.ts`), which looks up the
+coordinates of non-Paris rows on [geo.api.gouv.fr](https://geo.api.gouv.fr). Run it after adding rows
+(`-- --force` refreshes every value). The parser accepts LF and CRLF line endings.
 
 ## `lines/*.yaml`
 
@@ -51,7 +54,7 @@ into one station when their names are equal or aliased and they are less than
 
 ## Adding or fixing a line
 
-1. Add or edit its rows in `stations.csv`.
+1. Add or edit its rows in `stations.csv`, then run `npm run data:communes`.
 2. List its stations in order in `lines/<mode>-<id>.yaml`.
 3. Add alias pairs if a connection is spelled differently on each line.
 4. Run `npm test` (the dataset characterization test lists expected counts; update it on purpose).
