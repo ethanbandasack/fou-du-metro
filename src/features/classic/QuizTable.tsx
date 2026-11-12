@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
 import { LineBadge } from '@/components/LineBadge';
 import { lineShortId } from '@/domain/lines';
@@ -31,17 +31,11 @@ const QuizTable: React.FC<QuizTableProps> = ({
   isAuthenticated = false
 }) => {
   const [visibleLines, setVisibleLines] = useState<Set<string>>(new Set());
-  const [collapsedLines, setCollapsedLines] = useState<Set<string>>(new Set());
+  // Manual choices only: a line without one is collapsed once completed.
+  const [collapseChoices, setCollapseChoices] = useState<Map<string, boolean>>(new Map());
   const guessed = useMemo(() => new Set(guessedStations), [guessedStations]);
 
   const guessedCount = (line: Line) => line.stops.filter(stop => guessed.has(stop.key)).length;
-
-  // Auto-collapse completed lines
-  useEffect(() => {
-    const completed = lines.filter(line => line.stops.length > 0 && line.stops.every(stop => guessed.has(stop.key)));
-    if (completed.length === 0) return;
-    setCollapsedLines(prev => new Set([...prev, ...completed.map(line => line.id)]));
-  }, [lines, guessed]);
 
   // Split lines into 2 to 4 columns
   const numberOfColumns = Math.min(4, Math.max(2, lines.length));
@@ -59,7 +53,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
             const shouldShowAnswers = showAllAnswers || gameEnded || isLineVisible;
             const found = guessedCount(line);
             const isLineCompleted = found === line.stops.length;
-            const isCollapsed = collapsedLines.has(line.id);
+            const isCollapsed = collapseChoices.get(line.id) ?? (isLineCompleted && line.stops.length > 0);
 
             return (
               <div key={line.id} className={`border border-border rounded-lg ${isLineCompleted ? 'bg-green-500/10' : ''}`}>
@@ -71,7 +65,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
                   <div className={`px-3 py-2 border-b border-border flex justify-between items-center ${isLineCompleted ? 'bg-green-500/10' : 'bg-muted'}`}>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setCollapsedLines(prev => toggle(prev, line.id))}
+                        onClick={() => setCollapseChoices(prev => new Map(prev).set(line.id, !isCollapsed))}
                         className="text-foreground/60 hover:text-foreground transition-colors"
                         title={isCollapsed ? "Développer la ligne" : "Réduire la ligne"}
                       >

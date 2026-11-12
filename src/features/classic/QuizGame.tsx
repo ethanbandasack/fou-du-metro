@@ -47,10 +47,12 @@ export function QuizGame({ lines }: { lines: Line[] }) {
   const foundSet = useMemo(() => new Set(quiz.found), [quiz.found]);
 
   // A new selection starts a new game.
-  useEffect(() => {
+  const [quizAnswers, setQuizAnswers] = useState(answers);
+  if (quizAnswers !== answers) {
+    setQuizAnswers(answers);
     dispatch({ type: 'reset', total: answers.length });
     setInput('');
-  }, [answers]);
+  }
 
   // Clock
   useEffect(() => {
