@@ -54,7 +54,8 @@ server).
 - `domain/network.ts`: `buildNetwork`, groups rows by transfer zone, adds corridors, computes connections, orders lines.
 - `domain/matching.ts`: answer index. A guess matches a full name, or a part of a dashed or
   parenthesised name that only one station has. Prefixes never match. A hardcore index
-  (`buildAnswerIndex(answers, { hardcore: true })`) accepts the exact full name only (`exactForm`).
+  (`buildAnswerIndex(answers, { hardcore: true })`) accepts the exact full name only (`exactForm`);
+  with `spoken: true` (dictation) it forgives accents (`simplifyName`).
 - `domain/format.ts`: durations.
 - `domain/geo.ts`: projection to kilometres, map framing and zoom, line paths cut at branch jumps.
 - `features/classic`: classic quiz. `quizReducer` is the state machine
@@ -68,7 +69,8 @@ server).
 - `domain/selection.ts`: lines in play for a mode/line selection and a day (future stations hidden unless
   included), their answers (one per key), open lines and stations. `hooks/useToday.ts` gives the day.
 - `tui/`: `progress.ts` (found flag of each station per group: global, line, arrondissement, commune;
-  in line order, branches one after the other), `state.ts` (input, guesses, grouping, scroll),
+  in line order, branches one after the other), `state.ts` (input, guesses, grouping, scroll; `say`
+  is dictated text, matched like speech: `main.ts` sends text read in one go as `say`),
   `render.ts` (pure frame of strings; `stationBar` draws each station at its relative position),
   `options.ts` (CLI flags) and `main.ts` (raw-mode keyboard and screen IO only).
 - `hooks/useLocalStorageState.ts`: localStorage through `useSyncExternalStore`, shared by every

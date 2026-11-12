@@ -2,12 +2,19 @@ import { describe, expect, it } from "vitest";
 import { buildAnswerIndex } from "@/domain/matching";
 import { initialTuiState, tuiReducer, type TuiAction, type TuiState } from "@/tui/state";
 
-const index = buildAnswerIndex([
+const answers = [
   { key: "nation", names: ["Nation"] },
   { key: "bastille", names: ["Bastille"] },
-]);
-const run = (actions: TuiAction[], state: TuiState = initialTuiState("line")) =>
-  actions.reduce((s, action) => tuiReducer(s, action, index), state);
+  { key: "vanves", names: ["Porte de Vanves"] },
+  { key: "gaite", names: ["Gaîté"] },
+];
+const indexes = (hardcore = false) => ({
+  typed: buildAnswerIndex(answers, { hardcore }),
+  spoken: buildAnswerIndex(answers, { hardcore, spoken: true }),
+});
+const run = (actions: TuiAction[], state: TuiState = initialTuiState("line"), hardcore = false) =>
+  actions.reduce((s, action) => tuiReducer(s, action, indexes(hardcore)), state);
+const said = (text: string): TuiAction => ({ type: "say", text });
 const typed = (text: string): TuiAction[] => [...text].map((char) => ({ type: "type", text: char }));
 
 describe("tuiReducer", () => {
@@ -33,6 +40,26 @@ describe("tuiReducer", () => {
   it("explains a station found twice", () => {
     const state = run([...typed("nation"), ...typed("Nation"), { type: "submit" }]);
     expect(state.feedback).toBe("« Nation » : déjà trouvée");
+  });
+
+  it("finds every station named in a dictated sentence", () => {
+    const state = run([said("alors Nation et Bastille")]);
+    expect(state).toMatchObject({ input: "", found: ["nation", "bastille"], lastFound: ["nation", "bastille"] });
+  });
+
+  it("keeps dictated words until they name a station", () => {
+    expect(run([said("euh Porte"), said(" de")]).input).toBe("euh Porte de");
+    expect(run([said("euh Porte"), said(" de"), said(" Vanves")])).toMatchObject({ input: "", found: ["vanves"] });
+  });
+
+  it("says when every dictated station is already found", () => {
+    const state = run([said("Nation"), said("encore Nation")]);
+    expect(state).toMatchObject({ input: "", found: ["nation"], feedback: "« encore Nation » : déjà trouvée" });
+  });
+
+  it("forgives accents when dictating in hardcore, not when typing", () => {
+    expect(run(typed("gaite"), undefined, true).found).toEqual([]);
+    expect(run([said("la gaite")], undefined, true).found).toEqual(["gaite"]);
   });
 
   it("cycles through groupings and resets the scroll", () => {

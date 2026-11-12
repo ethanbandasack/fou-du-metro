@@ -54,7 +54,10 @@ function main() {
   }
 
   const answers = answersOf(lines);
-  const index = buildAnswerIndex(answers, { hardcore: options.hardcore });
+  const indexes = {
+    typed: buildAnswerIndex(answers, { hardcore: options.hardcore }),
+    spoken: buildAnswerIndex(answers, { hardcore: options.hardcore, spoken: true }),
+  };
   const names = new Map(answers.map((answer) => [answer.key, answer.names[0]]));
   const title = titleOf(options, lines) + (options.hardcore ? " · hardcore" : "");
   const startedAt = Date.now();
@@ -91,7 +94,7 @@ function main() {
   };
 
   const dispatch = (action: TuiAction) => {
-    state = tuiReducer(state, action, index);
+    state = tuiReducer(state, action, indexes);
     if (state.found.length === answers.length) quit();
     draw();
   };
@@ -108,7 +111,21 @@ function main() {
     process.exit(1);
   });
 
+  // A keystroke brings one character; text read in one go comes from dictation (or a paste).
+  let pending = "";
+  const flush = () => {
+    const text = pending;
+    pending = "";
+    if (text) dispatch(text.length > 1 ? { type: "say", text } : { type: "type", text });
+  };
+
   process.stdin.on("keypress", (text: string | undefined, key: readline.Key | undefined) => {
+    if (text && text >= " " && text !== "\x7f" && !key?.ctrl && !key?.meta) {
+      if (!pending) setImmediate(flush);
+      pending += text;
+      return;
+    }
+    flush();
     if (key?.ctrl && (key.name === "c" || key.name === "d")) return quit();
     const page = visibleRows(size().height);
     switch (key?.name) {
@@ -130,7 +147,6 @@ function main() {
       case "enter":
         return dispatch({ type: "submit" });
     }
-    if (text && !key?.ctrl && !key?.meta && text >= " ") dispatch({ type: "type", text });
   });
 
   draw();

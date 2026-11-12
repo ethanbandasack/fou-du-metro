@@ -1,4 +1,4 @@
-import { exactForm, normalizeName } from "@/domain/names";
+import { exactForm, normalizeName, simplifyName } from "@/domain/names";
 
 /** Something the player can find: an identity and every name that designates it. */
 export interface Answer {
@@ -7,9 +7,9 @@ export interface Answer {
 }
 
 export interface AnswerIndex {
-  /** Hardcore: only the exact full name counts (see exactForm). */
-  hardcore: boolean;
-  /** Normalized full name -> answer keys. */
+  /** How a name or an input is compared. */
+  form: (name: string) => string;
+  /** Full name, in `form` -> answer keys. */
   full: Map<string, Set<string>>;
   /** Normalized short form (dashed part, name without parentheses) -> answer keys. */
   partial: Map<string, Set<string>>;
@@ -31,15 +31,19 @@ function shortForms(name: string): string[] {
   return [withoutParentheses, ...(parts.length > 1 ? parts : [])];
 }
 
-export function buildAnswerIndex(answers: readonly Answer[], { hardcore = false } = {}): AnswerIndex {
-  const index: AnswerIndex = { hardcore, full: new Map(), partial: new Map() };
-  const form = hardcore ? exactForm : normalizeName;
+/**
+ * Hardcore accepts the exact full name only (`exactForm`). Spoken input is spelled by speech
+ * recognition, not by the player: there hardcore forgives accents but still wants every word.
+ */
+export function buildAnswerIndex(answers: readonly Answer[], { hardcore = false, spoken = false } = {}): AnswerIndex {
+  const form = !hardcore ? normalizeName : spoken ? simplifyName : exactForm;
+  const index: AnswerIndex = { form, full: new Map(), partial: new Map() };
   for (const { key, names } of answers) {
     for (const name of names) {
       add(index.full, form(name), key);
       if (hardcore) continue;
-      for (const form of shortForms(name)) {
-        const normalized = normalizeName(form);
+      for (const short of shortForms(name)) {
+        const normalized = normalizeName(short);
         if (normalized.length >= MIN_PART_LENGTH) add(index.partial, normalized, key);
       }
     }
@@ -52,7 +56,7 @@ export function buildAnswerIndex(answers: readonly Answer[], { hardcore = false 
  * short form that only one answer has (not in hardcore). Prefixes never match.
  */
 export function lookupAnswer(index: AnswerIndex, input: string): string[] {
-  const form = (index.hardcore ? exactForm : normalizeName)(input.trim());
+  const form = index.form(input.trim());
   if (!form) return [];
   const full = index.full.get(form);
   if (full) return [...full];
