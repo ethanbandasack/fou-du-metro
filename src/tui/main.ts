@@ -49,9 +49,9 @@ function main() {
   }
 
   const answers = answersOf(lines);
-  const index = buildAnswerIndex(answers);
+  const index = buildAnswerIndex(answers, { hardcore: options.hardcore });
   const names = new Map(answers.map((answer) => [answer.key, answer.names[0]]));
-  const title = titleOf(options, lines);
+  const title = titleOf(options, lines) + (options.hardcore ? " · hardcore" : "");
   const startedAt = Date.now();
   const out = process.stdout;
   let state = initialTuiState(options.grouping);

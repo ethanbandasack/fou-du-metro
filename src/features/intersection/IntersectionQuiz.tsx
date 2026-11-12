@@ -15,6 +15,7 @@ import {
   type Category,
   type CategoryGroup,
 } from '@/features/intersection/categories';
+import { useHardcore } from '@/hooks/useHardcore';
 import { useVoice } from '@/features/voice/useVoice';
 import { VoiceButton, VoiceStatus } from '@/features/voice/VoiceControls';
 
@@ -35,7 +36,11 @@ const sideButton =
 export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   const stations = useMemo(() => allStations.filter(s => s.lines.some(isMetroLine)), [allStations]);
   const categories = useMemo(() => buildCategories(stations), [stations]);
-  const answerIndex = useMemo(() => buildAnswerIndex(stations.map(s => ({ key: s.name, names: s.aliases }))), [stations]);
+  const [hardcore, setHardcore] = useHardcore();
+  const answerIndex = useMemo(
+    () => buildAnswerIndex(stations.map(s => ({ key: s.name, names: s.aliases })), { hardcore }),
+    [stations, hardcore]
+  );
 
   const randomPick = (group: CategoryGroup): Pick => {
     const playable = categories[group].filter(c => !c.custom);
@@ -75,8 +80,9 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   }
 
   const suggestions = useMemo(
-    () => (suggestionsEnabled ? suggestStations(stations, input) : []),
-    [stations, input, suggestionsEnabled]
+    // Suggestions would hand out the exact names: none in hardcore.
+    () => (suggestionsEnabled && !hardcore ? suggestStations(stations, input) : []),
+    [stations, input, suggestionsEnabled, hardcore]
   );
 
   const updatePick = (index: 0 | 1, pick: Pick) =>
@@ -168,14 +174,9 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
             <button onClick={() => setRound(r => r + 1)} className={sideButton}>Recommencer</button>
           </div>
 
-          <div className="pt-6 border-t border-border flex items-center gap-3">
-            <span className="text-[11px] font-bold">Suggestions</span>
-            <button
-              onClick={() => setSuggestionsEnabled(!suggestionsEnabled)}
-              className={`border border-border px-3 py-1 text-[10px] font-bold transition-all ${suggestionsEnabled ? 'bg-accent text-accent-foreground' : 'bg-card'}`}
-            >
-              {suggestionsEnabled ? 'Oui' : 'Non'}
-            </button>
+          <div className="pt-6 border-t border-border space-y-3">
+            <OptionToggle label="Hardcore" hint="nom exact" on={hardcore} onChange={setHardcore} />
+            <OptionToggle label="Suggestions" on={suggestionsEnabled && !hardcore} disabled={hardcore} onChange={setSuggestionsEnabled} />
           </div>
         </div>
       </aside>
@@ -349,5 +350,33 @@ function CategoryChip({ category }: { category?: Category }) {
     >
       {category?.name}
     </span>
+  );
+}
+
+interface OptionToggleProps {
+  label: string;
+  hint?: string;
+  on: boolean;
+  disabled?: boolean;
+  onChange: (on: boolean) => void;
+}
+
+function OptionToggle({ label, hint, on, disabled, onChange }: OptionToggleProps) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-[11px] font-bold">
+        {label}
+        {hint && <span className="ml-1 font-medium text-foreground/40">({hint})</span>}
+      </span>
+      <button
+        onClick={() => onChange(!on)}
+        disabled={disabled}
+        aria-pressed={on}
+        aria-label={label}
+        className={`border border-border px-3 py-1 text-[10px] font-bold transition-colors disabled:opacity-40 ${on ? 'bg-accent text-accent-foreground' : 'bg-card'}`}
+      >
+        {on ? 'Oui' : 'Non'}
+      </button>
+    </div>
   );
 }

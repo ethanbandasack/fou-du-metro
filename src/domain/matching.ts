@@ -1,4 +1,4 @@
-import { normalizeName } from "@/domain/names";
+import { exactForm, normalizeName } from "@/domain/names";
 
 /** Something the player can find: an identity and every name that designates it. */
 export interface Answer {
@@ -7,6 +7,8 @@ export interface Answer {
 }
 
 export interface AnswerIndex {
+  /** Hardcore: only the exact full name counts (see exactForm). */
+  hardcore: boolean;
   /** Normalized full name -> answer keys. */
   full: Map<string, Set<string>>;
   /** Normalized short form (dashed part, name without parentheses) -> answer keys. */
@@ -29,11 +31,13 @@ function shortForms(name: string): string[] {
   return [withoutParentheses, ...(parts.length > 1 ? parts : [])];
 }
 
-export function buildAnswerIndex(answers: readonly Answer[]): AnswerIndex {
-  const index: AnswerIndex = { full: new Map(), partial: new Map() };
+export function buildAnswerIndex(answers: readonly Answer[], { hardcore = false } = {}): AnswerIndex {
+  const index: AnswerIndex = { hardcore, full: new Map(), partial: new Map() };
+  const form = hardcore ? exactForm : normalizeName;
   for (const { key, names } of answers) {
     for (const name of names) {
-      add(index.full, normalizeName(name), key);
+      add(index.full, form(name), key);
+      if (hardcore) continue;
       for (const form of shortForms(name)) {
         const normalized = normalizeName(form);
         if (normalized.length >= MIN_PART_LENGTH) add(index.partial, normalized, key);
@@ -45,10 +49,10 @@ export function buildAnswerIndex(answers: readonly Answer[]): AnswerIndex {
 
 /**
  * Keys designated by what the player typed: an exact full name, otherwise a
- * short form that only one answer has. Prefixes never match.
+ * short form that only one answer has (not in hardcore). Prefixes never match.
  */
 export function lookupAnswer(index: AnswerIndex, input: string): string[] {
-  const form = normalizeName(input.trim());
+  const form = (index.hardcore ? exactForm : normalizeName)(input.trim());
   if (!form) return [];
   const full = index.full.get(form);
   if (full) return [...full];

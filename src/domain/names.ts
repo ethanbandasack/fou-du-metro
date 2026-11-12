@@ -14,3 +14,8 @@ export function simplifyName(name: string): string {
 export function normalizeName(name: string): string {
   return simplifyName(name.toLowerCase().replace(/^gare d(e |')/, ""));
 }
+
+/** Hardcore form: case, spaces and punctuation ignored; accents and every word kept. */
+export function exactForm(name: string): string {
+  return name.normalize("NFC").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+}

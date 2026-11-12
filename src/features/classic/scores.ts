@@ -10,6 +10,8 @@ export interface QuizScore {
   modes: string[];
   lines: string[];
   username: string;
+  /** Exact names only (absent in scores saved before the mode existed). */
+  hardcore?: boolean;
 }
 
 export const MAX_SCORES = 10;
@@ -23,6 +25,7 @@ export function createScore(input: {
   modes: string[];
   lines: string[];
   username: string;
+  hardcore: boolean;
   date: Date;
 }): QuizScore {
   return {
@@ -35,6 +38,7 @@ export function createScore(input: {
     modes: input.modes,
     lines: input.lines,
     username: input.username,
+    hardcore: input.hardcore,
   };
 }
 

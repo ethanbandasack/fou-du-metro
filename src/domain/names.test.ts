@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeName, simplifyName } from "@/domain/names";
+import { exactForm, normalizeName, simplifyName } from "@/domain/names";
 
 describe("normalizeName", () => {
   it("ignores case, accents, spaces and punctuation", () => {
@@ -21,5 +21,17 @@ describe("normalizeName", () => {
 describe("simplifyName", () => {
   it("folds case, accents and punctuation but keeps 'Gare de'", () => {
     expect(simplifyName("Gare de l'Est")).toBe("garedelest");
+  });
+});
+
+describe("exactForm", () => {
+  it("ignores case, spaces and punctuation but keeps accents and every word", () => {
+    expect(exactForm("Champs-Élysées - Clemenceau")).toBe("champsélyséesclemenceau");
+    expect(exactForm("Gare de l'Est")).toBe("garedelest");
+    expect(exactForm("Saint-Paul (Le Marais)")).toBe("saintpaullemarais");
+  });
+
+  it("treats composed and decomposed accents alike", () => {
+    expect(exactForm("Étoile")).toBe(exactForm("Étoile"));
   });
 });

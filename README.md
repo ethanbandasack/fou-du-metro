@@ -11,6 +11,8 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
   pause, show or hide connections, reveal the answers. Partial input never reveals anything: type a full
   name (accents, case and dashes don't matter) or an unambiguous part of it (`Étoile` for
   `Charles de Gaulle - Étoile`).
+- **Hardcore** (both modes): only the exact name counts. Case, spaces and punctuation are ignored, but
+  accents, every word and "Gare de" are required (`Charles de Gaulle Étoile`, not `Étoile`).
 - **Intersection**: find the metro stations matching one or two categories (line, line group, Paris or
   suburbs, arrondissement, connections, names...).
 - **Carte** (classic mode): a map of the lines in play that fills in as you find stations. Zoom with the
@@ -23,6 +25,7 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
 ```bash
 npm run tui                                   # metro, progress per line
 npm run tui -- --modes metro,rer --group ville
+npm run tui -- --hardcore
 npm run tui -- --help
 ```
 
