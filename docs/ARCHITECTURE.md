@@ -15,7 +15,7 @@ src/
   components/ UI shared by several features
   hooks/      generic React hooks
   app/        Next.js routes, kept thin
-  tui/        terminal version (Node only, no dependency)
+  tui/        terminal version (Node only, no dependency; a Swift helper for live dictation on macOS)
 scripts/      data maintenance (add-communes.ts)
 ```
 
@@ -72,7 +72,8 @@ server).
   in line order, branches one after the other), `state.ts` (input, guesses, grouping, scroll; `say`
   is dictated text, matched like speech: `main.ts` sends text read in one go as `say`),
   `render.ts` (pure frame of strings; `stationBar` draws each station at its relative position),
-  `options.ts` (CLI flags) and `main.ts` (raw-mode keyboard and screen IO only).
+  `options.ts` (CLI flags), `voice.ts` (compiles `listen.swift` into `node_modules/.cache` on first
+  `--voice`, streams its transcripts as `hear` actions) and `main.ts` (raw-mode keyboard and screen IO only).
 - `hooks/useLocalStorageState.ts`: localStorage through `useSyncExternalStore`, shared by every
   component using a key (scores, player, settings); `hooks/useHardcore.ts` is one such shared flag.
 

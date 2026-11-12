@@ -30,13 +30,17 @@ npm run tui                                   # metro, progress per line
 npm run tui -- --modes metro,rer --group ville
 npm run tui -- --hardcore
 npm run tui -- --future                       # include lines not open yet
+npm run tui -- --voice                        # dictate live (macOS)
 npm run tui -- --help
 ```
 
 Type station names; only the number found is shown, globally or per line, arrondissement or city
 (`Tab` to switch, arrows to scroll, `Ctrl+C` to quit). Each bar lights up found stations at their
-position along the line, branches one after the other. To play by voice, use the system dictation
-(macOS: System Settings > Keyboard > Dictation): every station named in a sentence counts.
+position along the line, branches one after the other. With `--voice` (macOS), the microphone is
+transcribed live by Apple's speech recognition and every station named counts as soon as it is heard.
+The first run compiles a small helper (Xcode command line tools: `xcode-select --install`) and macOS asks
+your terminal app for microphone and speech recognition access. The system dictation also works, but it
+types only once you stop talking.
 
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 

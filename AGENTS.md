@@ -25,5 +25,8 @@ Read `docs/ARCHITECTURE.md` before changing code and `docs/DATA.md` before touch
 - `next build` and `next dev` both write `.next/`: stop the dev server before building.
 - The home page is prerendered from `src/data/` at build time: data edits need a rebuild (or `next dev`).
 - `npm run data:communes` calls geo.api.gouv.fr; run it after adding rows to `stations.csv`.
+- `npm run tui -- --voice` runs `src/tui/listen.swift`: macOS prompts the terminal app for microphone and
+  speech recognition access, so test the TUI wiring with a fake `node_modules/.cache/fou-du-metro/listen`
+  script printing `ready` and `heard<TAB>text` lines.
 - Chrome now exposes `SpeechRecognition` unprefixed: a fake for tests must replace both it and
   `webkitSpeechRecognition`.
