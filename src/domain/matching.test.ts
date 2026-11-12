@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAnswerIndex, lookupAnswer } from "@/domain/matching";
+import { buildAnswerIndex, findMentionedAnswers, lookupAnswer } from "@/domain/matching";
 
 const index = buildAnswerIndex(
   [
@@ -52,5 +52,27 @@ describe("lookupAnswer", () => {
 
   it("returns nothing for blank input", () => {
     expect(lookupAnswer(index, "  ")).toEqual([]);
+  });
+});
+
+describe("findMentionedAnswers", () => {
+  it("finds every station named in a sentence", () => {
+    expect(findMentionedAnswers(index, "Saint-Lazare euh Saint-Paul et gare de Lyon")).toEqual([
+      "Saint-Lazare",
+      "Saint-Paul (Le Marais)",
+      "Gare de Lyon",
+    ]);
+  });
+
+  it("prefers the longest name", () => {
+    expect(findMentionedAnswers(index, "neuilly porte maillot")).toEqual(["Neuilly - Porte Maillot"]);
+  });
+
+  it("matches whole words only", () => {
+    expect(findMentionedAnswers(index, "saintlazareville lyonnais")).toEqual([]);
+  });
+
+  it("returns nothing for silence", () => {
+    expect(findMentionedAnswers(index, "")).toEqual([]);
   });
 });
