@@ -1,0 +1,62 @@
+# Data
+
+All files live in `src/data/` and are read at build time by
+`src/server/loadNetwork.ts`. A malformed file fails the build with the file
+name (and line number for the CSV).
+
+## `stations.csv`
+
+One row per station and line (a station served by 3 lines has 3 rows).
+Comma separated, no quoting, header required:
+
+| Column | Meaning |
+|--------|---------|
+| `nom` | station name as displayed |
+| `line` | line id: `1`..`14`, `3B`, `7B` (read as `3bis`, `7bis`), `A`..`E`, `T1`.., `H`..`V`, `C1`, `TER ...`, `ORLYVAL`... |
+| `mode` | `METRO`, `RER`, `TRANSILIEN`, `TRAIN`, `TRAMWAY`, `VAL`, `CABLE` |
+| `order` | legacy position along the line (the YAML file wins) |
+| `lat`, `lon` | WGS84 coordinates |
+| `arrondissement` | 1-20 inside Paris, otherwise the département number (92, 93...) |
+| `figure_historique` | `1` if named after a historical figure |
+| `couleur` | `1` if the name contains a color |
+| `ouverte_apres_1980` | `1` if opened after 1980 |
+| `rive_gauche` | `1` if on the left bank |
+| `has_rer` | `1` if RER connections should be listed for this row |
+| `has_tram` | `1` if tram connections should be listed for this row |
+
+The file mixes CRLF and LF line endings; the parser accepts both.
+
+## `lines/*.yaml`
+
+One file per line. It sets the order of stops and which CSV rows are played:
+a CSV row whose name is not listed in its line's YAML file is ignored.
+
+```yaml
+line: '1'        # same id as the CSV (3B and 7B are fine)
+mode: METRO
+stations:
+- La Défense (Grande Arche)
+- Esplanade de la Défense
+```
+
+Names are matched with `normalizeName` (case, accents and punctuation
+ignored). Branching lines list their branches one after the other.
+
+## `connection-aliases.json`
+
+Pairs of names that designate the same interchange even though they differ,
+for example `Saint-Lazare` / `Haussmann Saint-Lazare`. Two CSV rows are merged
+into one station when their names are equal or aliased and they are less than
+0.01° apart in latitude and longitude (~1 km).
+
+## Adding or fixing a line
+
+1. Add or edit its rows in `stations.csv`.
+2. List its stations in order in `lines/<mode>-<id>.yaml`.
+3. Add alias pairs if a connection is spelled differently on each line.
+4. Run `npm test` (the dataset characterization test lists expected counts; update it on purpose).
+
+## Untracked files
+
+- `src/data/users.json`: login codes for `/api/auth` (`[{ id, username, hash, createdAt }]`).
+- `dev/`: private scripts used to fetch and enrich IDFM open data. Not versioned.
