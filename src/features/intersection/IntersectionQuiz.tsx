@@ -37,10 +37,9 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   const stations = useMemo(() => allStations.filter(s => s.lines.some(isMetroLine)), [allStations]);
   const categories = useMemo(() => buildCategories(stations), [stations]);
   const [hardcore, setHardcore] = useHardcore();
-  const answerIndex = useMemo(
-    () => buildAnswerIndex(stations.map(s => ({ key: s.name, names: s.aliases })), { hardcore }),
-    [stations, hardcore]
-  );
+  const answers = useMemo(() => stations.map(s => ({ key: s.name, names: s.aliases })), [stations]);
+  const answerIndex = useMemo(() => buildAnswerIndex(answers, { hardcore }), [answers, hardcore]);
+  const spokenIndex = useMemo(() => buildAnswerIndex(answers, { hardcore, spoken: true }), [answers, hardcore]);
 
   const randomPick = (group: CategoryGroup): Pick => {
     const playable = categories[group].filter(c => !c.custom);
@@ -109,7 +108,7 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
 
   // Voice: every target named in what the player says is found.
   const voice = useVoice((transcript, isFinal) => {
-    const named = findMentionedAnswers(answerIndex, transcript).filter(name => targets.includes(name));
+    const named = findMentionedAnswers(spokenIndex, transcript).filter(name => targets.includes(name));
     const fresh = named.filter(name => !found.includes(name));
     if (fresh.length > 0) setFound(prev => [...new Set([...prev, ...fresh])]);
     else if (isFinal && named.length === 0) shake();

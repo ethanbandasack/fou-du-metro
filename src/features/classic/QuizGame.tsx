@@ -45,6 +45,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
   const answers = useMemo(() => answersOf(playLines), [playLines]);
   const [hardcore, setHardcore] = useHardcore();
   const answerIndex = useMemo(() => buildAnswerIndex(answers, { hardcore }), [answers, hardcore]);
+  const spokenIndex = useMemo(() => buildAnswerIndex(answers, { hardcore, spoken: true }), [answers, hardcore]);
   const namesByKey = useMemo(() => new Map(answers.map(a => [a.key, a.names[0]])), [answers]);
 
   const [quiz, dispatch] = useReducer(quizReducer, answers.length, initialQuizState);
@@ -114,7 +115,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
   // Voice: every station named in what the player says counts as typed.
   const voice = useVoice((transcript) => {
     if (quiz.status !== 'running') return;
-    const keys = findMentionedAnswers(answerIndex, transcript);
+    const keys = findMentionedAnswers(spokenIndex, transcript);
     if (keys.length > 0) dispatch({ type: 'guess', keys });
   });
   const stopVoice = voice.stop;
