@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  /* Height of the top navigation; sticky quiz headers sit right below it. */
+  --nav-height: 3.5rem;
   --background: #ffffff;
   --foreground: #171717;
   --border: #e5e5e5;
@@ -8,6 +10,12 @@
   --muted: #fafafa;
   --accent: #171717;
   --accent-foreground: #ffffff;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --nav-height: 5rem;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

@@ -124,7 +124,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div ref={headerRef} className="sticky top-20 bg-card z-50 shadow-sm mb-6 transition-colors duration-300">
+      <div ref={headerRef} className="sticky top-[var(--nav-height)] bg-card z-50 shadow-sm mb-6 transition-colors duration-300">
         <div className="p-6 space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="flex items-center gap-4 p-4 bg-muted">
