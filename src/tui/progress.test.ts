@@ -4,7 +4,7 @@ import { progressBy } from "@/tui/progress";
 
 const stop = (name: string, arrondissement: number, commune: string): Stop => ({
   id: name, key: name.toLowerCase(), name, lineId: "", mode: "METRO", order: 1, lat: 0, lon: 0,
-  arrondissement, commune, connections: [],
+  arrondissement, commune, opening: null, connections: [],
 });
 const line = (id: string, stops: Stop[]): Line => ({
   id, mode: "METRO", label: `Métro ${id}`, colors: { background: "#FFCE00", text: "#000000" }, stops,

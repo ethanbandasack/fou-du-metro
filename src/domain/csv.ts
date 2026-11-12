@@ -19,6 +19,8 @@ export interface StopRow {
   commune: string;
   /** Official IDFM transfer zone (zone de correspondance) id, "" when unknown. */
   zone: string;
+  /** ISO date (YYYY-MM-DD) a future station opens, null when already open. */
+  opening: string | null;
 }
 
 const COLUMNS = [
@@ -35,6 +37,7 @@ const COLUMNS = [
   "rive_gauche",
   "commune",
   "zone",
+  "opening",
 ] as const;
 
 /** Parses `stations.csv` (comma separated, no quoting). Throws on malformed input. */
@@ -77,7 +80,13 @@ function parseRow(line: string, lineNumber: number): StopRow {
     leftBank,
     commune,
     zone: rest[5].trim(),
+    opening: opening(rest[6].trim(), fail),
   };
+}
+
+function opening(value: string, fail: (reason: string) => never): string | null {
+  if (!value) return null;
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : fail(`"opening" must be YYYY-MM-DD, got "${value}"`);
 }
 
 /** Inverse of parseStationsCsv (LF line endings, bis lines written "3bis"). */
@@ -98,6 +107,7 @@ export function formatStationsCsv(rows: StopRow[]): string {
       flag(r.leftBank),
       r.commune,
       r.zone,
+      r.opening ?? "",
     ].join(","),
   );
   return [COLUMNS.join(","), ...lines].join("\n") + "\n";
