@@ -1,6 +1,6 @@
 # Architecture
 
-Le Fou du Métro is a Next.js 15 (App Router) app with a static home page. All
+Le Fou du Métro is a Next.js 16 (App Router) app with a static home page. All
 network data is read at build time and passed to client components as plain
 objects.
 
