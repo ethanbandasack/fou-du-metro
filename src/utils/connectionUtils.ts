@@ -22,20 +22,6 @@ export function areAliases(name1: string, name2: string): boolean {
 }
 
 /**
- * Returns all known aliases for a given station name.
- */
-export function getAliasesForName(name: string): string[] {
-  const aliases = new Set<string>([name]);
-  
-  ALIASES.forEach(a => {
-    if (a.name1 === name) aliases.add(a.name2);
-    if (a.name2 === name) aliases.add(a.name1);
-  });
-  
-  return Array.from(aliases);
-}
-
-/**
  * Generic station grouping logic used by both Classic and Intersection modes.
  * Groups stations that have the same name or are aliases AND are geographically close.
  */

@@ -153,34 +153,6 @@ export const LINE_TEXT_COLORS: Record<string, string> = {
   "C1": COLORS.BLEU_OUTREMER.text,
 };
 
-export function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  let braceCount = 0;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === "{" && !inQuotes) {
-      braceCount++;
-      current += char;
-    } else if (char === "}" && !inQuotes) {
-      braceCount--;
-      current += char;
-    } else if (char === ";" && !inQuotes && braceCount === 0) {
-      result.push(current.trim());
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
-
 export function groupStationsByLine(stations: MetroStation[]): MetroLine[] {
   const linesMap = new Map<string, MetroStation[]>();
 

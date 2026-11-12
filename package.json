@@ -6,9 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "populate-data": "python3 dev/entrypoint.py",
-    "sync": "python3 dev/sync/entrypoint.py"
+    "lint": "next lint"
   },
   "dependencies": {
     "js-yaml": "^4.1.1",
