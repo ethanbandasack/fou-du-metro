@@ -45,7 +45,10 @@ stations:
 ```
 
 Names are matched with `normalizeName` (case, accents and punctuation
-ignored). Branching lines list their branches one after the other.
+ignored). Branching lines list their branches one after the other: a branch starts next to its fork,
+or ends next to the trunk when listed towards it (RER A starts with its western branches, each
+listed towards the trunk). A station appears once per line. The stop sequences of the official GTFS
+(see DATA-SOURCES.md) are the reference; every line was checked against them on 2026-11-12.
 
 ## Stations and connections
 
