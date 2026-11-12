@@ -37,20 +37,35 @@ function hexToAnsi(hex: string): string {
 
 const MIN_BAR_WIDTH = 4;
 
+/**
+ * One character per cell, each station drawn at its relative position: █ found, ░ missing,
+ * ▒ a cell holding both (more stations than cells).
+ */
+export function stationBar(stations: boolean[], width: number): string {
+  let bar = "";
+  for (let cell = 0; cell < width; cell++) {
+    const start = Math.floor((cell * stations.length) / width);
+    const end = Math.max(start + 1, Math.floor(((cell + 1) * stations.length) / width));
+    const found = stations.slice(start, end).filter(Boolean).length;
+    bar += found === 0 ? "░" : found === end - start ? "█" : "▒";
+  }
+  return bar;
+}
+
 function groupRow(group: GroupProgress, labelWidth: number, countWidth: number, width: number, color: boolean): string {
-  const complete = group.total > 0 && group.found === group.total;
-  const count = `${group.found} / ${group.total}`.padStart(countWidth);
+  const found = group.stations.filter(Boolean).length;
+  const total = group.stations.length;
+  const complete = total > 0 && found === total;
+  const count = `${found} / ${total}`.padStart(countWidth);
   const barWidth = width - labelWidth - countWidth - 3;
   if (barWidth < MIN_BAR_WIDTH) {
     // Too narrow for a bar: label and count only.
     const narrowLabel = fit(group.label, Math.max(0, width - countWidth - 2)).padEnd(Math.max(0, width - countWidth - 2));
     return ` ${paint(narrowLabel, color && complete, "32")} ${count}`;
   }
-  const filled = group.total > 0 ? Math.round((group.found / group.total) * barWidth) : 0;
   const label = fit(group.label, labelWidth).padEnd(labelWidth);
-  const bar =
-    paint("█".repeat(filled), color, complete ? "32" : group.color ? hexToAnsi(group.color) : "37") +
-    paint("░".repeat(barWidth - filled), color, "90");
+  const fill = complete ? "32" : group.color ? hexToAnsi(group.color) : "37";
+  const bar = stationBar(group.stations, barWidth).replace(/░+|[█▒]+/g, (run) => paint(run, color, run[0] === "░" ? "90" : fill));
   return ` ${paint(label, color && complete, "32")} ${bar} ${count}`;
 }
 
@@ -65,7 +80,7 @@ export function render(screen: Screen): string[] {
   const header = left.length + right.length <= width ? left + " ".repeat(width - left.length - right.length) + right : fit(left, width);
 
   const labelWidth = Math.min(32, Math.floor(width * 0.4), Math.max(0, ...groups.map((g) => g.label.length)));
-  const countWidth = Math.max(0, ...groups.map((g) => `${g.total} / ${g.total}`.length));
+  const countWidth = Math.max(0, ...groups.map((g) => `${g.stations.length} / ${g.stations.length}`.length));
   const start = Math.min(state.scroll, Math.max(0, groups.length - rows));
   const hidden = groups.length - start - rows;
   const shown = groups.slice(start, start + (hidden > 0 ? rows - 1 : rows));

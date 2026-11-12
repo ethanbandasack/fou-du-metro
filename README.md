@@ -33,7 +33,8 @@ npm run tui -- --help
 ```
 
 Type station names; only the number found is shown, globally or per line, arrondissement or city
-(`Tab` to switch, arrows to scroll, `Ctrl+C` to quit).
+(`Tab` to switch, arrows to scroll, `Ctrl+C` to quit). Each bar lights up found stations at their
+position along the line, branches one after the other.
 
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 

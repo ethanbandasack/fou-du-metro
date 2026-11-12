@@ -17,23 +17,23 @@ const lines = [
 const found = new Set(["nation", "la défense"]);
 
 describe("progressBy", () => {
-  it("counts each station once overall", () => {
-    expect(progressBy(lines, found, "global")).toEqual([{ label: "Total", found: 2, total: 4 }]);
+  it("lists each station once overall, line after line", () => {
+    expect(progressBy(lines, found, "global")).toEqual([{ label: "Total", stations: [true, false, true, false] }]);
   });
 
-  it("counts per line, in line order, with the line colors", () => {
+  it("lists stations along each line, in line order, with the line colors", () => {
     expect(progressBy(lines, found, "line")).toEqual([
-      { label: "Métro 1", found: 2, total: 3, color: "#FFCE00" },
-      { label: "Métro 2", found: 1, total: 2, color: "#FFCE00" },
+      { label: "Métro 1", stations: [true, false, true], color: "#FFCE00" },
+      { label: "Métro 2", stations: [true, false], color: "#FFCE00" },
     ]);
   });
 
   it("counts per Paris arrondissement, then per département outside Paris", () => {
-    expect(progressBy(lines, found, "arrondissement").map((g) => [g.label, g.found, g.total])).toEqual([
-      ["Paris 4e", 0, 1],
-      ["Paris 9e", 0, 1],
-      ["Paris 12e", 1, 1],
-      ["Hors Paris (92)", 1, 1],
+    expect(progressBy(lines, found, "arrondissement").map((g) => [g.label, g.stations])).toEqual([
+      ["Paris 4e", [false]],
+      ["Paris 9e", [false]],
+      ["Paris 12e", [true]],
+      ["Hors Paris (92)", [true]],
     ]);
   });
 
@@ -43,9 +43,9 @@ describe("progressBy", () => {
   });
 
   it("counts per commune, alphabetically", () => {
-    expect(progressBy(lines, found, "commune").map((g) => [g.label, g.found, g.total])).toEqual([
-      ["Paris", 1, 3],
-      ["Puteaux", 1, 1],
+    expect(progressBy(lines, found, "commune").map((g) => [g.label, g.stations])).toEqual([
+      ["Paris", [true, false, false]],
+      ["Puteaux", [true]],
     ]);
   });
 });
