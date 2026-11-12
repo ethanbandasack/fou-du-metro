@@ -3,9 +3,9 @@ mode: TRAIN
 stations:
 - Gare du Nord
 - Beauvais
-- Creil
-- Chantilly-Gouvieux
 - Orry-la-Ville-Coye-la-Forêt
+- Chantilly-Gouvieux
+- Creil
 - Dammartin - Juilly - Saint-Mard
 - Le Plessis-Belleville
 - Nanteuil-le-Haudouin

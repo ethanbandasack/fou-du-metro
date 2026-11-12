@@ -18,7 +18,7 @@ API v2.1, no key, updated daily. Whole datasets download as JSON from
 | `arrets-lignes` | every stop served by every line (all modes, 72k records) | `stop_name`, `route_long_name`, `mode`, `nom_commune`, `code_insee` |
 | `projets_lignes_idf` | lines and extensions under construction or planned, by operation | `res_com`, `operation`, `statut`, `mes_estime` (estimated opening), `rvb` (color) |
 | `projets_arrets_idf` | their stops | `nom_arret`, `res_com`, `id_operati`, `variante`, `geo_point_2d` |
-| `offre-horaires-tc-gtfs-idfm` ([PRIM](https://prim.iledefrance-mobilites.fr/en/jeux-de-donnees/offre-horaires-tc-gtfs-idfm)) | full GTFS timetable | `stop_times` sequences give line order (branches included); `transfers.txt` gives walking transfers, also between zones |
+| `offre-horaires-tc-gtfs-idfm` ([PRIM](https://prim.iledefrance-mobilites.fr/en/jeux-de-donnees/offre-horaires-tc-gtfs-idfm), zip of 115 MB at `https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip`) | full GTFS timetable | `stop_times` sequences give line order (branches included); `transfers.txt` gives walking transfers, also between zones |
 
 Notes:
 
