@@ -1,14 +1,16 @@
 {
-  "name": "metro",
+  "name": "fou-du-metro",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "populate-data": "python3 dev/entrypoint.py",
-    "sync": "python3 dev/sync/entrypoint.py"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "js-yaml": "^4.1.1",
@@ -27,6 +29,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^4.1.12"
   }
 }

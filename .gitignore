@@ -76,10 +76,13 @@ storybook-static
 src/data/users.json
 src/data/arrondissements.geojson
 src/app/fonts/
-docs/
+# private data tooling (not versioned)
 dev/
-public/file.svg
-public/globe.svg
-public/next.svg
-public/vercel.svg
-public/window.svg
+
+# AI / dev tooling (local only)
+.claude/
+CLAUDE.local.md
+.codegraph/
+graphify-out/
+.understand-anything/
+.superpowers/

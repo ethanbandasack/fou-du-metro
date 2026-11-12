@@ -1,19 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QuizGame } from '@/components/QuizGame';
-import { IntersectionQuiz } from '@/components/IntersectionQuiz';
-import { MetroStation, MetroLine, EnrichedStation } from '@/types/metro';
+import { QuizGame } from '@/features/classic/QuizGame';
+import { IntersectionQuiz } from '@/features/intersection/IntersectionQuiz';
+import type { Network } from '@/domain/network';
 import { LayoutGrid, Blend } from 'lucide-react';
 
-interface HomePageProps {
-  stations: MetroStation[];
-  lines: MetroLine[];
-  enrichedStations: EnrichedStation[];
-  dataError?: boolean;
-}
-
-export default function HomePage({ stations, lines, enrichedStations, dataError }: HomePageProps) {
+export default function HomePage({ network }: { network: Network }) {
   const [activeQuiz, setActiveQuiz] = useState<'classic' | 'intersection'>('classic');
 
   return (
@@ -48,22 +41,13 @@ export default function HomePage({ stations, lines, enrichedStations, dataError 
 
       <div className="max-w-[1400px] mx-auto">
         <main className="">
-          {dataError && (
-            <div className="mx-6 mt-6 p-4 bg-red-50 border-2 border-red-500 text-red-700 flex items-center gap-3">
-              <span className="text-xl">⚠️</span>
-              <div>
-                <p className="font-black text-xs tracking-widest">Erreur de données</p>
-                <p className="text-[10px] font-medium">Le fichier des stations enrichies (stations-enriched.csv) est introuvable ou corrompu. Le mode Intersection peut ne pas fonctionner correctement.</p>
-              </div>
-            </div>
-          )}
           {activeQuiz === 'classic' ? (
             <div className="py-12 px-6">
-              <QuizGame stations={stations} lines={lines} />
+              <QuizGame lines={network.lines} />
             </div>
           ) : (
             <div className="py-12 px-6">
-              <IntersectionQuiz allStations={enrichedStations} />
+              <IntersectionQuiz allStations={network.stations} />
             </div>
           )}
         </main>

@@ -1,36 +1,49 @@
 # Le Fou du Métro 🚇
 
-An interactive quiz about the rail transport network in Île-de-France (Paris).
+An interactive quiz about the rail network of Île-de-France (Métro, RER, Transilien, Tramway, Train).
 
 > [!NOTE]
 > The game interface and station names are in French.
 
-## Getting Started
+## Game modes
+
+- **Classique**: type station names; they are revealed line by line. Choose the modes and lines to play,
+  pause, show or hide connections, reveal the answers. Partial input never reveals anything: type a full
+  name (accents, case and dashes don't matter) or an unambiguous part of it (`Étoile` for
+  `Charles de Gaulle - Étoile`).
+- **Intersection**: find the metro stations matching one or two categories (line, line group, Paris or
+  suburbs, arrondissement, connections, names...).
+
+Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
+
+## Getting started
 
 ```bash
 git clone https://github.com/ethanbandasack/fou-du-metro.git
-
 cd fou-du-metro
-
 npm install
-
 npm run dev
 ```
 
-## About the Game
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | development server |
+| `npm test` | unit tests |
+| `npm run check` | lint, typecheck and tests |
+| `npm run build` | production build |
 
-Test your knowledge of the Parisian transport network (Metro, RER, Train, Tramway) through various game modes, including a classic quiz and an advanced "Intersection" mode to master the network.
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md): layers, data flow, vocabulary
+- [Data](docs/DATA.md): `stations.csv`, line files, aliases
+- [Agent guide](AGENTS.md): commands and rules for contributors and coding agents
 
 > [!IMPORTANT]
-> **Data Quality**: Due to heavy recent refactoring and automated data enrichment, it is possible to encounter minor errors in station connections or sequence ordering. The `stations.csv` file is under continuous improvement.
+> **Data quality**: station data was enriched semi-automatically; a few connections or orders may be wrong.
+> Fixes to `src/data/` are welcome.
 
-## Font Installation
+## Parisine font
 
-To achieve the "full experience" and match the official RATP signage aesthetics, you can manually add the **Parisine** font to the project.
-
-> [!WARNING]
-> **Intellectual Property**: Parisine is a proprietary font and the property of RATP. It is **not included** in this repository. Users must ensure they have the right to use it. If the font is not detected, the application will automatically fall back to standard system fonts (Arial/Helvetica).
-
-To install:
-1. Place your Parisine font files in `fou-du-metro/fonts/Parisine/`.
-2. Ensure the paths match those expected in `src/app/layout.tsx`.
+The RATP signage font **Parisine** is proprietary and **not included**. If it is installed on your system
+(as "Parisine" / "Parisine Regular" / "Parisine Bold"), the app uses it; otherwise it falls back to
+Helvetica / Arial. Make sure you have the right to use it.
