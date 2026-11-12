@@ -4,9 +4,10 @@
  *              smallest detour; curated columns are copied from a local row of the same zone
  *              (or same name nearby), otherwise left at 0 and listed for review
  *   --remove   drop local rows that have no official counterpart on their line
+ *   --dedupe   keep one row per line and transfer zone (a station listed twice under two spellings)
  * Then run `npm test` (the dataset characterization changes on purpose) and `npm run data:audit`.
  *
- * Usage: npm run data:import -- --add --remove
+ * Usage: npm run data:import -- --add --remove --dedupe
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -15,6 +16,7 @@ import { formatStationsCsv, type StopRow } from "@/domain/csv";
 import { normalizeLineId } from "@/domain/lines";
 import { normalizeName } from "@/domain/names";
 import { matchRows, missingStops } from "@/server/idfm/audit";
+import { dedupeByZone } from "@/server/idfm/dedupe";
 import { IDFM_API, parseOfficialStops, type OfficialStop } from "@/server/idfm/official";
 import { insertByDetour, orderByDetour } from "@/server/idfm/order";
 import { loadSources } from "@/server/loadNetwork";
@@ -85,7 +87,8 @@ async function newRow(stop: OfficialStop, rows: StopRow[]): Promise<{ row: StopR
 async function main() {
   const add = process.argv.includes("--add");
   const remove = process.argv.includes("--remove");
-  if (!add && !remove) throw new Error("pass --add and/or --remove");
+  const dedupe = process.argv.includes("--dedupe");
+  if (!add && !remove && !dedupe) throw new Error("pass --add, --remove and/or --dedupe");
 
   const response = await fetch(`${IDFM_API}/emplacement-des-gares-idf/exports/json`);
   if (!response.ok) throw new Error(`emplacement-des-gares-idf: HTTP ${response.status}`);
@@ -95,16 +98,29 @@ async function main() {
   const lineFiles = readLineFiles();
   const matches = matchRows(rows, official);
 
+  const dropFromLineFile = (gone: StopRow) => {
+    const file = lineFiles.find((f) => sameLine(f, gone));
+    const stillServed = rows.some((r) => r.lineId === gone.lineId && normalizeName(r.name) === normalizeName(gone.name));
+    if (file && !stillServed) {
+      file.data.stations = file.data.stations.filter((n) => normalizeName(n) !== normalizeName(gone.name));
+      file.changed = true;
+    }
+  };
+
+  if (dedupe) {
+    const { kept, dropped } = dedupeByZone(rows);
+    rows = kept;
+    for (const gone of dropped) {
+      dropFromLineFile(gone);
+      console.log(`- merged ${gone.lineId} · ${gone.name}`);
+    }
+  }
+
   if (remove) {
     const unmatched = rows.filter((row) => !matches.has(row));
     rows = rows.filter((row) => matches.has(row));
     for (const gone of unmatched) {
-      const file = lineFiles.find((f) => sameLine(f, gone));
-      const stillServed = rows.some((r) => r.lineId === gone.lineId && normalizeName(r.name) === normalizeName(gone.name));
-      if (file && !stillServed) {
-        file.data.stations = file.data.stations.filter((n) => normalizeName(n) !== normalizeName(gone.name));
-        file.changed = true;
-      }
+      dropFromLineFile(gone);
       console.log(`- removed ${gone.lineId} · ${gone.name}`);
     }
   }
