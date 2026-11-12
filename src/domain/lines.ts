@@ -90,6 +90,13 @@ export function lineColors(lineId: string): LineColors {
   return LINE_PALETTE[lineId] ?? (lineId.startsWith("TER ") ? TER : UNKNOWN_LINE);
 }
 
+const SHORT_IDS: Record<string, string> = { "CDG VAL": "CDG", ORLYVAL: "Orly", FUNICULAIRE: "Funi" };
+
+/** Id short enough for a badge: "TER Normandie" -> "TER". */
+export function lineShortId(lineId: string): string {
+  return lineId.startsWith("TER ") ? "TER" : (SHORT_IDS[lineId] ?? lineId);
+}
+
 export function lineLabel(mode: Mode, lineId: string): string {
   return `${MODE_LABELS[mode]} ${lineId}`;
 }

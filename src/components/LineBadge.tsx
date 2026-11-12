@@ -1,17 +1,20 @@
-import { lineColors } from '@/domain/lines';
+import { lineColors, lineShortId } from '@/domain/lines';
 
-/** Line id on its official color; long ids (TER, VAL) become a pill. */
-export function LineBadge({ id, className = '' }: { id: string; className?: string }) {
+const SIZES = {
+  sm: 'h-5 min-w-5 px-1 text-[9px]',
+  md: 'h-6 min-w-6 px-1.5 text-[10px]',
+};
+
+/** Line id on its official color, as on IDFM signage; long ids are shortened (full id in the tooltip). */
+export function LineBadge({ id, size = 'md', className = '' }: { id: string; size?: keyof typeof SIZES; className?: string }) {
   const { background, text } = lineColors(id);
-  const isLong = id.length > 4;
   return (
     <span
-      className={`inline-flex items-center justify-center text-[10px] font-black font-parisine shrink-0 ${
-        isLong ? 'px-2 h-6 min-w-[3rem]' : 'w-6 h-6'
-      } ${className}`}
+      title={id}
+      className={`inline-flex items-center justify-center font-black font-parisine leading-none shrink-0 ${SIZES[size]} ${className}`}
       style={{ backgroundColor: background, color: text }}
     >
-      {id}
+      {lineShortId(id)}
     </span>
   );
 }
