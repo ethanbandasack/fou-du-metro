@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Settings, Play, Pause, RotateCcw, Trophy, Eye, EyeOff, Search, LogIn, LogOut, User as UserIcon } from 'lucide-react';
+import { Settings, Play, Pause, RotateCcw, Trophy, Eye, EyeOff, Search, LogIn, LogOut, Map as MapIcon, User as UserIcon } from 'lucide-react';
 import { formatDuration } from '@/domain/format';
 import { buildAnswerIndex, lookupAnswer } from '@/domain/matching';
 import type { Line } from '@/domain/network';
@@ -14,6 +14,7 @@ import { ScoresPanel } from '@/features/classic/ScoresPanel';
 import { addScore, createScore, parseStoredScores, SCORES_STORAGE_KEY, type QuizScore } from '@/features/classic/scores';
 import { answersOf, selectLines } from '@/features/classic/selection';
 import { DEFAULT_SETTINGS, parseStoredSettings, SETTINGS_STORAGE_KEY, type QuizSettings } from '@/features/classic/settings';
+import { StationMap } from '@/features/map/StationMap';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 
 const toolbarButton = (active: boolean) =>
@@ -47,6 +48,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
   const isPlaying = quiz.status === 'running' || quiz.status === 'paused';
   const isComplete = quiz.total > 0 && quiz.found.length === quiz.total;
   const progress = quiz.total > 0 ? (quiz.found.length / quiz.total) * 100 : 0;
+  const foundSet = useMemo(() => new Set(quiz.found), [quiz.found]);
 
   // A new selection starts a new game.
   useEffect(() => {
@@ -156,6 +158,11 @@ export function QuizGame({ lines }: { lines: Line[] }) {
               >
                 {settings.showConnections ? <Eye size={16} /> : <EyeOff size={16} />}
                 {settings.showConnections ? 'Masquer' : 'Afficher'} corresp.
+              </button>
+
+              <button onClick={() => updateSettings({ showMap: !settings.showMap })} className={toolbarButton(settings.showMap)}>
+                <MapIcon size={16} />
+                {settings.showMap ? 'Masquer la carte' : 'Carte'}
               </button>
 
               {isPlaying ? (
@@ -275,6 +282,17 @@ export function QuizGame({ lines }: { lines: Line[] }) {
               </div>
             )}
           </div>
+        )}
+
+        {settings.showMap && playLines.length > 0 && (
+          <StationMap
+            lines={playLines}
+            found={foundSet}
+            highlighted={quiz.lastFound}
+            revealAll={showAllAnswers || quiz.status === 'finished'}
+            showUnfound={settings.showUnfoundOnMap}
+            onShowUnfoundChange={(showUnfoundOnMap) => updateSettings({ showUnfoundOnMap })}
+          />
         )}
 
         {playLines.length > 0 ? (
