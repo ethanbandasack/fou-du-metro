@@ -1,0 +1,63 @@
+import { parseArgs } from "node:util";
+import { MODES, normalizeLineId, type Mode } from "@/domain/lines";
+import type { Grouping } from "@/tui/progress";
+
+export interface TuiOptions {
+  /** Empty means every mode. */
+  modes: string[];
+  /** Empty means every line of the modes. */
+  lines: string[];
+  grouping: Grouping;
+  color: boolean;
+  help: boolean;
+}
+
+export const USAGE = `Usage: npm run tui -- [options]
+
+  --modes <liste>   modes à jouer : metro, rer, transilien, train, tramway, val, cable, ou all (défaut : metro)
+  --lines <liste>   lignes à jouer, ex. 1,4,14 (défaut : toutes celles des modes)
+  --group <nom>     regroupement initial : global, ligne, arrondissement, ville (défaut : ligne)
+  --no-color        sans couleurs (aussi avec NO_COLOR)
+  -h, --help        cette aide`;
+
+const GROUPING_NAMES: Record<string, Grouping> = {
+  global: "global",
+  total: "global",
+  line: "line",
+  ligne: "line",
+  arrondissement: "arrondissement",
+  ville: "commune",
+  city: "commune",
+  commune: "commune",
+};
+
+const list = (value: string | undefined) =>
+  (value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
+
+export function parseOptions(argv: string[], env: Record<string, string | undefined>): TuiOptions {
+  const { values } = parseArgs({
+    args: argv,
+    options: {
+      modes: { type: "string" },
+      lines: { type: "string" },
+      group: { type: "string" },
+      "no-color": { type: "boolean" },
+      help: { type: "boolean", short: "h" },
+    },
+  });
+
+  const modeNames = list(values.modes ?? "metro").map((mode) => mode.toUpperCase());
+  for (const mode of modeNames) {
+    if (mode !== "ALL" && !MODES.includes(mode as Mode)) throw new Error(`Mode inconnu : ${mode.toLowerCase()}\n\n${USAGE}`);
+  }
+  const grouping = GROUPING_NAMES[(values.group ?? "ligne").toLowerCase()];
+  if (!grouping) throw new Error(`Regroupement inconnu : ${values.group}\n\n${USAGE}`);
+
+  return {
+    modes: modeNames.includes("ALL") ? [] : modeNames,
+    lines: list(values.lines).map(normalizeLineId),
+    grouping,
+    color: !values["no-color"] && !env.NO_COLOR,
+    help: values.help ?? false,
+  };
+}
