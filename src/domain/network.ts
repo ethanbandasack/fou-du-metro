@@ -58,7 +58,7 @@ export interface LineOrder {
 }
 
 /** Two rows are the same place when their names are aliases and they lie within ~1 km. */
-const PROXIMITY_DEGREES = 0.01;
+export const PROXIMITY_DEGREES = 0.01;
 
 export function buildNetwork(input: { rows: StopRow[]; lineOrders: LineOrder[]; aliases: AliasPair[] }): Network {
   const groups = groupRows(input.rows, createAliasMatcher(input.aliases));

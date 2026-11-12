@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "data:communes": "tsx scripts/add-communes.ts",
-    "tui": "tsx src/tui/main.ts"
+    "tui": "tsx src/tui/main.ts",
+    "data:audit": "tsx scripts/audit-data.ts"
   },
   "dependencies": {
     "js-yaml": "^4.1.1",

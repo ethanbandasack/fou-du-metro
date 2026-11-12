@@ -59,6 +59,12 @@ into one station when their names are equal or aliased and they are less than
 3. Add alias pairs if a connection is spelled differently on each line.
 4. Run `npm test` (the dataset characterization test lists expected counts; update it on purpose).
 
+## Checking against official data
+
+`npm run data:audit` downloads Île-de-France Mobilités open data and lists stations missing on either
+side, connections that differ from the official transfer zones and colors that differ from the official
+ones. Sources and the migration plan: [DATA-SOURCES.md](DATA-SOURCES.md).
+
 ## Untracked files
 
 - `src/data/users.json`: login codes for `/api/auth` (`[{ id, username, hash, createdAt }]`).
