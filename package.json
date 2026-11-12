@@ -14,7 +14,8 @@
     "tui": "tsx src/tui/main.ts",
     "data:communes": "tsx scripts/add-communes.ts",
     "data:audit": "tsx scripts/audit-data.ts",
-    "data:zones": "tsx scripts/sync-zones.ts"
+    "data:zones": "tsx scripts/sync-zones.ts",
+    "data:import": "tsx scripts/import-official.ts"
   },
   "dependencies": {
     "js-yaml": "^4.1.1",
