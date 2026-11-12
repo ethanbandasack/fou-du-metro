@@ -7,7 +7,7 @@ import { Timer } from './Timer';
 import QuizTable from './QuizTable';
 import { LineFilter } from './LineFilter';
 import { Settings, Play, Pause, RotateCcw, Trophy, Eye, EyeOff, Search, Trash2, X, LogIn, LogOut, User as UserIcon } from 'lucide-react';
-import { fuzzyMatch } from '@/utils/metroUtils';
+import { buildAnswerIndex, lookupAnswer } from '@/domain/matching';
 
 interface QuizGameProps {
   lines: Line[];
@@ -136,25 +136,24 @@ export function QuizGame({ lines }: QuizGameProps) {
     return uniqueNames;
   }, [filteredStations]);
 
+  const answerIndex = useMemo(
+    () => buildAnswerIndex(filteredStations.map(station => ({ key: station.key, names: [station.name] }))),
+    [filteredStations]
+  );
+
   // Real-time search and station matching
   const handleSearchChange = useCallback((value: string) => {
     if (!quizState.isGameActive) return;
     
     setQuizState(prev => ({ ...prev, searchInput: value }));
     
-    // Check for matches when user types (exact matching required)
+    // Reveal stations whose name was fully typed
     if (value.trim().length >= 1) {
-      const matches = filteredStations.filter(station => {
-        return fuzzyMatch(value, station.name);
-      });
-      
-      // Reveal matching stations that haven't been guessed yet
       let foundNew = false;
       const newGuessedStations = [...quizState.guessedStations];
       const uniqueNewStations = new Set<string>();
       
-      matches.forEach(station => {
-        const stationKey = station.key;
+      lookupAnswer(answerIndex, value).forEach(stationKey => {
         if (!quizState.guessedStations.includes(stationKey)) {
           foundNew = true;
           newGuessedStations.push(stationKey);
@@ -181,7 +180,7 @@ export function QuizGame({ lines }: QuizGameProps) {
         }, 100); // Reduced from 800ms to 100ms for faster clearing
       }
     }
-  }, [filteredStations, quizState.guessedStations, quizState.isGameActive]);
+  }, [answerIndex, quizState.guessedStations, quizState.isGameActive]);
 
   // Initialize game when settings change
   useEffect(() => {
