@@ -13,6 +13,8 @@ interface QuizTableProps {
   gameEnded?: boolean;
   showConnections?: boolean;
   isAuthenticated?: boolean;
+  /** Connections to hide (future lines when they are not played). */
+  showLine?: (lineId: string) => boolean;
 }
 
 function toggle(set: Set<string>, id: string): Set<string> {
@@ -28,7 +30,8 @@ const QuizTable: React.FC<QuizTableProps> = ({
   showAllAnswers = false,
   gameEnded = false,
   showConnections = true,
-  isAuthenticated = false
+  isAuthenticated = false,
+  showLine = () => true
 }) => {
   const [visibleLines, setVisibleLines] = useState<Set<string>>(new Set());
   // Manual choices only: a line without one is collapsed once completed.
@@ -103,6 +106,7 @@ const QuizTable: React.FC<QuizTableProps> = ({
                       <tbody className="bg-card divide-y divide-border">
                         {line.stops.map(stop => {
                           const isGuessed = guessed.has(stop.key);
+                          const connections = stop.connections.filter(showLine);
                           const rowClass = gameEnded && !isGuessed ? 'bg-red-500/10' : isGuessed ? 'bg-green-500/10' : '';
                           const nameClass = isGuessed ? 'text-green-600' : gameEnded ? 'text-red-600' : 'text-blue-600';
                           return (
@@ -116,9 +120,9 @@ const QuizTable: React.FC<QuizTableProps> = ({
                               </td>
                               {showConnections && (
                                 <td className="px-3 py-2">
-                                  <div className="flex flex-wrap gap-1" aria-label={`Correspondances : ${stop.connections.join(', ') || 'aucune'}`}>
-                                    {stop.connections.length > 0
-                                      ? [...new Map(stop.connections.map(id => [lineShortId(id), id])).values()].map(id => <LineBadge key={id} id={id} size="sm" />)
+                                  <div className="flex flex-wrap gap-1" aria-label={`Correspondances : ${connections.join(', ') || 'aucune'}`}>
+                                    {connections.length > 0
+                                      ? [...new Map(connections.map(id => [lineShortId(id), id])).values()].map(id => <LineBadge key={id} id={id} size="sm" />)
                                       : <span className="text-sm text-foreground/30">-</span>}
                                   </div>
                                 </td>

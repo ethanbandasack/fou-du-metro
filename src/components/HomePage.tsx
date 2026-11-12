@@ -4,10 +4,13 @@ import React, { useState } from 'react';
 import { QuizGame } from '@/features/classic/QuizGame';
 import { IntersectionQuiz } from '@/features/intersection/IntersectionQuiz';
 import type { Network } from '@/domain/network';
+import { openStations } from '@/domain/selection';
+import { useToday } from '@/hooks/useToday';
 import { LayoutGrid, Blend } from 'lucide-react';
 
 export default function HomePage({ network }: { network: Network }) {
   const [activeQuiz, setActiveQuiz] = useState<'classic' | 'intersection'>('classic');
+  const today = useToday();
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
@@ -47,7 +50,7 @@ export default function HomePage({ network }: { network: Network }) {
             </div>
           ) : (
             <div className="py-6 sm:py-12 px-4 sm:px-6">
-              <IntersectionQuiz allStations={network.stations} />
+              <IntersectionQuiz allStations={openStations(network.stations, network.lines, today)} />
             </div>
           )}
         </main>

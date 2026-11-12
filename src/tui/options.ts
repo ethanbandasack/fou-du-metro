@@ -11,6 +11,8 @@ export interface TuiOptions {
   color: boolean;
   /** Exact names only. */
   hardcore: boolean;
+  /** Also play stations not open yet. */
+  future: boolean;
   help: boolean;
 }
 
@@ -19,6 +21,7 @@ export const USAGE = `Usage: npm run tui -- [options]
   --modes <liste>   modes à jouer : metro, rer, transilien, train, tramway, val, cable, ou all (défaut : metro)
   --lines <liste>   lignes à jouer, ex. 1,4,14 (défaut : toutes celles des modes)
   --group <nom>     regroupement initial : global, ligne, arrondissement, ville (défaut : ligne)
+  --future          inclure les lignes et prolongements pas encore ouverts
   --hardcore        noms exacts uniquement (casse, espaces et ponctuation ignorés)
   --no-color        sans couleurs (aussi avec NO_COLOR)
   -h, --help        cette aide`;
@@ -46,6 +49,7 @@ export function parseOptions(argv: string[], env: Record<string, string | undefi
       group: { type: "string" },
       "no-color": { type: "boolean" },
       hardcore: { type: "boolean" },
+      future: { type: "boolean" },
       help: { type: "boolean", short: "h" },
     },
   });
@@ -63,6 +67,7 @@ export function parseOptions(argv: string[], env: Record<string, string | undefi
     grouping,
     color: !values["no-color"] && !env.NO_COLOR,
     hardcore: values.hardcore ?? false,
+    future: values.future ?? false,
     help: values.help ?? false,
   };
 }

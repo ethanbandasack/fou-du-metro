@@ -5,6 +5,8 @@ export interface QuizSettings {
   showMap: boolean;
   /** Draw stations not found yet as gray dots on the map. */
   showUnfoundOnMap: boolean;
+  /** Also play stations of lines and extensions not open yet. */
+  includeFuture: boolean;
 }
 
 export const SETTINGS_STORAGE_KEY = "metro-quiz-settings";
@@ -15,6 +17,7 @@ export const DEFAULT_SETTINGS: QuizSettings = {
   showConnections: true,
   showMap: false,
   showUnfoundOnMap: true,
+  includeFuture: false,
 };
 
 const isStringList = (value: unknown): value is string[] =>
@@ -29,7 +32,7 @@ export function parseStoredSettings(raw: string | null): QuizSettings {
     // Corrupt value: use the defaults.
   }
   const list = (key: "selectedModes" | "selectedLines") => (isStringList(data[key]) ? data[key] : DEFAULT_SETTINGS[key]);
-  const flag = (key: "showConnections" | "showMap" | "showUnfoundOnMap") =>
+  const flag = (key: "showConnections" | "showMap" | "showUnfoundOnMap" | "includeFuture") =>
     typeof data[key] === "boolean" ? data[key] : DEFAULT_SETTINGS[key];
   return {
     selectedModes: list("selectedModes"),
@@ -37,5 +40,6 @@ export function parseStoredSettings(raw: string | null): QuizSettings {
     showConnections: flag("showConnections"),
     showMap: flag("showMap"),
     showUnfoundOnMap: flag("showUnfoundOnMap"),
+    includeFuture: flag("includeFuture"),
   };
 }
