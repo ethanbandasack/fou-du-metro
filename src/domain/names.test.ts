@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createAliasMatcher, normalizeName } from "@/domain/names";
+import { createAliasMatcher, normalizeName, simplifyName } from "@/domain/names";
 
 describe("normalizeName", () => {
   it("ignores case, accents, spaces and punctuation", () => {
@@ -15,6 +15,12 @@ describe("normalizeName", () => {
 
   it("returns an empty string for empty input", () => {
     expect(normalizeName("")).toBe("");
+  });
+});
+
+describe("simplifyName", () => {
+  it("folds case, accents and punctuation but keeps 'Gare de'", () => {
+    expect(simplifyName("Gare de l'Est")).toBe("garedelest");
   });
 });
 
