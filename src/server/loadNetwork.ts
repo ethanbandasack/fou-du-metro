@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "js-yaml";
-import { parseStationsCsv } from "@/domain/csv";
+import { parseStationsCsv, type StopRow } from "@/domain/csv";
 import { MODES, normalizeLineId, type Mode } from "@/domain/lines";
 import type { AliasPair } from "@/domain/names";
 import { buildNetwork, type LineOrder, type Network } from "@/domain/network";
@@ -9,12 +9,20 @@ import { buildNetwork, type LineOrder, type Network } from "@/domain/network";
 const DEFAULT_DATA_DIR = path.join(process.cwd(), "src/data");
 
 /** Reads the raw data files (Node only: build time or CLI). */
-export function loadNetwork(dataDir: string = DEFAULT_DATA_DIR): Network {
+export function loadSources(dataDir: string = DEFAULT_DATA_DIR): {
+  rows: StopRow[];
+  lineOrders: LineOrder[];
+  aliases: AliasPair[];
+} {
   const rows = parseStationsCsv(fs.readFileSync(path.join(dataDir, "stations.csv"), "utf8"));
   const { aliases } = JSON.parse(fs.readFileSync(path.join(dataDir, "connection-aliases.json"), "utf8")) as {
     aliases: AliasPair[];
   };
-  return buildNetwork({ rows, lineOrders: loadLineOrders(path.join(dataDir, "lines")), aliases });
+  return { rows, lineOrders: loadLineOrders(path.join(dataDir, "lines")), aliases };
+}
+
+export function loadNetwork(dataDir: string = DEFAULT_DATA_DIR): Network {
+  return buildNetwork(loadSources(dataDir));
 }
 
 function loadLineOrders(linesDir: string): LineOrder[] {
