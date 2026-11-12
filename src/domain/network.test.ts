@@ -38,6 +38,14 @@ describe("buildNetwork", () => {
     ]);
   });
 
+  it("refuses a line listing a station twice, even spelled differently", () => {
+    const rows = [row("Nemours-Saint-Pierre", "R")];
+    const lineOrders = [order("R", ["Nemours - Saint-Pierre", "Nemours-Saint-Pierre"])];
+    expect(() => buildNetwork({ rows, lineOrders, corridors: [] })).toThrow(
+      "Line R lists Nemours-Saint-Pierre twice",
+    );
+  });
+
   it("keeps where each stop is", () => {
     const rows = [row("Saint-Denis - Porte de Paris", "13", { arrondissement: 93, commune: "Saint-Denis" })];
     const { lines } = buildNetwork({ rows, lineOrders: [order("13", ["Saint-Denis - Porte de Paris"])], corridors: [] });

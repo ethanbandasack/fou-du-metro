@@ -139,7 +139,10 @@ function orderLines(rows: StopRow[], lineOrders: LineOrder[], connections: Map<S
       const stops = lineOrder.stations
         .map((name) => byKey.get(normalizeName(name)))
         .filter((row): row is StopRow => row !== undefined)
-        .map((row, index) => toStop(row, index + 1, connections.get(row) ?? []));
+        .map((row, index, listed) => {
+          if (listed.indexOf(row) !== index) throw new Error(`Line ${lineOrder.lineId} lists ${row.name} twice`);
+          return toStop(row, index + 1, connections.get(row) ?? []);
+        });
       return {
         id: lineOrder.lineId,
         mode: lineOrder.mode,
