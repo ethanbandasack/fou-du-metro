@@ -129,7 +129,7 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
 
   return (
     <div className="flex flex-col md:flex-row bg-card text-foreground transition-colors duration-300 shadow-sm overflow-hidden">
-      <aside className="w-full md:w-[300px] bg-muted border-r border-border p-8 space-y-10 shrink-0 flex flex-col transition-colors duration-300">
+      <aside className="order-2 md:order-1 w-full md:w-[300px] bg-muted border-t md:border-t-0 md:border-r border-border p-5 sm:p-8 space-y-6 sm:space-y-10 shrink-0 flex flex-col transition-colors duration-300">
         <header className="border-b border-border pb-4">
           <h1 className="text-xl font-bold tracking-tight">Intersection</h1>
           <span className="text-[11px] text-foreground/50 font-medium">Entraînement / Intersection</span>
@@ -186,8 +186,8 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
-        <header className="sticky top-0 bg-card/80 backdrop-blur-md z-30 px-8 lg:px-12 py-4 lg:py-6 border-b border-border flex flex-col md:flex-row justify-between items-baseline gap-4 mb-6 transition-colors duration-300">
+      <main className="order-1 md:order-2 flex-1 min-w-0 overflow-y-auto">
+        <header className="sticky top-0 bg-card/80 backdrop-blur-md z-30 px-5 sm:px-8 lg:px-12 py-4 lg:py-6 border-b border-border flex flex-col md:flex-row justify-between items-baseline gap-4 mb-6 transition-colors duration-300">
           <div className="flex flex-wrap items-center gap-3">
             <CategoryChip category={catA} />
             {twoCategories && (
@@ -203,7 +203,7 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
           </div>
         </header>
 
-        <div className="px-8 lg:px-12 pt-0 space-y-10">
+        <div className="px-5 sm:px-8 lg:px-12 pt-0 pb-8 space-y-10">
           <section className="space-y-2 relative">
             <form onSubmit={submit} className="flex gap-2 items-end">
               <input
@@ -216,7 +216,7 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
                 disabled={revealed || isEmpty}
                 autoComplete="off"
                 spellCheck={false}
-                className={`w-full bg-transparent border-b-2 border-border py-2 text-3xl font-bold tracking-tight outline-none placeholder:text-foreground/20 transition-all font-parisine ${isEmpty ? 'opacity-20 cursor-not-allowed' : ''} ${errorShake ? 'animate-shake border-red-500' : ''}`}
+                className={`flex-1 min-w-0 w-full bg-transparent border-b-2 border-border py-2 text-2xl sm:text-3xl font-bold tracking-tight outline-none placeholder:text-foreground/20 transition-all font-parisine ${isEmpty ? 'opacity-20 cursor-not-allowed' : ''} ${errorShake ? 'animate-shake border-red-500' : ''}`}
               />
               <VoiceButton
                 supported={voice.supported}

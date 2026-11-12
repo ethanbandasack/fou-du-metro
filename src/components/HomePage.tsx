@@ -12,25 +12,25 @@ export default function HomePage({ network }: { network: Network }) {
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
       <nav className="bg-card sticky top-0 z-[70] transition-colors duration-300 shadow-sm w-full border-b border-border">
-        <div className="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-3xl grayscale">🚇</span>
-            <div className="flex flex-col -space-y-1">
-              <span className="font-black text-2xl tracking-tighter">Fou du métro</span>
-            </div>
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-[var(--nav-height)] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="hidden sm:inline text-3xl grayscale" aria-hidden>🚇</span>
+            <span className="font-black text-lg sm:text-2xl tracking-tighter whitespace-nowrap">Fou du métro</span>
           </div>
 
-          <div className="flex bg-muted rounded-lg p-1">
+          <div className="flex bg-muted rounded-lg p-1 shrink-0">
             <button 
               onClick={() => setActiveQuiz('classic')}
-              className={`flex items-center gap-2 px-6 py-2 text-[11px] font-bold transition-all rounded-md ${activeQuiz === 'classic' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}
+              aria-pressed={activeQuiz === 'classic'}
+              className={`flex items-center gap-2 px-3 sm:px-6 py-2 text-[11px] font-bold transition-all rounded-md ${activeQuiz === 'classic' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}
             >
               <LayoutGrid size={14} />
               Classique
             </button>
             <button 
               onClick={() => setActiveQuiz('intersection')}
-              className={`flex items-center gap-2 px-6 py-2 text-[11px] font-bold transition-all rounded-md ${activeQuiz === 'intersection' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}
+              aria-pressed={activeQuiz === 'intersection'}
+              className={`flex items-center gap-2 px-3 sm:px-6 py-2 text-[11px] font-bold transition-all rounded-md ${activeQuiz === 'intersection' ? 'bg-card text-foreground shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}
             >
               <Blend size={14} />
               Intersection
@@ -42,11 +42,11 @@ export default function HomePage({ network }: { network: Network }) {
       <div className="max-w-[1400px] mx-auto">
         <main className="">
           {activeQuiz === 'classic' ? (
-            <div className="py-12 px-6">
+            <div className="py-6 sm:py-12 px-4 sm:px-6">
               <QuizGame lines={network.lines} />
             </div>
           ) : (
-            <div className="py-12 px-6">
+            <div className="py-6 sm:py-12 px-4 sm:px-6">
               <IntersectionQuiz allStations={network.stations} />
             </div>
           )}
