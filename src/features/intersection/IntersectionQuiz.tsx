@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Shuffle } from 'lucide-react';
 import { LineBadge } from '@/components/LineBadge';
 import { isMetroLine } from '@/domain/lines';
-import { buildAnswerIndex, lookupAnswer } from '@/domain/matching';
+import { buildAnswerIndex, findMentionedAnswers, lookupAnswer } from '@/domain/matching';
 import type { Station } from '@/domain/network';
 import {
   buildCategories,
@@ -15,6 +15,8 @@ import {
   type Category,
   type CategoryGroup,
 } from '@/features/intersection/categories';
+import { useVoice } from '@/features/voice/useVoice';
+import { VoiceButton, VoiceStatus } from '@/features/voice/VoiceControls';
 
 interface Pick {
   group: CategoryGroup;
@@ -89,17 +91,29 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
   const shuffleAll = () =>
     setPicks([randomPick(randomItem(GROUP_IDS)!), randomPick(randomItem(GROUP_IDS)!)]);
 
+  const shake = () => {
+    setErrorShake(true);
+    setTimeout(() => setErrorShake(false), 500);
+  };
+
   const guess = (text: string) => {
     const newTarget = lookupAnswer(answerIndex, text).find(name => targets.includes(name) && !found.includes(name));
     if (newTarget) {
       setFound(prev => [...prev, newTarget]);
       setInput('');
     } else {
-      setErrorShake(true);
-      setTimeout(() => setErrorShake(false), 500);
+      shake();
     }
     inputRef.current?.focus();
   };
+
+  // Voice: every target named in what the player says is found.
+  const voice = useVoice((transcript, isFinal) => {
+    const named = findMentionedAnswers(answerIndex, transcript).filter(name => targets.includes(name));
+    const fresh = named.filter(name => !found.includes(name));
+    if (fresh.length > 0) setFound(prev => [...new Set([...prev, ...fresh])]);
+    else if (isFinal && named.length === 0) shake();
+  });
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -108,6 +122,10 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
 
   const [catA, catB] = picks.map(findCategory);
   const isEmpty = targets.length === 0;
+  const stopVoice = voice.stop;
+  useEffect(() => {
+    if (revealed || isEmpty) stopVoice();
+  }, [revealed, isEmpty, stopVoice]);
 
   return (
     <div className="flex flex-col md:flex-row bg-card text-foreground transition-colors duration-300 shadow-sm overflow-hidden">
@@ -187,7 +205,7 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
 
         <div className="px-8 lg:px-12 pt-0 space-y-10">
           <section className="space-y-2 relative">
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="flex gap-2 items-end">
               <input
                 ref={inputRef}
                 type="text"
@@ -199,6 +217,13 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
                 autoComplete="off"
                 spellCheck={false}
                 className={`w-full bg-transparent border-b-2 border-border py-2 text-3xl font-bold tracking-tight outline-none placeholder:text-foreground/20 transition-all font-parisine ${isEmpty ? 'opacity-20 cursor-not-allowed' : ''} ${errorShake ? 'animate-shake border-red-500' : ''}`}
+              />
+              <VoiceButton
+                supported={voice.supported}
+                disabled={revealed || isEmpty}
+                listening={voice.listening}
+                onToggle={voice.toggle}
+                className="h-12"
               />
               {isEmpty && (
                 <div className="absolute inset-0 flex items-center justify-start pointer-events-none">
@@ -222,8 +247,9 @@ export function IntersectionQuiz({ allStations }: { allStations: Station[] }) {
                 </div>
               )}
             </form>
+            <VoiceStatus listening={voice.listening} transcript={voice.transcript} error={voice.error} />
             <div className="flex justify-between items-center text-[10px] font-medium text-foreground/40">
-              <span>Entrée pour valider</span>
+              <span>Entrée pour valider · Alt+V pour dicter</span>
               <button onClick={() => setRevealed(true)} className="hover:text-foreground">Afficher les réponses</button>
             </div>
           </section>
