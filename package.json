@@ -1,12 +1,14 @@
 {
-  "name": "metro",
+  "name": "fou-du-metro",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck"
   },
   "dependencies": {
     "js-yaml": "^4.1.1",
