@@ -53,7 +53,8 @@ server).
 - `domain/csv.ts`: strict parser and writer for `stations.csv` (throws with a line number).
 - `domain/network.ts`: `buildNetwork`, groups rows by transfer zone, adds corridors, computes connections, orders lines.
 - `domain/matching.ts`: answer index. A guess matches a full name, or a part of a dashed or
-  parenthesised name that only one station has. Prefixes never match.
+  parenthesised name that only one station has. Prefixes never match. A hardcore index
+  (`buildAnswerIndex(answers, { hardcore: true })`) accepts the exact full name only (`exactForm`).
 - `domain/format.ts`: durations.
 - `domain/geo.ts`: projection to kilometres, map framing and zoom, line paths cut at branch jumps.
 - `features/classic`: classic quiz. `quizReducer` is the state machine
@@ -68,7 +69,8 @@ server).
 - `tui/`: `progress.ts` (found / total per group: global, line, arrondissement, commune),
   `state.ts` (input, guesses, grouping, scroll), `render.ts` (pure frame of strings),
   `options.ts` (CLI flags) and `main.ts` (raw-mode keyboard and screen IO only).
-- `hooks/useLocalStorageState.ts`: state mirrored in localStorage (scores, player, settings).
+- `hooks/useLocalStorageState.ts`: localStorage through `useSyncExternalStore`, shared by every
+  component using a key (scores, player, settings); `hooks/useHardcore.ts` is one such shared flag.
 
 ## Testing
 
