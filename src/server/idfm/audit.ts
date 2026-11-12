@@ -35,10 +35,18 @@ function nameSimilarity(local: string, official: string): number {
   return shared / Math.max(1, localWords.size);
 }
 
-/** Pairs each local row with the official stop of the same line that best fits its name and position. */
-export function matchRows(rows: StopRow[], official: OfficialStop[]): Map<StopRow, OfficialStop> {
+/**
+ * Pairs each local row with the official stop of the same line that best fits its name and position.
+ * Future rows are left out: the official data lists open stations only.
+ */
+export function matchRows(
+  rows: StopRow[],
+  official: OfficialStop[],
+  today: string = new Date().toISOString().slice(0, 10),
+): Map<StopRow, OfficialStop> {
   const matches = new Map<StopRow, OfficialStop>();
   for (const row of rows) {
+    if (row.opening && row.opening > today) continue;
     let best: OfficialStop | undefined;
     let bestScore = MIN_MATCH_SCORE;
     for (const stop of official) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { StopRow } from "@/domain/csv";
-import { auditNetwork, formatAudit } from "@/server/idfm/audit";
+import { auditNetwork, formatAudit, matchRows } from "@/server/idfm/audit";
 import type { OfficialStop } from "@/server/idfm/official";
 
 const row = (name: string, lineId: string, lat = 48.85, lon = 2.35, zone = ""): StopRow => ({
@@ -40,6 +40,12 @@ describe("auditNetwork", () => {
   it("does not expect future stations in the official open data", () => {
     const future = { ...row("Bagneux", "15"), opening: "2099-12-31" };
     expect(audit([future], []).unmatched).toEqual([]);
+  });
+
+  it("never pairs a future station with an open one nearby", () => {
+    const future = { ...row("Champarons", "T1", 48.9284, 2.2700), opening: "2099-12-31" };
+    expect(audit([future], [official("Asnières Quatre Routes", "T1", "z1", 48.9273, 2.2743)]).zones).toEqual([]);
+    expect(matchRows([future], [official("Asnières Quatre Routes", "T1", "z1", 48.9273, 2.2743)]).size).toBe(0);
   });
 
   it("reports rows whose stored zone differs from the official one", () => {
