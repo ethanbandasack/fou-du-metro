@@ -32,7 +32,7 @@ const names = (filter: (s: Station) => boolean) => stations.filter(filter).map((
 describe("buildCategories", () => {
   it("offers one category per metro line, naturally sorted, with the line colors", () => {
     expect(categories.line.map((c) => c.name)).toEqual(["Métro 1", "Métro 2", "Métro 3", "Métro 3bis", "Métro 4", "Métro 5", "Métro 6", "Métro 8", "Métro 9"]);
-    expect(byId("line-1").colors.background).toBe("#FFCE00");
+    expect(byId("line-1").colors.background).toBe("#FFBE00");
   });
 
   it("filters by line, geography and arrondissement groups", () => {

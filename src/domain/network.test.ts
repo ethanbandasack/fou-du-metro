@@ -52,7 +52,7 @@ describe("buildNetwork", () => {
       aliases: [],
     });
     expect(lines.map((l) => l.label)).toEqual(["Métro 3bis", "Métro 14", "RER A"]);
-    expect(lines[2].colors.background).toBe("#E3051C");
+    expect(lines[2].colors.background).toBe("#EB2132");
   });
 
   it("groups nearby stops with the same name into one station", () => {

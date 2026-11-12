@@ -41,10 +41,10 @@ describe("auditNetwork", () => {
 
   it("reports colors that differ from the official ones, for local lines only", () => {
     const result = audit([row("Nation", "1")], [official("Nation", "1", "z1")], [
-      { lineId: "1", colors: { background: "#FFBE00", text: "#000000" } },
+      { lineId: "1", colors: { background: "#123456", text: "#FFFFFF" } },
       { lineId: "18", colors: { background: "#00A092", text: "#FFFFFF" } },
     ] as never);
-    expect(result.colors).toEqual([{ lineId: "1", local: "#FFCE00 / #000000", official: "#FFBE00 / #000000" }]);
+    expect(result.colors).toEqual([{ lineId: "1", local: "#FFBE00 / #000000", official: "#123456 / #FFFFFF" }]);
   });
 });
 
