@@ -11,6 +11,8 @@ export interface Screen {
   total: number;
   elapsedSeconds: number;
   lastFoundNames: string[];
+  /** The microphone is on. */
+  listening: boolean;
   width: number;
   height: number;
   color: boolean;
@@ -25,6 +27,8 @@ export function visibleRows(height: number): number {
 }
 
 const fit = (text: string, width: number) => (text.length > width ? `${text.slice(0, Math.max(0, width - 1))}…` : text);
+/** The end of `text`, which matters most in a transcript. */
+const fitEnd = (text: string, width: number) => (text.length > width ? `…${text.slice(text.length - Math.max(0, width - 1))}` : text);
 
 function paint(text: string, enabled: boolean, code: string): string {
   return enabled && text ? `\x1b[${code}m${text}\x1b[0m` : text;
@@ -94,6 +98,7 @@ export function render(screen: Screen): string[] {
       ? paint(fit(` ✓ ${screen.lastFoundNames.join(", ")}`, width), color, "32")
       : "";
   const separator = paint("─".repeat(width), color, "90");
+  const heard = state.heard ? `« ${fitEnd(state.heard, Math.max(1, width - 11))} »` : "à l'écoute : citez des gares";
 
   return [
     paint(header, color, "1"),
@@ -102,6 +107,6 @@ export function render(screen: Screen): string[] {
     separator,
     feedback,
     fit(` > ${state.input}█`, width),
-    paint(fit(` ${HELP}`, width), color, "90"),
+    screen.listening ? paint(fit(` Micro ${heard}`, width), color, "36") : paint(fit(` ${HELP}`, width), color, "90"),
   ].slice(0, height);
 }

@@ -13,6 +13,8 @@ export interface TuiOptions {
   hardcore: boolean;
   /** Also play stations not open yet. */
   future: boolean;
+  /** Listen to the microphone (macOS). */
+  voice: boolean;
   help: boolean;
 }
 
@@ -23,11 +25,12 @@ export const USAGE = `Usage: npm run tui -- [options]
   --group <nom>     regroupement initial : global, ligne, arrondissement, ville (défaut : ligne)
   --future          inclure les lignes et prolongements pas encore ouverts
   --hardcore        noms exacts uniquement (casse, espaces et ponctuation ignorés)
+  --voice           dicter au micro, en direct (macOS) : chaque gare citée compte
   --no-color        sans couleurs (aussi avec NO_COLOR)
   -h, --help        cette aide
 
-Dictée : la dictée du système écrit dans le terminal (macOS : Réglages Système > Clavier > Dictée).
-Chaque gare citée dans la phrase compte ; en hardcore, les accents ne sont pas exigés à la voix.`;
+Avec --voice ou la dictée du système, chaque gare citée dans une phrase compte ; en hardcore,
+les accents ne sont pas exigés à la voix.`;
 
 const GROUPING_NAMES: Record<string, Grouping> = {
   global: "global",
@@ -53,6 +56,7 @@ export function parseOptions(argv: string[], env: Record<string, string | undefi
       "no-color": { type: "boolean" },
       hardcore: { type: "boolean" },
       future: { type: "boolean" },
+      voice: { type: "boolean" },
       help: { type: "boolean", short: "h" },
     },
   });
@@ -71,6 +75,7 @@ export function parseOptions(argv: string[], env: Record<string, string | undefi
     color: !values["no-color"] && !env.NO_COLOR,
     hardcore: values.hardcore ?? false,
     future: values.future ?? false,
+    voice: values.voice ?? false,
     help: values.help ?? false,
   };
 }

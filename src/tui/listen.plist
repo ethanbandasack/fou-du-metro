@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>fr.foudumetro.listen</string>
+  <key>CFBundleName</key>
+  <string>Fou du métro</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Dicter des noms de gares au quiz.</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>Reconnaître les noms de gares dictés au quiz.</string>
+</dict>
+</plist>

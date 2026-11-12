@@ -10,6 +10,7 @@ describe("parseOptions", () => {
       color: true,
       hardcore: false,
       future: false,
+      voice: false,
       help: false,
     });
   });
@@ -21,6 +22,10 @@ describe("parseOptions", () => {
 
   it("plays the whole network with --modes all", () => {
     expect(parseOptions(["--modes", "all"], {}).modes).toEqual([]);
+  });
+
+  it("listens to the microphone with --voice", () => {
+    expect(parseOptions(["--voice"], {}).voice).toBe(true);
   });
 
   it("turns on the hardcore mode", () => {

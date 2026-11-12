@@ -15,6 +15,7 @@ import { parseOptions, USAGE, type TuiOptions } from "@/tui/options";
 import { progressBy } from "@/tui/progress";
 import { render, visibleRows } from "@/tui/render";
 import { initialTuiState, tuiReducer, type TuiAction } from "@/tui/state";
+import { startListening } from "@/tui/voice";
 
 const ENTER_ALT_SCREEN = "\x1b[?1049h\x1b[?25l";
 const LEAVE_ALT_SCREEN = "\x1b[?25h\x1b[?1049l";
@@ -63,6 +64,7 @@ function main() {
   const startedAt = Date.now();
   const out = process.stdout;
   let state = initialTuiState(options.grouping);
+  let listening = false;
 
   const size = () => ({ width: out.columns ?? 80, height: out.rows ?? 24 });
   const elapsed = () => Math.floor((Date.now() - startedAt) / 1000);
@@ -77,15 +79,33 @@ function main() {
       total: answers.length,
       elapsedSeconds: elapsed(),
       lastFoundNames: state.lastFound.map((key) => names.get(key) ?? key),
+      listening,
       ...size(),
       color: options.color,
     });
     out.write("\x1b[H" + frame.map((line) => line + "\x1b[K").join("\n") + "\x1b[J");
   };
 
+  // Compiles the listener on first use, before the screen is taken over.
+  let stopListening = () => {};
+  if (options.voice) {
+    try {
+      stopListening = startListening([...new Set(answers.flatMap((answer) => answer.names))], (event) => {
+        if (event.type === "heard") return dispatch({ type: "hear", transcript: event.transcript });
+        listening = event.type === "ready";
+        if (event.type === "error") return dispatch({ type: "notice", text: `Micro : ${event.message}` });
+        draw();
+      });
+    } catch (error) {
+      console.error((error as Error).message);
+      process.exit(1);
+    }
+  }
+
   const timer = setInterval(draw, 1000);
   const quit = () => {
     clearInterval(timer);
+    stopListening();
     process.stdin.setRawMode(false);
     out.write(LEAVE_ALT_SCREEN);
     const done = state.found.length === answers.length ? "Bravo ! " : "";
@@ -106,6 +126,7 @@ function main() {
   out.write(ENTER_ALT_SCREEN);
   out.on("resize", draw);
   process.on("uncaughtException", (error) => {
+    stopListening();
     out.write(LEAVE_ALT_SCREEN);
     console.error(error);
     process.exit(1);

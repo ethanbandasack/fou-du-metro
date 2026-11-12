@@ -12,6 +12,8 @@ export interface TuiState {
   scroll: number;
   /** Message about the last submitted guess. */
   feedback: string;
+  /** What the microphone heard last. */
+  heard: string;
 }
 
 /** Typed input must be a name; spoken input (dictation) may name stations among other words. */
@@ -23,6 +25,9 @@ export interface TuiIndexes {
 export type TuiAction =
   | { type: "type"; text: string }
   | { type: "say"; text: string }
+  /** The microphone's transcript so far, which grows until the recognizer starts a new one. */
+  | { type: "hear"; transcript: string }
+  | { type: "notice"; text: string }
   | { type: "backspace" }
   | { type: "clear" }
   | { type: "submit" }
@@ -30,7 +35,7 @@ export type TuiAction =
   | { type: "scroll"; delta: number; max: number };
 
 export function initialTuiState(grouping: Grouping): TuiState {
-  return { input: "", found: [], lastFound: [], grouping, scroll: 0, feedback: "" };
+  return { input: "", found: [], lastFound: [], grouping, scroll: 0, feedback: "", heard: "" };
 }
 
 const record = (state: TuiState, fresh: string[]): TuiState => ({
@@ -62,6 +67,13 @@ export function tuiReducer(state: TuiState, action: TuiAction, indexes: TuiIndex
       return guess(state, state.input + action.text, indexes.typed);
     case "say":
       return hear(state, state.input + action.text, indexes.spoken);
+    case "hear": {
+      const fresh = findMentionedAnswers(indexes.spoken, action.transcript).filter((key) => !state.found.includes(key));
+      const heard = { ...state, heard: action.transcript };
+      return fresh.length === 0 ? heard : { ...heard, found: [...state.found, ...fresh], lastFound: fresh, feedback: "" };
+    }
+    case "notice":
+      return { ...state, feedback: action.text };
     case "backspace":
       return { ...state, input: state.input.slice(0, -1) };
     case "clear":
