@@ -3,14 +3,14 @@ mode: TRAIN
 stations:
 - Gare d'Austerlitz
 - Dourdan
-- Étampes
-- Guillerval
-- Monnerville
-- Angerville
 - Auneau
 - Voves
 - Bonneval
 - Châteaudun
+- Étampes
+- Guillerval
+- Monnerville
+- Angerville
 - Gare Montparnasse
 - Versailles Chantiers
 - Saint-Quentin en Yvelines - Montigny-le-Bretonneux
@@ -19,10 +19,9 @@ stations:
 - Épernon
 - Maintenon
 - Saint-Piat
-- La Villette Saint-Prest
 - Jouy
+- La Villette Saint-Prest
 - Chartres
 - Paris-Bercy Bourgogne - Pays d'Auvergne
-- Montargis
-- Nemours - Saint-Pierre
 - Nemours-Saint-Pierre
+- Montargis

@@ -10,7 +10,7 @@ describe("loadNetwork (real data)", () => {
 
   it("loads every line and stop, one station per official transfer zone", () => {
     expect(network.lines).toHaveLength(58);
-    expect(network.lines.flatMap((l) => l.stops)).toHaveLength(1422);
+    expect(network.lines.flatMap((l) => l.stops)).toHaveLength(1421);
     // 999 official zones (open network) + 78 stations of lines under construction
     expect(network.stations).toHaveLength(1077);
   });
