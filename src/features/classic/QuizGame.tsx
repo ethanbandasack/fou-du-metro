@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Settings, Play, Pause, RotateCcw, Trophy, Eye, EyeOff, Search, LogIn, LogOut, Map as MapIcon, User as UserIcon } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, LogIn, LogOut, Map as MapIcon, Settings, Trophy, User as UserIcon } from 'lucide-react';
+import { ToolbarButton } from '@/components/ToolbarButton';
 import { formatDuration } from '@/domain/format';
 import { buildAnswerIndex, findMentionedAnswers, lookupAnswer } from '@/domain/matching';
 import type { Line } from '@/domain/network';
@@ -10,19 +11,14 @@ import { useAuth } from '@/features/auth/useAuth';
 import { LineFilter } from '@/features/classic/LineFilter';
 import QuizTable from '@/features/classic/QuizTable';
 import { initialQuizState, quizReducer } from '@/features/classic/quizReducer';
+import { PlayBar } from '@/features/classic/PlayBar';
 import { ScoresPanel } from '@/features/classic/ScoresPanel';
 import { addScore, createScore, parseStoredScores, SCORES_STORAGE_KEY, type QuizScore } from '@/features/classic/scores';
 import { answersOf, selectLines } from '@/domain/selection';
 import { DEFAULT_SETTINGS, parseStoredSettings, SETTINGS_STORAGE_KEY, type QuizSettings } from '@/features/classic/settings';
 import { StationMap } from '@/features/map/StationMap';
 import { useVoice } from '@/features/voice/useVoice';
-import { VoiceButton, VoiceStatus } from '@/features/voice/VoiceControls';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
-
-const toolbarButton = (active: boolean) =>
-  `flex items-center gap-2 px-4 py-2 border border-border text-[11px] font-bold transition-all ${
-    active ? 'bg-accent text-accent-foreground' : 'bg-card text-foreground hover:bg-accent hover:text-accent-foreground'
-  }`;
 
 export function QuizGame({ lines }: { lines: Line[] }) {
   const { player, loading: authLoading, login, logout } = useAuth();
@@ -47,9 +43,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
   const namesByKey = useMemo(() => new Map(answers.map(a => [a.key, a.names[0]])), [answers]);
 
   const [quiz, dispatch] = useReducer(quizReducer, answers.length, initialQuizState);
-  const isPlaying = quiz.status === 'running' || quiz.status === 'paused';
   const isComplete = quiz.total > 0 && quiz.found.length === quiz.total;
-  const progress = quiz.total > 0 ? (quiz.found.length / quiz.total) * 100 : 0;
   const foundSet = useMemo(() => new Set(quiz.found), [quiz.found]);
 
   // A new selection starts a new game.
@@ -124,144 +118,46 @@ export function QuizGame({ lines }: { lines: Line[] }) {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div ref={headerRef} className="sticky top-[var(--nav-height)] bg-card z-50 shadow-sm mb-6 transition-colors duration-300">
-        <div className="p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="flex items-center gap-4 p-4 bg-muted">
-              <div className="text-2xl font-mono font-bold text-foreground min-w-[80px]">
-                {formatDuration(quiz.elapsedSeconds)}
-              </div>
-              {quiz.status === 'paused' && (
-                <div className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">En pause</div>
-              )}
-            </div>
-
-            <div className="flex gap-2 flex-wrap">
-              {authLoading ? null : player ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-foreground/60 flex items-center gap-1">
-                    <UserIcon size={16} />
-                    {player.username}
-                  </span>
-                  <button onClick={logout} className={toolbarButton(false)}>
-                    <LogOut size={14} />
-                    Déconnexion
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => setShowLogin(true)} className={toolbarButton(false)}>
-                  <LogIn size={16} />
-                  Connexion
-                </button>
-              )}
-
-              <button onClick={() => setShowSettings(!showSettings)} className={toolbarButton(showSettings)}>
-                <Settings size={16} />
-                Paramètres
-              </button>
-
-              <button onClick={() => setShowScores(!showScores)} className={toolbarButton(showScores)}>
-                <Trophy size={16} />
-                Scores
-              </button>
-
-              <button
-                onClick={() => updateSettings({ showConnections: !settings.showConnections })}
-                className={toolbarButton(settings.showConnections)}
-              >
-                {settings.showConnections ? <Eye size={16} /> : <EyeOff size={16} />}
-                {settings.showConnections ? 'Masquer' : 'Afficher'} corresp.
-              </button>
-
-              <button onClick={() => updateSettings({ showMap: !settings.showMap })} className={toolbarButton(settings.showMap)}>
-                <MapIcon size={16} />
-                {settings.showMap ? 'Masquer la carte' : 'Carte'}
-              </button>
-
-              {isPlaying ? (
-                <>
-                  <button onClick={() => dispatch({ type: 'togglePause' })} className={toolbarButton(false)}>
-                    <Pause size={16} />
-                    {quiz.status === 'paused' ? 'Reprendre' : 'Pause'}
-                  </button>
-                  <button onClick={() => dispatch({ type: 'stop' })} className={toolbarButton(true)}>
-                    <RotateCcw size={16} />
-                    Terminer
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => dispatch({ type: 'start' })}
-                  disabled={quiz.total === 0}
-                  className={`${toolbarButton(true)} uppercase tracking-wide disabled:opacity-40`}
-                >
-                  <Play size={16} />
-                  Lancer le quiz
-                </button>
-              )}
-
-              <button onClick={() => setShowAllAnswers(!showAllAnswers)} className={toolbarButton(showAllAnswers)}>
-                {showAllAnswers ? <EyeOff size={16} /> : <Eye size={16} />}
-                {showAllAnswers ? 'Masquer les solutions' : 'Afficher les solutions'}
-              </button>
-            </div>
-          </div>
-
-          {isPlaying && (
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-foreground/40" />
-                  </div>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => handleInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Escape' && setInput('')}
-                    placeholder="Tapez le nom d'une gare..."
-                    disabled={quiz.status === 'paused'}
-                    autoComplete="off"
-                    spellCheck={false}
-                    className="block w-full px-10 py-4 border border-border bg-card text-foreground placeholder-gray-400 focus:outline-none focus:bg-accent focus:text-accent-foreground text-xl font-black tracking-tight font-parisine transition-colors"
-                  />
-                  {quiz.lastFound.length > 0 && (
-                    <div key={quiz.found.length} className="absolute right-3 top-1/2 -translate-y-1/2 bg-green-600 text-white px-2 py-1 text-sm font-bold">
-                      ✓ {quiz.lastFound.map(key => namesByKey.get(key)).join(', ')}
-                    </div>
-                  )}
-                </div>
-                <VoiceButton
-                  supported={voice.supported}
-                  disabled={quiz.status !== 'running'}
-                  listening={voice.listening}
-                  onToggle={voice.toggle}
-                />
-              </div>
-              <VoiceStatus listening={voice.listening} transcript={voice.transcript} error={voice.error} />
-            </div>
-          )}
-
-          {quiz.total > 0 && (
-            <div className="pt-4 border-t border-border">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] font-black text-foreground/40 tracking-wider">Progression globale</span>
-                <span className="text-[10px] font-black text-foreground/60">
-                  {quiz.found.length} / {quiz.total} gares ({Math.round(progress)}%)
-                </span>
-              </div>
-              <div className="w-full bg-muted h-2">
-                <div className="bg-accent h-2 transition-all duration-300" style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-          )}
-        </div>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        {authLoading ? null : player ? (
+          <>
+            <span className="h-10 flex items-center gap-1 px-2 text-sm text-foreground/60">
+              <UserIcon size={16} aria-hidden />
+              {player.username}
+            </span>
+            <ToolbarButton icon={LogOut} label="Déconnexion" onClick={logout} />
+          </>
+        ) : (
+          <ToolbarButton icon={LogIn} label="Connexion" onClick={() => setShowLogin(true)} />
+        )}
+        <ToolbarButton icon={Settings} label="Paramètres" active={showSettings} onClick={() => setShowSettings(!showSettings)} />
+        <ToolbarButton icon={Trophy} label="Scores" active={showScores} onClick={() => setShowScores(!showScores)} />
+        <ToolbarButton
+          icon={settings.showConnections ? Eye : EyeOff}
+          label="Correspondances"
+          active={settings.showConnections}
+          onClick={() => updateSettings({ showConnections: !settings.showConnections })}
+        />
+        <ToolbarButton icon={MapIcon} label="Carte" active={settings.showMap} onClick={() => updateSettings({ showMap: !settings.showMap })} />
+        <ToolbarButton icon={BookOpen} label="Solutions" active={showAllAnswers} onClick={() => setShowAllAnswers(!showAllAnswers)} />
       </div>
+
+      <PlayBar
+        ref={headerRef}
+        quiz={quiz}
+        input={input}
+        inputRef={inputRef}
+        lastFoundNames={quiz.lastFound.map(key => namesByKey.get(key) ?? key)}
+        voice={voice}
+        onInput={handleInput}
+        onStart={() => dispatch({ type: 'start' })}
+        onTogglePause={() => dispatch({ type: 'togglePause' })}
+        onStop={() => dispatch({ type: 'stop' })}
+      />
 
       {showLogin && <LoginModal onLogin={login} onClose={() => setShowLogin(false)} />}
 
-      <div className="px-6 space-y-6">
+      <div className="pt-6 space-y-6">
         {showSettings && (
           <LineFilter
             lines={lines}
