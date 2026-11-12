@@ -37,10 +37,11 @@ npm run tui -- --voice                        # dictate live (macOS)
 npm run tui -- --help
 ```
 
-Type station names; only the number found is shown, globally or per line, arrondissement or city
-(`Tab` to switch, arrows to scroll, `Ctrl+C` to quit). Each bar lights up found stations at their
-position along the line, branches one after the other. With `--voice` (macOS), the microphone is
-transcribed live by Apple's speech recognition and every station named counts as soon as it is heard.
+Type station names; only the number found is shown, globally or per line, arrondissement, city or first
+letter (`Tab` to switch, arrows to scroll, `Ctrl+C` to quit). Each bar lights up found stations at their
+position along the line, branches one after the other (alphabetically for a letter). With `--voice`
+(macOS), the microphone is transcribed live by Apple's speech recognition and every station named counts as
+soon as it is heard.
 The first run compiles a small helper (Xcode command line tools: `xcode-select --install`) and macOS asks
 your terminal app for microphone and speech recognition access. The system dictation also works, but it
 types only once you stop talking, and its text is matched like typing (exact spelling).
