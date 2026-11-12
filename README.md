@@ -12,7 +12,8 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
   name (accents, case and dashes don't matter) or an unambiguous part of it (`Étoile` for
   `Charles de Gaulle - Étoile`).
 - **Hardcore** (both modes): only the exact name counts. Case, spaces and punctuation are ignored, but
-  accents, every word and "Gare de" are required (`Charles de Gaulle Étoile`, not `Étoile`).
+  accents, every word and "Gare de" are required (`Charles de Gaulle Étoile`, not `Étoile`). Spoken, the
+  accents are forgiven: the speech recognizer spells the name, not you.
 - **Lignes futures** (classic mode): add the lines and extensions under construction (lines 15 to 18,
   tram extensions...), off by default. Stations appear by themselves once their opening date has passed.
 - **Intersection**: find the metro stations matching one or two categories (line, line group, Paris or
@@ -34,7 +35,8 @@ npm run tui -- --help
 
 Type station names; only the number found is shown, globally or per line, arrondissement or city
 (`Tab` to switch, arrows to scroll, `Ctrl+C` to quit). Each bar lights up found stations at their
-position along the line, branches one after the other.
+position along the line, branches one after the other. To play by voice, use the system dictation
+(macOS: System Settings > Keyboard > Dictation): every station named in a sentence counts.
 
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 
