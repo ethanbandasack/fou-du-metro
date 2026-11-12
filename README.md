@@ -18,6 +18,17 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
 - **Dictée**: click the microphone or press `Alt+V` (`Option+V` on a Mac) and say station names, several
   per sentence if you like. Works in browsers with speech recognition (Chrome, Edge, Safari).
 
+### Terminal version
+
+```bash
+npm run tui                                   # metro, progress per line
+npm run tui -- --modes metro,rer --group ville
+npm run tui -- --help
+```
+
+Type station names; only the number found is shown, globally or per line, arrondissement or city
+(`Tab` to switch, arrows to scroll, `Ctrl+C` to quit).
+
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 
 ## Getting started
@@ -35,6 +46,8 @@ npm run dev
 | `npm test` | unit tests |
 | `npm run check` | lint, typecheck and tests |
 | `npm run build` | production build |
+| `npm run tui` | terminal version |
+| `npm run data:communes` | fill the `commune` column of `stations.csv` |
 
 ## Documentation
 

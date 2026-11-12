@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { Line, Stop } from "@/domain/network";
-import { answersOf, selectLines } from "@/features/classic/selection";
+import { answersOf, selectLines } from "@/domain/selection";
 
 const stop = (name: string, key = name.toLowerCase()): Stop => ({
-  id: name, key, name, lineId: "", mode: "METRO", order: 1, lat: 0, lon: 0, arrondissement: 1, connections: [],
+  id: name, key, name, lineId: "", mode: "METRO", order: 1, lat: 0, lon: 0, arrondissement: 1, commune: "Paris", connections: [],
 });
 const line = (id: string, mode: Line["mode"], stops: Stop[] = []): Line => ({
   id, mode, label: id, colors: { background: "", text: "" }, stops,

@@ -15,9 +15,12 @@ src/
   components/ UI shared by several features
   hooks/      generic React hooks
   app/        Next.js routes, kept thin
+  tui/        terminal version (Node only, no dependency)
+scripts/      data maintenance (add-communes.ts)
 ```
 
-Dependencies point inwards: `app -> features -> domain`, `server -> domain`.
+Dependencies point inwards: `app -> features -> domain`, `server -> domain`,
+`tui -> server, domain`.
 `domain` never imports from another layer.
 
 ## Data flow
@@ -60,6 +63,10 @@ server).
   `useVoice` + `VoiceControls` plug it into a quiz. `findMentionedAnswers` (matching) extracts every
   station named in a transcript.
 - `features/auth`: optional login by code (`/api/auth`, users in the untracked `src/data/users.json`).
+- `domain/selection.ts`: lines in play for a mode/line selection, and their answers (one per key).
+- `tui/`: `progress.ts` (found / total per group: global, line, arrondissement, commune),
+  `state.ts` (input, guesses, grouping, scroll), `render.ts` (pure frame of strings),
+  `options.ts` (CLI flags) and `main.ts` (raw-mode keyboard and screen IO only).
 - `hooks/useLocalStorageState.ts`: state mirrored in localStorage (scores, player, settings).
 
 ## Testing

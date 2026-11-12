@@ -17,6 +17,7 @@ function row(name: string, lineId: string, overrides: Partial<StopRow> = {}): St
     leftBank: false,
     hasRer: false,
     hasTram: false,
+    commune: "Paris",
     ...overrides,
   };
 }
@@ -35,6 +36,12 @@ describe("buildNetwork", () => {
       ["A", 1],
       ["B", 2],
     ]);
+  });
+
+  it("keeps where each stop is", () => {
+    const rows = [row("Saint-Denis - Porte de Paris", "13", { arrondissement: 93, commune: "Saint-Denis" })];
+    const { lines } = buildNetwork({ rows, lineOrders: [order("13", ["Saint-Denis - Porte de Paris"])], aliases: [] });
+    expect(lines[0].stops[0]).toMatchObject({ arrondissement: 93, commune: "Saint-Denis" });
   });
 
   it("gives each line its label and colors, sorted by mode then id", () => {

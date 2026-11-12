@@ -17,6 +17,8 @@ export interface StopRow {
   leftBank: boolean;
   hasRer: boolean;
   hasTram: boolean;
+  /** Commune ("Paris" for the 20 arrondissements). */
+  commune: string;
 }
 
 const COLUMNS = [
@@ -33,6 +35,7 @@ const COLUMNS = [
   "rive_gauche",
   "has_rer",
   "has_tram",
+  "commune",
 ] as const;
 
 /** Parses `stations.csv` (comma separated, no quoting). Throws on malformed input. */
@@ -51,7 +54,10 @@ function parseRow(line: string, lineNumber: number): StopRow {
   const fields = line.split(",");
   if (fields.length !== COLUMNS.length) fail(`expected ${COLUMNS.length} fields, got ${fields.length}`);
 
-  const [name, line_, mode, order, lat, lon, arrondissement, ...flags] = fields;
+  const [name, line_, mode, order, lat, lon, arrondissement, ...rest] = fields;
+  const flags = rest.slice(0, 6);
+  const commune = rest[6].trim();
+  if (!commune) fail(`"commune" is empty`);
   if (!MODES.includes(mode as Mode)) fail(`unknown mode "${mode}"`);
   const number = (value: string, column: string) => {
     const parsed = Number(value);
@@ -73,5 +79,6 @@ function parseRow(line: string, lineNumber: number): StopRow {
     leftBank,
     hasRer,
     hasTram,
+    commune,
   };
 }

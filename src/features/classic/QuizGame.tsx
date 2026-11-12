@@ -12,7 +12,7 @@ import QuizTable from '@/features/classic/QuizTable';
 import { initialQuizState, quizReducer } from '@/features/classic/quizReducer';
 import { ScoresPanel } from '@/features/classic/ScoresPanel';
 import { addScore, createScore, parseStoredScores, SCORES_STORAGE_KEY, type QuizScore } from '@/features/classic/scores';
-import { answersOf, selectLines } from '@/features/classic/selection';
+import { answersOf, selectLines } from '@/domain/selection';
 import { DEFAULT_SETTINGS, parseStoredSettings, SETTINGS_STORAGE_KEY, type QuizSettings } from '@/features/classic/settings';
 import { StationMap } from '@/features/map/StationMap';
 import { useVoice } from '@/features/voice/useVoice';

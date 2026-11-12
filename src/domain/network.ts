@@ -15,6 +15,7 @@ export interface Stop {
   lat: number;
   lon: number;
   arrondissement: number;
+  commune: string;
   /** Other lines reachable at this interchange. */
   connections: string[];
 }
@@ -131,6 +132,7 @@ function toStop(row: StopRow, order: number, connections: string[]): Stop {
     lat: row.lat,
     lon: row.lon,
     arrondissement: row.arrondissement,
+    commune: row.commune,
     connections,
   };
 }
