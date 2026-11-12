@@ -22,7 +22,7 @@ export const USAGE = `Usage: npm run tui -- [options]
 
   --modes <liste>   modes à jouer : metro, rer, transilien, train, tramway, val, cable, ou all (défaut : metro)
   --lines <liste>   lignes à jouer, ex. 1,4,14 (défaut : toutes celles des modes)
-  --group <nom>     regroupement initial : global, ligne, arrondissement, ville (défaut : ligne)
+  --group <nom>     regroupement initial : global, ligne, arrondissement, ville, lettre (défaut : ligne)
   --future          inclure les lignes et prolongements pas encore ouverts
   --hardcore        noms exacts uniquement (casse, espaces et ponctuation ignorés)
   --voice           dicter au micro, en direct (macOS) : chaque gare citée compte
@@ -41,6 +41,9 @@ const GROUPING_NAMES: Record<string, Grouping> = {
   ville: "commune",
   city: "commune",
   commune: "commune",
+  lettre: "letter",
+  letter: "letter",
+  initiale: "letter",
 };
 
 const list = (value: string | undefined) =>

@@ -1,19 +1,24 @@
+import { simplifyName } from "@/domain/names";
 import type { Line, Stop } from "@/domain/network";
 
-export type Grouping = "global" | "line" | "arrondissement" | "commune";
+export type Grouping = "global" | "line" | "arrondissement" | "commune" | "letter";
 
-export const GROUPINGS: readonly Grouping[] = ["global", "line", "arrondissement", "commune"];
+export const GROUPINGS: readonly Grouping[] = ["global", "line", "arrondissement", "commune", "letter"];
 
 export const GROUPING_LABELS: Record<Grouping, string> = {
   global: "Global",
   line: "Ligne",
   arrondissement: "Arrondissement",
   commune: "Ville",
+  letter: "Lettre",
 };
 
 export interface GroupProgress {
   label: string;
-  /** Whether each distinct station is found, along the lines in play (branches one after the other). */
+  /**
+   * Whether each distinct station is found, along the lines in play (branches one after the other),
+   * or alphabetically when grouping by first letter.
+   */
   stations: boolean[];
   /** Line color, when grouping by line. */
   color?: string;
@@ -36,7 +41,7 @@ function arrondissementGroup(stop: Stop): Pick<Group, "label" | "order"> {
   return { label: `Hors Paris (${stop.arrondissement})`, order: 100 + stop.arrondissement };
 }
 
-/** Distinct stations found or not, overall or per line, arrondissement or commune. */
+/** Distinct stations found or not, overall or per line, arrondissement, commune or first letter. */
 export function progressBy(lines: Line[], found: ReadonlySet<string>, grouping: Grouping): GroupProgress[] {
   const groups = new Map<string, Group>();
   const add = (id: string, group: Omit<Group, "keys">, key: string) => {
@@ -45,17 +50,22 @@ export function progressBy(lines: Line[], found: ReadonlySet<string>, grouping: 
     groups.set(id, existing);
   };
 
-  lines.forEach((line, lineIndex) => {
-    for (const stop of line.stops) {
-      if (grouping === "global") add("total", { label: "Total", order: 0 }, stop.key);
-      if (grouping === "line") add(line.id, { label: line.label, order: lineIndex, color: line.colors.background }, stop.key);
-      if (grouping === "arrondissement") {
-        const group = arrondissementGroup(stop);
-        add(group.label, group, stop.key);
-      }
-      if (grouping === "commune") add(stop.commune, { label: stop.commune, order: stop.commune }, stop.key);
+  const stops = lines.flatMap((line, lineIndex) => line.stops.map((stop) => ({ line, lineIndex, stop })));
+  if (grouping === "letter") stops.sort((a, b) => a.stop.name.localeCompare(b.stop.name, "fr"));
+
+  for (const { line, lineIndex, stop } of stops) {
+    if (grouping === "global") add("total", { label: "Total", order: 0 }, stop.key);
+    if (grouping === "line") add(line.id, { label: line.label, order: lineIndex, color: line.colors.background }, stop.key);
+    if (grouping === "arrondissement") {
+      const group = arrondissementGroup(stop);
+      add(group.label, group, stop.key);
     }
-  });
+    if (grouping === "commune") add(stop.commune, { label: stop.commune, order: stop.commune }, stop.key);
+    if (grouping === "letter") {
+      const letter = simplifyName(stop.name).charAt(0).toUpperCase();
+      add(letter, { label: letter, order: letter }, stop.key);
+    }
+  }
 
   return [...groups.values()]
     .sort((a, b) =>

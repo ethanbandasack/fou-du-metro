@@ -20,6 +20,10 @@ describe("parseOptions", () => {
     expect(options).toMatchObject({ modes: ["METRO", "RER"], lines: ["1", "3bis", "A"], grouping: "commune" });
   });
 
+  it("groups by first letter with --group lettre", () => {
+    expect(parseOptions(["--group", "lettre"], {}).grouping).toBe("letter");
+  });
+
   it("plays the whole network with --modes all", () => {
     expect(parseOptions(["--modes", "all"], {}).modes).toEqual([]);
   });
