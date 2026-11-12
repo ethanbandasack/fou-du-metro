@@ -23,6 +23,7 @@ Comma separated, no quoting, header required:
 | `rive_gauche` | `1` if on the left bank |
 | `commune` | commune of the station (`Paris` for arrondissements 1-20) |
 | `zone` | official IDFM transfer zone id (`id_ref_zdc`); empty when IDFM has no such station on that line |
+| `opening` | `YYYY-MM-DD` opening date of a station not open yet (official or estimated); empty when open |
 
 `commune` is filled by `npm run data:communes` (`scripts/add-communes.ts`), which looks up the
 coordinates of non-Paris rows on [geo.api.gouv.fr](https://geo.api.gouv.fr). Run it after adding rows
@@ -49,8 +50,11 @@ ignored). Branching lines list their branches one after the other.
 ## Stations and connections
 
 Rows sharing a `zone` form one station: its names are the rows' names, its lines the rows' lines, and
-each stop lists the other lines of the zone as connections. Rows without a zone join a row of the same
-name less than 0.01° away (~1 km).
+each stop lists the other lines of the zone as connections. Rows without a zone (future stations) join
+a station with the same name less than 0.01° away (~1 km).
+
+Stations with a future `opening` are hidden unless the player turns on "Lignes futures" (classic quiz)
+or passes `--future` (terminal); the intersection quiz plays the open network only.
 
 ## `corridors.json`
 
