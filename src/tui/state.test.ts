@@ -62,6 +62,23 @@ describe("tuiReducer", () => {
     expect(run([said("la gaite")], undefined, true).found).toEqual(["gaite"]);
   });
 
+  it("finds stations heard among other words, leaving the typed input alone", () => {
+    const state = run([...typed("bas"), { type: "hear", transcript: "euh Nation" }]);
+    expect(state).toMatchObject({ input: "bas", heard: "euh Nation", found: ["nation"], lastFound: ["nation"] });
+  });
+
+  it("counts a station once while the transcript grows", () => {
+    const state = run([
+      { type: "hear", transcript: "Nation" },
+      { type: "hear", transcript: "Nation et Bastille" },
+    ]);
+    expect(state).toMatchObject({ found: ["nation", "bastille"], lastFound: ["bastille"] });
+  });
+
+  it("shows a notice", () => {
+    expect(run([{ type: "notice", text: "Micro refusé" }]).feedback).toBe("Micro refusé");
+  });
+
   it("cycles through groupings and resets the scroll", () => {
     const state = run([{ type: "scroll", delta: 5, max: 10 }, { type: "nextGrouping" }]);
     expect(state).toMatchObject({ grouping: "arrondissement", scroll: 0 });

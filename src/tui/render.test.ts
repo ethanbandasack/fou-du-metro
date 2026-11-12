@@ -16,6 +16,7 @@ const screen = (overrides: Partial<Screen> = {}): Screen => ({
   total: 321,
   elapsedSeconds: 75,
   lastFoundNames: ["Nation"],
+  listening: false,
   width: 60,
   height: 12,
   color: false,
@@ -53,6 +54,14 @@ describe("render", () => {
     const lines = render(screen());
     expect(lines).toContain(" ✓ Nation");
     expect(lines.some((line) => line.startsWith(" > bas"))).toBe(true);
+  });
+
+  it("shows the microphone and the end of what it hears", () => {
+    expect(render(screen({ listening: true })).at(-1)).toBe(" Micro à l'écoute : citez des gares");
+    const heard = "alors Nation et puis " + "x".repeat(80);
+    const last = render(screen({ listening: true, state: { ...initialTuiState("line"), heard } })).at(-1)!;
+    expect(last).toHaveLength(60);
+    expect(last).toMatch(/^ Micro « …x+ »$/);
   });
 
   it("says when more groups are below", () => {
