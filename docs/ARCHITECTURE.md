@@ -51,9 +51,11 @@ server).
 - `domain/matching.ts`: answer index. A guess matches a full name, or a part of a dashed or
   parenthesised name that only one station has. Prefixes never match.
 - `domain/format.ts`: durations.
+- `domain/geo.ts`: projection to kilometres, map framing and zoom, line paths cut at branch jumps.
 - `features/classic`: classic quiz. `quizReducer` is the state machine
   (idle / running / paused / finished + clock); `selection`, `scores` and `settings` are pure helpers.
 - `features/intersection`: category quiz. `categories.ts` holds categories, targets and suggestions.
+- `features/map`: `StationMap`, a dependency-free SVG map (pan, zoom, labels when zoomed in).
 - `features/auth`: optional login by code (`/api/auth`, users in the untracked `src/data/users.json`).
 - `hooks/useLocalStorageState.ts`: state mirrored in localStorage (scores, player, settings).
 
