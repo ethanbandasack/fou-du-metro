@@ -67,6 +67,9 @@ export function ScoresPanel({ scores, canEdit, onDelete, onClear, onClose }: Sco
                     <span className="text-[10px] font-black uppercase text-accent-foreground bg-accent px-2 py-1">
                       {score.username}
                     </span>
+                    {score.hardcore && (
+                      <span className="text-[10px] font-black uppercase text-white bg-red-600 px-2 py-1">Hardcore</span>
+                    )}
                   </div>
                   <div className="text-[10px] text-foreground/40 font-bold uppercase tracking-tight">
                     {date.toLocaleDateString('fr-FR')} {date.toLocaleTimeString('fr-FR')} •{' '}

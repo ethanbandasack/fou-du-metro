@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { addScore, createScore, MAX_SCORES, parseStoredScores } from "@/features/classic/scores";
 
 const score = (id: string) =>
-  createScore({ id, found: 5, total: 10, elapsedSeconds: 42, modes: ["METRO"], lines: [], username: "ana", date: new Date(0) });
+  createScore({ id, found: 5, total: 10, elapsedSeconds: 42, modes: ["METRO"], lines: [], username: "ana", hardcore: true, date: new Date(0) });
 
 describe("createScore", () => {
   it("computes the rounded percentage and stores the date as ISO text", () => {
@@ -16,6 +16,7 @@ describe("createScore", () => {
       modes: ["METRO"],
       lines: [],
       username: "ana",
+      hardcore: true,
     });
   });
 });

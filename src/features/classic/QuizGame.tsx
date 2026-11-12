@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { BookOpen, Eye, EyeOff, LogIn, LogOut, Map as MapIcon, Settings, Trophy, User as UserIcon } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, Flame, LogIn, LogOut, Map as MapIcon, Settings, Trophy, User as UserIcon } from 'lucide-react';
 import { ToolbarButton } from '@/components/ToolbarButton';
 import { formatDuration } from '@/domain/format';
 import { buildAnswerIndex, findMentionedAnswers, lookupAnswer } from '@/domain/matching';
@@ -18,6 +18,7 @@ import { answersOf, selectLines } from '@/domain/selection';
 import { DEFAULT_SETTINGS, parseStoredSettings, SETTINGS_STORAGE_KEY, type QuizSettings } from '@/features/classic/settings';
 import { StationMap } from '@/features/map/StationMap';
 import { useVoice } from '@/features/voice/useVoice';
+import { useHardcore } from '@/hooks/useHardcore';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 
 export function QuizGame({ lines }: { lines: Line[] }) {
@@ -39,17 +40,18 @@ export function QuizGame({ lines }: { lines: Line[] }) {
     [lines, settings.selectedModes, settings.selectedLines]
   );
   const answers = useMemo(() => answersOf(playLines), [playLines]);
-  const answerIndex = useMemo(() => buildAnswerIndex(answers), [answers]);
+  const [hardcore, setHardcore] = useHardcore();
+  const answerIndex = useMemo(() => buildAnswerIndex(answers, { hardcore }), [answers, hardcore]);
   const namesByKey = useMemo(() => new Map(answers.map(a => [a.key, a.names[0]])), [answers]);
 
   const [quiz, dispatch] = useReducer(quizReducer, answers.length, initialQuizState);
   const isComplete = quiz.total > 0 && quiz.found.length === quiz.total;
   const foundSet = useMemo(() => new Set(quiz.found), [quiz.found]);
 
-  // A new selection starts a new game.
-  const [quizAnswers, setQuizAnswers] = useState(answers);
-  if (quizAnswers !== answers) {
-    setQuizAnswers(answers);
+  // A new selection or a change of difficulty starts a new game.
+  const [quizRules, setQuizRules] = useState({ answers, hardcore });
+  if (quizRules.answers !== answers || quizRules.hardcore !== hardcore) {
+    setQuizRules({ answers, hardcore });
     dispatch({ type: 'reset', total: answers.length });
     setInput('');
   }
@@ -80,10 +82,11 @@ export function QuizGame({ lines }: { lines: Line[] }) {
       modes: settings.selectedModes,
       lines: settings.selectedLines,
       username: player.username,
+      hardcore,
       date: new Date(),
     });
     setScores(prev => addScore(prev, score));
-  }, [quiz, player, settings.selectedModes, settings.selectedLines, setScores]);
+  }, [quiz, player, hardcore, settings.selectedModes, settings.selectedLines, setScores]);
 
   // Line headers stick below this header: expose its height to CSS
   useEffect(() => {
@@ -142,6 +145,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
         />
         <ToolbarButton icon={MapIcon} label="Carte" active={settings.showMap} onClick={() => updateSettings({ showMap: !settings.showMap })} />
         <ToolbarButton icon={BookOpen} label="Solutions" active={showAllAnswers} onClick={() => setShowAllAnswers(!showAllAnswers)} />
+        <ToolbarButton icon={Flame} label="Hardcore" active={hardcore} onClick={() => setHardcore(!hardcore)} />
       </div>
 
       <PlayBar
