@@ -7,7 +7,9 @@ import { getAvailableCategories, MetaCategories } from '@/utils/intersectionUtil
 import { 
   Shuffle
 } from 'lucide-react';
-import { normalizeStationName, fuzzyMatch, simpleNormalize } from '@/utils/metroUtils';
+import { simpleNormalize } from '@/utils/metroUtils';
+import { normalizeName } from '@/domain/names';
+import { buildAnswerIndex, lookupAnswer } from '@/domain/matching';
 
 interface IntersectionQuizProps {
   allStations: Station[];
@@ -35,6 +37,11 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
   const metroOnlyStations = useMemo(() => 
     allStations.filter(s => s.lines.some(l => /^\d+(bis|B)?$/i.test(l))),
     [allStations]
+  );
+
+  const answerIndex = useMemo(
+    () => buildAnswerIndex(metroOnlyStations.map(s => ({ key: s.name, names: s.aliases }))),
+    [metroOnlyStations]
   );
 
   const categories = useMemo(() => 
@@ -152,14 +159,14 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
       const namesToSearch = [s.name, ...(s.aliases || [])];
       return namesToSearch.some(name => {
         const norm1 = simpleNormalize(name);
-        const norm2 = normalizeStationName(name);
+        const norm2 = normalizeName(name);
         return norm1.includes(val) || norm2.includes(val);
       });
     }).sort((a, b) => {
       const normA1 = simpleNormalize(a.name);
-      const normA2 = normalizeStationName(a.name);
+      const normA2 = normalizeName(a.name);
       const normB1 = simpleNormalize(b.name);
-      const normB2 = normalizeStationName(b.name);
+      const normB2 = normalizeName(b.name);
       
       const startsWithA = normA1.startsWith(val) || normA2.startsWith(val);
       const startsWithB = normB1.startsWith(val) || normB2.startsWith(val);
@@ -177,18 +184,13 @@ export function IntersectionQuiz({ allStations }: IntersectionQuizProps) {
     const val = (manualName || searchInput).trim();
     if (!val) return;
 
-    const matchedStation = allStations.find(s => 
-      fuzzyMatch(val, s.name) || (s.aliases && s.aliases.some(a => fuzzyMatch(val, a)))
-    );
+    const newTarget = lookupAnswer(answerIndex, val)
+      .find(name => targetStations.includes(name) && !foundStations.includes(name));
 
-    if (matchedStation && targetStations.includes(matchedStation.name)) {
-      if (!foundStations.includes(matchedStation.name)) {
-        setFoundStations(prev => [...prev, matchedStation.name]);
-        setSearchInput('');
-        setSuggestions([]);
-      } else {
-        triggerError();
-      }
+    if (newTarget) {
+      setFoundStations(prev => [...prev, newTarget]);
+      setSearchInput('');
+      setSuggestions([]);
     } else {
       triggerError();
     }
