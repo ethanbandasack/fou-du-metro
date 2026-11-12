@@ -55,3 +55,28 @@ export function lookupAnswer(index: AnswerIndex, input: string): string[] {
   const partial = index.partial.get(form);
   return partial?.size === 1 ? [...partial] : [];
 }
+
+const MAX_NAME_WORDS = 8;
+
+/**
+ * Keys named anywhere in a spoken sentence, in order. Scans words left to
+ * right and keeps the longest run of words that designates an answer.
+ */
+export function findMentionedAnswers(index: AnswerIndex, transcript: string): string[] {
+  const words = transcript.split(/\s+/).filter(Boolean);
+  const keys: string[] = [];
+  let start = 0;
+  while (start < words.length) {
+    let matched = 0;
+    for (let end = Math.min(words.length, start + MAX_NAME_WORDS); end > start; end--) {
+      const found = lookupAnswer(index, words.slice(start, end).join(" "));
+      if (found.length > 0) {
+        keys.push(...found.filter((key) => !keys.includes(key)));
+        matched = end - start;
+        break;
+      }
+    }
+    start += Math.max(matched, 1);
+  }
+  return keys;
+}

@@ -15,6 +15,8 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
   suburbs, arrondissement, connections, names...).
 - **Carte** (classic mode): a map of the lines in play that fills in as you find stations. Zoom with the
   wheel or buttons, drag to pan; hide it, or hide the gray dots of the stations still to find.
+- **Dictée**: click the microphone or press `Alt+V` (`Option+V` on a Mac) and say station names, several
+  per sentence if you like. Works in browsers with speech recognition (Chrome, Edge, Safari).
 
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 

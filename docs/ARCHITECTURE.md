@@ -56,6 +56,9 @@ server).
   (idle / running / paused / finished + clock); `selection`, `scores` and `settings` are pure helpers.
 - `features/intersection`: category quiz. `categories.ts` holds categories, targets and suggestions.
 - `features/map`: `StationMap`, a dependency-free SVG map (pan, zoom, labels when zoomed in).
+- `features/voice`: `voiceSession.ts` wraps the Web Speech API (restart after silences, errors);
+  `useVoice` + `VoiceControls` plug it into a quiz. `findMentionedAnswers` (matching) extracts every
+  station named in a transcript.
 - `features/auth`: optional login by code (`/api/auth`, users in the untracked `src/data/users.json`).
 - `hooks/useLocalStorageState.ts`: state mirrored in localStorage (scores, player, settings).
 
