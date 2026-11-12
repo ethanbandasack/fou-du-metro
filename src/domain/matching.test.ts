@@ -76,3 +76,30 @@ describe("findMentionedAnswers", () => {
     expect(findMentionedAnswers(index, "")).toEqual([]);
   });
 });
+
+describe("hardcore index", () => {
+  const hardcore = buildAnswerIndex(
+    ["Charles de Gaulle - Étoile", "Saint-Paul (Le Marais)", "Gare de Lyon"].map((name) => ({ key: name, names: [name] })),
+    { hardcore: true },
+  );
+
+  it("accepts the exact name, whatever the case, spaces and punctuation", () => {
+    expect(lookupAnswer(hardcore, "charles de gaulle étoile")).toEqual(["Charles de Gaulle - Étoile"]);
+    expect(lookupAnswer(hardcore, "SAINT PAUL LE MARAIS")).toEqual(["Saint-Paul (Le Marais)"]);
+  });
+
+  it("requires accents, every word and the 'Gare de' prefix", () => {
+    expect(lookupAnswer(hardcore, "charles de gaulle etoile")).toEqual([]);
+    expect(lookupAnswer(hardcore, "Étoile")).toEqual([]);
+    expect(lookupAnswer(hardcore, "Saint-Paul")).toEqual([]);
+    expect(lookupAnswer(hardcore, "Lyon")).toEqual([]);
+    expect(lookupAnswer(hardcore, "gare de lyon")).toEqual(["Gare de Lyon"]);
+  });
+
+  it("still finds several exact names in a spoken sentence", () => {
+    expect(findMentionedAnswers(hardcore, "gare de Lyon puis Saint-Paul le Marais")).toEqual([
+      "Gare de Lyon",
+      "Saint-Paul (Le Marais)",
+    ]);
+  });
+});
