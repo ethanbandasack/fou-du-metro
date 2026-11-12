@@ -13,7 +13,8 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
   `Charles de Gaulle - Étoile`).
 - **Hardcore** (both modes): only the exact name counts. Case, spaces and punctuation are ignored, but
   accents, every word and "Gare de" are required (`Charles de Gaulle Étoile`, not `Étoile`). Spoken, the
-  accents are forgiven: the speech recognizer spells the name, not you.
+  spelling is forgiven (the speech recognizer spells the name, not you), but every word, in order, is
+  still required (`Pont de Levallois Bécon`, not `Bécon`).
 - **Lignes futures** (classic mode): add the lines and extensions under construction (lines 15 to 18,
   tram extensions...), off by default. Stations appear by themselves once their opening date has passed.
 - **Intersection**: find the metro stations matching one or two categories (line, line group, Paris or
@@ -21,7 +22,9 @@ An interactive quiz about the rail network of Île-de-France (Métro, RER, Trans
 - **Carte** (classic mode): a map of the lines in play that fills in as you find stations. Zoom with the
   wheel or buttons, drag to pan; hide it, or hide the gray dots of the stations still to find.
 - **Dictée**: click the microphone or press `Alt+V` (`Option+V` on a Mac) and say station names, several
-  per sentence if you like. Works in browsers with speech recognition (Chrome, Edge, Safari).
+  per sentence if you like. Works in browsers with speech recognition (Chrome, Edge, Safari). Names are
+  matched by sound, so one the recognizer spells its own way (`Invalide`, `Pernetti`, `Corbisart`) still
+  counts; typing is never this lenient.
 
 ### Terminal version
 
@@ -40,7 +43,7 @@ position along the line, branches one after the other. With `--voice` (macOS), t
 transcribed live by Apple's speech recognition and every station named counts as soon as it is heard.
 The first run compiles a small helper (Xcode command line tools: `xcode-select --install`) and macOS asks
 your terminal app for microphone and speech recognition access. The system dictation also works, but it
-types only once you stop talking.
+types only once you stop talking, and its text is matched like typing (exact spelling).
 
 Settings and scores are kept in your browser. Saving scores requires a login code (see `docs/DATA.md`).
 
