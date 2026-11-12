@@ -70,6 +70,13 @@ the two stations. Both ends must be less than 0.01° apart.
 3. Add a corridor only for a walking link between two different zones.
 4. Run `npm test` (the dataset characterization test lists expected counts; update it on purpose).
 
+## Importing official data
+
+`npm run data:import -- --dedupe --remove --add` aligns `src/data/` with IDFM: it merges stations listed
+twice on one line, removes rows IDFM does not list on that line, and adds the missing official stations
+(placed in their line file at the smallest detour, curated columns copied from the same zone or listed
+for review). Review the diff, then update `src/server/loadNetwork.test.ts`.
+
 ## Checking against official data
 
 `npm run data:audit` downloads Île-de-France Mobilités open data and lists stations missing on either
