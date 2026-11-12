@@ -3,7 +3,14 @@ import { parseOptions } from "@/tui/options";
 
 describe("parseOptions", () => {
   it("plays the metro, grouped by line, in color by default", () => {
-    expect(parseOptions([], {})).toEqual({ modes: ["METRO"], lines: [], grouping: "line", color: true, help: false });
+    expect(parseOptions([], {})).toEqual({
+      modes: ["METRO"],
+      lines: [],
+      grouping: "line",
+      color: true,
+      hardcore: false,
+      help: false,
+    });
   });
 
   it("reads modes, lines and grouping (French or English names)", () => {
@@ -13,6 +20,10 @@ describe("parseOptions", () => {
 
   it("plays the whole network with --modes all", () => {
     expect(parseOptions(["--modes", "all"], {}).modes).toEqual([]);
+  });
+
+  it("turns on the hardcore mode", () => {
+    expect(parseOptions(["--hardcore"], {}).hardcore).toBe(true);
   });
 
   it("disables colors with --no-color or NO_COLOR", () => {
