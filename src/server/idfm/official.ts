@@ -24,6 +24,8 @@ export interface OfficialStop {
 
 export interface OfficialLine {
   lineId: string;
+  /** Open; lines announced for later carry placeholder colors. */
+  active: boolean;
   colors: LineColors;
 }
 
@@ -44,6 +46,7 @@ interface LineRecord {
   networkname: string | null;
   colourweb_hexa: string;
   textcolourweb_hexa: string;
+  status: string;
 }
 
 const NAMED_LINES: Record<string, string> = {
@@ -94,9 +97,59 @@ export function parseOfficialLines(records: unknown[]): OfficialLine[] {
     .filter((record) => record.networkname !== "TER")
     .map((record) => ({
       lineId: LINE_IDS[record.shortname_line] ?? normalizeLineId(record.shortname_line),
+      active: record.status === "active",
       colors: {
         background: `#${record.colourweb_hexa.toUpperCase()}`,
         text: `#${record.textcolourweb_hexa.toUpperCase()}`,
       },
     }));
+}
+
+interface ProjectStopRecord {
+  nom_arret: string;
+  res_com: string;
+  id_operati: string;
+  mode: string;
+  variante: string;
+  geo_point_2d: { lon: number; lat: number };
+}
+
+interface ProjectLineRecord {
+  id_operati: string;
+  mes_estime: string | null;
+}
+
+const PROJECT_LINES: [RegExp, (id: string) => { lineId: string; mode: Mode }][] = [
+  [/^METRO (\w+)$/, (id) => ({ lineId: normalizeLineId(id), mode: "METRO" })],
+  [/^TRAM (\w+)$/, (id) => ({ lineId: `T${id}`, mode: "TRAMWAY" })],
+  [/^RER (\w)$/, (id) => ({ lineId: id, mode: "RER" })],
+];
+
+/**
+ * Rail stops of projets_arrets_idf (lines and extensions under construction or planned), with the
+ * estimated opening of their operation (projets_lignes_idf). An estimate already past means a delay:
+ * it moves to the end of the current year.
+ */
+export function parseProjectStops(stops: unknown[], lines: unknown[], today: string): OfficialStop[] {
+  const estimates = new Map<string, string>();
+  for (const line of lines as ProjectLineRecord[]) {
+    if (!line.mes_estime) continue;
+    const date = line.mes_estime.slice(0, 10);
+    const known = estimates.get(line.id_operati);
+    if (!known || date > known) estimates.set(line.id_operati, date);
+  }
+  const byKey = new Map<string, OfficialStop>();
+  for (const stop of stops as ProjectStopRecord[]) {
+    const estimate = estimates.get(stop.id_operati);
+    const pattern = PROJECT_LINES.find(([regex]) => regex.test(stop.res_com));
+    if (stop.mode === "bus" || stop.variante !== "0" || !estimate || !pattern) continue;
+    const [regex, toLine] = pattern;
+    const { lineId, mode } = toLine(regex.exec(stop.res_com)![1]);
+    const openedOn = estimate > today ? estimate : `${today.slice(0, 4)}-12-31`;
+    const key = `${lineId}|${stop.nom_arret.toLowerCase()}`;
+    const known = byKey.get(key);
+    if (known && known.openedOn! <= openedOn) continue;
+    byKey.set(key, { name: stop.nom_arret, lineId, mode, lat: stop.geo_point_2d.lat, lon: stop.geo_point_2d.lon, zdcId: "", zdcName: "", openedOn });
+  }
+  return [...byKey.values()];
 }

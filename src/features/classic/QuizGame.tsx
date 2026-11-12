@@ -175,7 +175,7 @@ export function QuizGame({ lines }: { lines: Line[] }) {
       <div className="pt-6 space-y-6">
         {showSettings && (
           <LineFilter
-            lines={lines}
+            lines={settings.includeFuture ? lines : lines.filter(line => openLines.has(line.id))}
             selectedLines={settings.selectedLines}
             selectedModes={settings.selectedModes}
             onSelectionChange={(selectedLines) => updateSettings({ selectedLines })}

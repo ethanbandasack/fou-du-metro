@@ -5,9 +5,12 @@
  *              (or same name nearby), otherwise left at 0 and listed for review
  *   --remove   drop local rows that have no official counterpart on their line
  *   --dedupe   keep one row per line and transfer zone (a station listed twice under two spellings)
+ *   --projects add stations of lines and extensions under construction (projets_arrets_idf), with
+ *              their estimated opening date and no zone
+ * Sources other than --projects come from emplacement-des-gares-idf.
  * Then run `npm test` (the dataset characterization changes on purpose) and `npm run data:audit`.
  *
- * Usage: npm run data:import -- --add --remove --dedupe
+ * Usage: npm run data:import -- --dedupe --remove --add --projects
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,7 +20,7 @@ import { normalizeLineId } from "@/domain/lines";
 import { normalizeName } from "@/domain/names";
 import { matchRows, missingStops } from "@/server/idfm/audit";
 import { dedupeByZone } from "@/server/idfm/dedupe";
-import { IDFM_API, parseOfficialStops, type OfficialStop } from "@/server/idfm/official";
+import { IDFM_API, parseOfficialStops, parseProjectStops, type OfficialStop } from "@/server/idfm/official";
 import { insertByDetour, orderByDetour } from "@/server/idfm/order";
 import { loadSources } from "@/server/loadNetwork";
 
@@ -43,12 +46,24 @@ function readLineFiles(): LineFile[] {
 const sameLine = (file: LineFile, row: { lineId: string; mode: string }) =>
   normalizeLineId(String(file.data.line)) === row.lineId && file.data.mode.toUpperCase() === row.mode;
 
+async function fetchExport(dataset: string): Promise<unknown[]> {
+  const response = await fetch(`${IDFM_API}/${dataset}/exports/json`);
+  if (!response.ok) throw new Error(`${dataset}: HTTP ${response.status}`);
+  return (await response.json()) as unknown[];
+}
+
 /** Commune and arrondissement (1-20 in Paris, département elsewhere) from geo.api.gouv.fr. */
 async function placeOf(lat: number, lon: number): Promise<{ commune: string; arrondissement: number }> {
-  const get = async (query: string) => {
-    const response = await fetch(`https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lon}&${query}`);
-    if (!response.ok) throw new Error(`geo.api.gouv.fr: HTTP ${response.status}`);
-    return ((await response.json()) as { nom: string; code: string; codeDepartement?: string }[])[0];
+  const get = async (query: string, attempt = 1): Promise<{ nom: string; code: string; codeDepartement?: string }> => {
+    try {
+      const response = await fetch(`https://geo.api.gouv.fr/communes?lat=${lat}&lon=${lon}&${query}`);
+      if (!response.ok) throw new Error(`geo.api.gouv.fr: HTTP ${response.status}`);
+      return ((await response.json()) as { nom: string; code: string; codeDepartement?: string }[])[0];
+    } catch (error) {
+      if (attempt >= 4) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      return get(query, attempt + 1);
+    }
   };
   const commune = await get("fields=nom,codeDepartement");
   if (!commune) throw new Error(`no commune at ${lat},${lon}`);
@@ -59,7 +74,7 @@ async function placeOf(lat: number, lon: number): Promise<{ commune: string; arr
 
 async function newRow(stop: OfficialStop, rows: StopRow[]): Promise<{ row: StopRow; curated: boolean }> {
   const template =
-    rows.find((r) => r.zone === stop.zdcId) ??
+    rows.find((r) => stop.zdcId !== "" && r.zone === stop.zdcId) ??
     rows.find((r) => normalizeName(r.name) === normalizeName(stop.name) && km(r, stop) < 1);
   const place = template ?? (await placeOf(stop.lat, stop.lon));
   const opened = stop.openedOn && stop.openedOn <= today ? stop.openedOn : null;
@@ -88,12 +103,10 @@ async function main() {
   const add = process.argv.includes("--add");
   const remove = process.argv.includes("--remove");
   const dedupe = process.argv.includes("--dedupe");
-  if (!add && !remove && !dedupe) throw new Error("pass --add, --remove and/or --dedupe");
+  const projects = process.argv.includes("--projects");
+  if (!add && !remove && !dedupe && !projects) throw new Error("pass --dedupe, --remove, --add and/or --projects");
 
-  const response = await fetch(`${IDFM_API}/emplacement-des-gares-idf/exports/json`);
-  if (!response.ok) throw new Error(`emplacement-des-gares-idf: HTTP ${response.status}`);
-  const official = parseOfficialStops((await response.json()) as unknown[]);
-
+  const official = add || remove ? parseOfficialStops(await fetchExport("emplacement-des-gares-idf")) : [];
   let { rows } = loadSources();
   const lineFiles = readLineFiles();
   const matches = matchRows(rows, official);
@@ -117,16 +130,17 @@ async function main() {
   }
 
   if (remove) {
-    const unmatched = rows.filter((row) => !matches.has(row));
-    rows = rows.filter((row) => matches.has(row));
+    // Future rows are not in the open-network data: keep them.
+    const unofficial = (row: StopRow) => !matches.has(row) && !(row.opening && row.opening > today);
+    const unmatched = rows.filter(unofficial);
+    rows = rows.filter((row) => !unofficial(row));
     for (const gone of unmatched) {
       dropFromLineFile(gone);
       console.log(`- removed ${gone.lineId} · ${gone.name}`);
     }
   }
 
-  if (add) {
-    const missing = missingStops(rows, official, new Set(matches.values()));
+  const addStops = async (missing: OfficialStop[]) => {
     const added: StopRow[] = [];
     for (const stop of missing) {
       const { row, curated } = await newRow(stop, rows);
@@ -154,6 +168,16 @@ async function main() {
       file.changed = true;
       for (const row of newcomers) row.order = file.data.stations.indexOf(row.name) + 1;
     }
+  };
+
+  if (add) await addStops(missingStops(rows, official, new Set(matches.values())));
+
+  if (projects) {
+    const planned = parseProjectStops(await fetchExport("projets_arrets_idf"), await fetchExport("projets_lignes_idf"), today);
+    // Already on the line: same name, or a station less than 300 m away (current terminus renamed).
+    const onLine = (stop: OfficialStop) =>
+      rows.some((r) => r.lineId === stop.lineId && (normalizeName(r.name) === normalizeName(stop.name) || km(r, stop) < 0.3));
+    await addStops(planned.filter((stop) => !onLine(stop)));
   }
 
   fs.writeFileSync(path.join(DATA, "stations.csv"), formatStationsCsv(rows));

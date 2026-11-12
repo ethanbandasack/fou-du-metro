@@ -35,10 +35,18 @@ function nameSimilarity(local: string, official: string): number {
   return shared / Math.max(1, localWords.size);
 }
 
-/** Pairs each local row with the official stop of the same line that best fits its name and position. */
-export function matchRows(rows: StopRow[], official: OfficialStop[]): Map<StopRow, OfficialStop> {
+/**
+ * Pairs each local row with the official stop of the same line that best fits its name and position.
+ * Future rows are left out: the official data lists open stations only.
+ */
+export function matchRows(
+  rows: StopRow[],
+  official: OfficialStop[],
+  today: string = new Date().toISOString().slice(0, 10),
+): Map<StopRow, OfficialStop> {
   const matches = new Map<StopRow, OfficialStop>();
   for (const row of rows) {
+    if (row.opening && row.opening > today) continue;
     let best: OfficialStop | undefined;
     let bestScore = MIN_MATCH_SCORE;
     for (const stop of official) {
@@ -73,6 +81,7 @@ export function auditNetwork(input: { rows: StopRow[]; official: OfficialStop[];
   const matches = matchRows(rows, official);
   const matched = new Set(matches.values());
   const localLines = new Set(rows.map((row) => row.lineId));
+  const today = new Date().toISOString().slice(0, 10);
 
   const zones = rows.flatMap((row) => {
     const officialZone = matches.get(row)?.zdcId;
@@ -81,15 +90,16 @@ export function auditNetwork(input: { rows: StopRow[]; official: OfficialStop[];
       : [];
   });
 
-  const colors = officialLines.flatMap(({ lineId, colors: expected }) => {
-    if (!localLines.has(lineId)) return [];
+  const colors = officialLines.flatMap(({ lineId, active, colors: expected }) => {
+    if (!active || !localLines.has(lineId)) return [];
     const actual = lineColors(lineId);
     const [local, wanted] = [`${actual.background} / ${actual.text}`, `${expected.background} / ${expected.text}`];
     return local === wanted ? [] : [{ lineId, local, official: wanted }];
   });
 
   return {
-    unmatched: rows.filter((row) => !matches.has(row)).map(({ lineId, name }) => ({ lineId, name })),
+    // Future stations are not in the open-network data yet.
+    unmatched: rows.filter((row) => !matches.has(row) && !(row.opening && row.opening > today)).map(({ lineId, name }) => ({ lineId, name })),
     missing: missingStops(rows, official, matched).map(({ lineId, name }) => ({ lineId, name })),
     zones,
     colors,

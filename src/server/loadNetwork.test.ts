@@ -9,10 +9,10 @@ describe("loadNetwork (real data)", () => {
     network.lines.find((l) => l.id === lineId)?.stops.find((s) => s.name === name);
 
   it("loads every line and stop, one station per official transfer zone", () => {
-    expect(network.lines).toHaveLength(55);
-    expect(network.lines.flatMap((l) => l.stops)).toHaveLength(1283);
-    // Every row has an official zone: one station per zone
-    expect(network.stations).toHaveLength(999);
+    expect(network.lines).toHaveLength(58);
+    expect(network.lines.flatMap((l) => l.stops)).toHaveLength(1422);
+    // 999 official zones (open network) + 78 stations of lines under construction
+    expect(network.stations).toHaveLength(1077);
   });
 
   it("orders stops along the line and lists the lines of the zone, then across corridors", () => {
@@ -30,5 +30,10 @@ describe("loadNetwork (real data)", () => {
     expect(saintLazare).toMatchObject({ lines: ["3", "12", "13", "14", "J", "L", "TER Normandie"], hasRer: true });
     const metroStations = new Set(network.stations.filter((s) => s.lines.some(isMetroLine)).map((s) => s.name));
     expect(["Gare du Nord", "La Chapelle", "Abbesses", "Anvers", "Le Peletier", "Notre-Dame-de-Lorette"].filter((n) => !metroStations.has(n))).toEqual([]);
+  });
+
+  it("links stations under construction to the open ones", () => {
+    expect(stop("9", "Pont de Sèvres")?.connections).toContain("15");
+    expect(stop("14", "Saint-Denis - Pleyel")?.connections).toEqual(expect.arrayContaining(["15", "16", "17"]));
   });
 });

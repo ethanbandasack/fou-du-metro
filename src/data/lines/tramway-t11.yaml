@@ -1,6 +1,10 @@
 line: T11
 mode: TRAMWAY
 stations:
+- Sartrouville
+- Sartrouville Val-Notre-Dame
+- Val d'Argenteuil
+- Argenteuil
 - Épinay-sur-Seine
 - Épinay - Villetaneuse
 - Villetaneuse - Université
@@ -8,3 +12,6 @@ stations:
 - Stains la Cerisaie
 - Dugny - La Courneuve
 - Le Bourget
+- Drancy-Bobigny
+- Bobigny - La Folie
+- Noisy-le-Sec

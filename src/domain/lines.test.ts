@@ -83,3 +83,11 @@ describe("lineShortId", () => {
     expect(lineShortId(id)).toBe(expected);
   });
 });
+
+describe("lines under construction", () => {
+  it("use the colors of the IDFM project data", () => {
+    expect(lineColors("15")).toEqual({ background: "#A50034", text: "#FFFFFF" });
+    expect(lineColors("16")).toEqual({ background: "#FF82B4", text: "#000000" });
+    expect(lineColors("17")).toEqual({ background: "#D2D200", text: "#000000" });
+  });
+});

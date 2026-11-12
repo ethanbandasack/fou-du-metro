@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { StopRow } from "@/domain/csv";
-import { auditNetwork, formatAudit } from "@/server/idfm/audit";
+import { auditNetwork, formatAudit, matchRows } from "@/server/idfm/audit";
 import type { OfficialStop } from "@/server/idfm/official";
 
 const row = (name: string, lineId: string, lat = 48.85, lon = 2.35, zone = ""): StopRow => ({
@@ -37,6 +37,17 @@ describe("auditNetwork", () => {
     expect(audit(rows, officialStops).missing).toEqual([]);
   });
 
+  it("does not expect future stations in the official open data", () => {
+    const future = { ...row("Bagneux", "15"), opening: "2099-12-31" };
+    expect(audit([future], []).unmatched).toEqual([]);
+  });
+
+  it("never pairs a future station with an open one nearby", () => {
+    const future = { ...row("Champarons", "T1", 48.9284, 2.2700), opening: "2099-12-31" };
+    expect(audit([future], [official("Asnières Quatre Routes", "T1", "z1", 48.9273, 2.2743)]).zones).toEqual([]);
+    expect(matchRows([future], [official("Asnières Quatre Routes", "T1", "z1", 48.9273, 2.2743)]).size).toBe(0);
+  });
+
   it("reports rows whose stored zone differs from the official one", () => {
     const rows = [row("Châtelet", "1", 48.85, 2.35, "old"), row("Châtelet", "4", 48.85, 2.35, "z1")];
     const officialStops = [official("Châtelet", "1", "z1"), official("Châtelet", "4", "z1")];
@@ -45,8 +56,8 @@ describe("auditNetwork", () => {
 
   it("reports colors that differ from the official ones, for local lines only", () => {
     const result = audit([row("Nation", "1")], [official("Nation", "1", "z1")], [
-      { lineId: "1", colors: { background: "#123456", text: "#FFFFFF" } },
-      { lineId: "18", colors: { background: "#00A092", text: "#FFFFFF" } },
+      { lineId: "1", active: true, colors: { background: "#123456", text: "#FFFFFF" } },
+      { lineId: "18", active: true, colors: { background: "#00A092", text: "#FFFFFF" } },
     ] as never);
     expect(result.colors).toEqual([{ lineId: "1", local: "#FFBE00 / #000000", official: "#123456 / #FFFFFF" }]);
   });
@@ -58,5 +69,16 @@ describe("formatAudit", () => {
     expect(text).toContain("Gares officielles absentes localement : 1");
     expect(text).toContain("- 18 · Polytechnique");
     expect(text).toContain("Zones de correspondance à mettre à jour : 0");
+  });
+});
+
+describe("colors of lines not open yet", () => {
+  it("are not compared: the referential holds placeholders for them", () => {
+    const result = auditNetwork({
+      rows: [row("Bagneux", "15")],
+      official: [],
+      officialLines: [{ lineId: "15", active: false, colors: { background: "#AAAAAA", text: "#000000" } }],
+    });
+    expect(result.colors).toEqual([]);
   });
 });

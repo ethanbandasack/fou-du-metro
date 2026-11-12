@@ -16,6 +16,8 @@ API v2.1, no key, updated daily. Whole datasets download as JSON from
 | `zones-de-correspondance` | official transfer zones (ZdC): stops in one zone are one interchange | `zdcid`, `zdcname`, `zdctown` (commune, or "Paris 11e"), `zdcpostalregion` (INSEE code, 751xx in Paris) |
 | `referentiel-des-lignes` | every line with its official colors and status | `shortname_line`, `transportmode`, `colourweb_hexa`, `textcolourweb_hexa`, `status` |
 | `arrets-lignes` | every stop served by every line (all modes, 72k records) | `stop_name`, `route_long_name`, `mode`, `nom_commune`, `code_insee` |
+| `projets_lignes_idf` | lines and extensions under construction or planned, by operation | `res_com`, `operation`, `statut`, `mes_estime` (estimated opening), `rvb` (color) |
+| `projets_arrets_idf` | their stops | `nom_arret`, `res_com`, `id_operati`, `variante`, `geo_point_2d` |
 | `offre-horaires-tc-gtfs-idfm` ([PRIM](https://prim.iledefrance-mobilites.fr/en/jeux-de-donnees/offre-horaires-tc-gtfs-idfm)) | full GTFS timetable | `stop_times` sequences give line order (branches included); `transfers.txt` gives walking transfers, also between zones |
 
 Notes:
@@ -62,6 +64,8 @@ differences.
 3. **Connections** (done): stations are grouped by official transfer zone (`zone` column, filled by
    `npm run data:zones`), `corridors.json` keeps the hand-curated links between zones, and the hand-set
    `has_rer` / `has_tram` flags are gone. Next: cross-check corridors with GTFS `transfers.txt`.
-4. **Later**: regenerate `stations.csv` from `emplacement-des-gares-idf` (names, coordinates, commune
+4. **Lines under construction** (done): `npm run data:import -- --projects` adds lines 15 to 18 and the
+   tram and RER extensions with their estimated opening dates (off by default in the game).
+5. **Later**: regenerate `stations.csv` from `emplacement-des-gares-idf` (names, coordinates, commune
    from the ZdC, opening date) with the hand-curated columns kept in an overrides file; derive line order
    from GTFS stop sequences; derive `figure_historique` from Wikidata.
