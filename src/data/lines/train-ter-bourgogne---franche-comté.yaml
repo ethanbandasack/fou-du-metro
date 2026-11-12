@@ -3,9 +3,12 @@ mode: TRAIN
 stations:
 - Paris-Bercy Bourgogne - Pays d'Auvergne
 - Gare de Lyon
-- Gare d'Austerlitz
-- Juvisy
+- Melun
+- Bois-le-Roi
+- Fontainebleau Avon
 - Champagne-sur-Seine
+- Moret-Veneux-les-Sablons
+- Saint-Mammès
 - Montereau
 - Villeneuve-la-Guyard
 - Champigny-sur-Yonne
