@@ -39,6 +39,9 @@ export function initialTuiState(grouping: Grouping): TuiState {
   return { input: "", found: [], lastFound: [], grouping, scroll: 0, feedback: "", heard: "" };
 }
 
+/** Enough words for the longest name and what came just before it. */
+const RECENT_WORDS = 24;
+
 const record = (state: TuiState, fresh: string[]): TuiState => ({
   ...state,
   input: "",
@@ -69,7 +72,9 @@ export function tuiReducer(state: TuiState, action: TuiAction, indexes: TuiIndex
     case "paste":
       return paste(state, state.input + action.text, indexes.typed);
     case "hear": {
-      const fresh = findMentionedAnswers(indexes.spoken, action.transcript).filter((key) => !state.found.includes(key));
+      // Earlier words were read with earlier transcripts.
+      const recent = action.transcript.split(/\s+/).slice(-RECENT_WORDS).join(" ");
+      const fresh = findMentionedAnswers(indexes.spoken, recent).filter((key) => !state.found.includes(key));
       const heard = { ...state, heard: action.transcript };
       return fresh.length === 0 ? heard : { ...heard, found: [...state.found, ...fresh], lastFound: fresh, feedback: "" };
     }

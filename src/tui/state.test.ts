@@ -66,6 +66,10 @@ describe("tuiReducer", () => {
     expect(run([heard("porte de vanve")]).found).toEqual(["vanves"]);
   });
 
+  it("reads the end of a long transcript", () => {
+    expect(run([heard(`${"bla ".repeat(500)}Nation`)]).found).toEqual(["nation"]);
+  });
+
   it("finds stations heard among other words, leaving the typed input alone", () => {
     const state = run([...typed("bas"), { type: "hear", transcript: "euh Nation" }]);
     expect(state).toMatchObject({ input: "bas", heard: "euh Nation", found: ["nation"], lastFound: ["nation"] });
